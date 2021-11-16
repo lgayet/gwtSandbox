@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  When updating your version of GWT, you should also update this DTD reference,
+  so that your app can take advantage of the latest GWT module capabilities.
+-->
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.9.0//EN"
+  "http://gwtproject.org/doctype/2.9.0/gwt-module.dtd">
+<module rename-to='test'>
+  <!-- Inherit our applications main module.                      -->
+  <inherits name='com.example.gwt.sandbox.Test'/>
+
+  <!-- Specify the path to any remote services.                   -->
+  <servlet path="/test/greet" class="com.example.gwt.sandbox.server.GreetingServiceImpl" />
+
+</module>

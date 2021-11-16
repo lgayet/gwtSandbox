@@ -1,0 +1,17 @@
+.section-hide {
+  display: none;
+}
+
+.section-show {
+  display: block;
+}
+
+.section-button {
+  border:none;
+  background:none;
+  color: blue;
+}
+
+.section {
+  padding:0 0 0 20px;
+}
