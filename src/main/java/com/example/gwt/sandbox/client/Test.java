@@ -19,20 +19,6 @@ import com.google.gwt.user.client.ui.*;
  */
 public class Test implements EntryPoint {
 
-  private static final String TEMPLATE_SECTION_STR =
-    "<div>" +
-      "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection('{0}', true)\" title=\"Ouvrir {1}\"> <b>{1}</b> &#9660; </button>\n" +
-      "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection('{0}', false)\" title=\"Fermer {1}\"> <b>Section 1</b> &#9650; </button>\n" +
-      "<div id=\"{0}\" class=\"section\" style=\"display:none;\">" +
-      "<br>{2}<br>" +
-      "</div>" +
-    "</div>";
-
-  /*interface TemplateSection extends SafeHtmlTemplates {
-    @Template(TEMPLATE_SECTION_STR)
-    SafeHtml create(String identifiantSection, String texteSection, String contenuSection);
-  }*/
-
   /**
    * The message displayed to the user when the server cannot be reached or
    * returns an error.
@@ -107,9 +93,17 @@ public class Test implements EntryPoint {
     SafeHtml safeHtml = SafeHtmlUtils.fromSafeConstant(html);
 
     //safeHtml = TEMPLATE_SECTION.create("Section1", "Section 1", "contenu de la section 1");
+    greetingService.transformHtmlWithSection(null, new AsyncCallback<String>() {
+      @Override
+      public void onFailure(Throwable throwable) {}
 
-    HTMLPanel htmlPanel = new HTMLPanel(safeHtml);
-    RootPanel.get("htmlPanelContainer").add(htmlPanel);
+      @Override
+      public void onSuccess(String html) {
+        HTMLPanel htmlPanel = new HTMLPanel(html);
+        RootPanel.get("htmlPanelContainer").add(htmlPanel);
+      }
+    });
+
 
     // Create the popup dialog box
     final DialogBox dialogBox = new DialogBox();
