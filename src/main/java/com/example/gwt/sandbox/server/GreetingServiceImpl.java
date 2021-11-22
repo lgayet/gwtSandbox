@@ -14,6 +14,8 @@ import java.util.UUID;
 @SuppressWarnings("serial")
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 
+    private final GestionSectionService gestionSectionService;
+
     private static final String TEMPLATE_SECTION =
         "<div>" +
             "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection(''{0}'', true)\" title=\"Ouvrir {1}\"> <b>{1}</b> &#9660; </button>\n" +
@@ -26,6 +28,10 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
                 "{3}" +
             "</div>" +
         "</div>";
+
+    public GreetingServiceImpl() {
+        this.gestionSectionService = new GestionSectionService();
+    }
 
     public String greetServer(String input) throws IllegalArgumentException {
         // Verify that the input is valid.
@@ -49,21 +55,7 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
     @Override
     public String transformHtmlWithSection(String html) {
-        return createSection(
-                "Section 1",
-                "Le contenu de la première section",
-                createSection("Section 1.1",
-                        "Le contenu de la section 1.1"),
-                createSection("Section 1.2",
-                        "Le contenu de la section 1.2"));
-    }
-
-    private String createSection(String titre, String contenu, String... sectionsEnfants) {
-        return MessageFormat.format(TEMPLATE_SECTION,
-                "section" + UUID.randomUUID(),
-                titre,
-                contenu,
-                Joiner.on("<br>").join(sectionsEnfants));
+        return gestionSectionService.transformHtml(html);
     }
 
     /**
