@@ -74,11 +74,19 @@ public class GestionSectionService {
 
     public String transformHtml(String html) throws IOException, SAXException {
 
-        //Lecture du html
-        Document doc = db.parse(new InputSource(new StringReader(html)));
+        // Traitement du html pour qu'il soit lu comme du XML correct
+        String htmlNormalise = html
+                .replaceAll("<br>", "<br/>")
+                .replaceAll("&lt;", "<")
+                .replaceAll("&gt;", ">");
+
+        htmlNormalise = "<html>" + htmlNormalise + "</html>";
+
+        // Lecture du html
+        Document doc = db.parse(new InputSource(new StringReader(htmlNormalise)));
         doc.getDocumentElement().normalize();
 
-        List<Section> sections = parserSectionsEnfant(doc.getChildNodes());
+        List<Section> sections = parserSectionsEnfant(doc.getChildNodes().item(0).getChildNodes());
 
         /*sections =
             Arrays.asList(
@@ -100,6 +108,9 @@ public class GestionSectionService {
         return Section.write(sections);
     }
 
+    /**
+     * Permet de récupérer toutes les sections enfant d'une liste de noeud
+     */
     private static List<Section> parserSectionsEnfant(NodeList list) {
         List<Section> sections = new ArrayList<>();
         for (int i = 0; i < list.getLength(); i++) {
@@ -115,6 +126,10 @@ public class GestionSectionService {
         return sections;
     }
 
+    /**
+     * Permet de ne récupérer que le contenu de type texte du noeud courant
+     * sans le contenu des noeuds enfant
+     */
     private static String getFirstLevelTextContent(Node node) {
         NodeList list = node.getChildNodes();
         StringBuilder textContent = new StringBuilder();

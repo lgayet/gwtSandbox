@@ -19,12 +19,20 @@ import com.google.gwt.user.client.ui.*;
 public class Test implements EntryPoint {
 
   private static final String HTML =
-    "<section titre=\"section1\">" +
-      "contenu section 1" +
-      "<section titre=\"section1.1\">" +
-        "contenu section 1.1" +
-      "</section>" +
-    "</section>";
+    "<html>" +
+    "&lt;section titre=\"section 1\"&gt;<br>" +
+      "contenu section 1 <br>" +
+      "&lt;section titre=\"section 1.1\"&gt;<br>" +
+        "contenu section 1.1<br>" +
+      "&lt;/section&gt;<br>" +
+    "&lt;/section&gt;<br>" +
+    "&lt;section titre=\"section 2\"&gt;<br>" +
+      "contenu section 2<br>" +
+      "&lt;section titre=\"section 2.1\"&gt;<br>" +
+        "contenu section 2.1<br>" +
+      "&lt;/section&gt;<br>" +
+    "&lt;/section&gt;<br>" +
+    "</html>";
 
   /**
    * The message displayed to the user when the server cannot be reached or
@@ -72,7 +80,7 @@ public class Test implements EntryPoint {
     toolbar.setWidth("100%");
 
     // Add the components to a panel
-    Grid grid = new Grid(2, 10);
+    Grid grid = new Grid(2, 20);
     grid.setStyleName("cw-RichText");
     grid.setWidget(0, 0, toolbar);
     grid.setWidget(1, 0, area);
