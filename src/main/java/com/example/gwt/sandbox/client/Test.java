@@ -1,5 +1,6 @@
 package com.example.gwt.sandbox.client;
 
+import com.example.gwt.sandbox.client.richtext.RichTextToolbar;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -8,8 +9,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.safehtml.client.SafeHtmlTemplates;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
@@ -18,6 +17,14 @@ import com.google.gwt.user.client.ui.*;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Test implements EntryPoint {
+
+  private static final String HTML =
+    "<section titre=\"section1\">" +
+      "contenu section 1" +
+      "<section titre=\"section1.1\">" +
+        "contenu section 1.1" +
+      "</section>" +
+    "</section>";
 
   /**
    * The message displayed to the user when the server cannot be reached or
@@ -57,7 +64,7 @@ public class Test implements EntryPoint {
     nameField.selectAll();
 
     // Create the text area and toolbar
-    /*RichTextArea area = new RichTextArea();
+    RichTextArea area = new RichTextArea();
     area.ensureDebugId("cwRichText-area");
     area.setSize("100%", "14em");
     RichTextToolbar toolbar = new RichTextToolbar(area);
@@ -65,45 +72,13 @@ public class Test implements EntryPoint {
     toolbar.setWidth("100%");
 
     // Add the components to a panel
-    Grid grid = new Grid(2, 1);
+    Grid grid = new Grid(2, 10);
     grid.setStyleName("cw-RichText");
     grid.setWidget(0, 0, toolbar);
     grid.setWidget(1, 0, area);
-    RootPanel.get("richTextContainer").add(grid);*/
+    RootPanel.get("richTextContainer").add(grid);
 
-    String html =
-              "<div>" +
-                "<button id=\"Section1Show\" class=\"section-button\" onclick=\"showAndHideSection('Section1', true)\" title=\"Ouvrir la section 1\"> <b>Section 1</b> &#9660; </button>\n" +
-                "<button id=\"Section1Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection('Section1', false)\" title=\"Fermer la section 1\"> <b>Section 1</b> &#9650; </button>\n" +
-                "<div id=\"Section1\" class=\"section\" style=\"display:none;\">" +
-                    "<br>Le texte de la section 1<br>" +
-                    "<div>" +
-                      "<button id=\"Section11Show\" class=\"section-button\" onclick=\"showAndHideSection('Section11', true)\" title=\"Ouvrir la section 1.1\"> <b>Section 1.1</b> &#9660; </button>\n" +
-                      "<button id=\"Section11Hide\" class=\"section-button\" style=\"display:none;\"  onclick=\"showAndHideSection('Section11', false)\" title=\"Fermer la section 1.1\"> <b>Section 1.1</b> &#9650; </button>\n" +
-                      "<div id=\"Section11\" class=\"section\" style=\"display:none;\"><br>Le texte de la section 1.1<br></div>" +
-                    "</div>" +
-                    "<div>" +
-                      "<button id=\"Section12Show\" class=\"section-button\" onclick=\"showAndHideSection('Section12', true)\"> <b>Section 1.2</b> &#9660; </button>\n" +
-                      "<button id=\"Section12Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection('Section12', false)\"> <b>Section 1.2</b> &#9650; </button>\n" +
-                      "<div id=\"Section12\" class=\"section\" style=\"display:none;\"><br>Le texte de la section 1.2<br></div>" +
-                    "</div>" +
-                "</div>" +
-              "</div>";
-
-    SafeHtml safeHtml = SafeHtmlUtils.fromSafeConstant(html);
-
-    //safeHtml = TEMPLATE_SECTION.create("Section1", "Section 1", "contenu de la section 1");
-    greetingService.transformHtmlWithSection(null, new AsyncCallback<String>() {
-      @Override
-      public void onFailure(Throwable throwable) {}
-
-      @Override
-      public void onSuccess(String html) {
-        HTMLPanel htmlPanel = new HTMLPanel(html);
-        RootPanel.get("htmlPanelContainer").add(htmlPanel);
-      }
-    });
-
+    area.setHTML(HTML);
 
     // Create the popup dialog box
     final DialogBox dialogBox = new DialogBox();
@@ -125,12 +100,10 @@ public class Test implements EntryPoint {
     dialogBox.setWidget(dialogVPanel);
 
     // Add a handler to close the DialogBox
-    closeButton.addClickHandler(new ClickHandler() {
-      public void onClick(ClickEvent event) {
-        dialogBox.hide();
-        sendButton.setEnabled(true);
-        sendButton.setFocus(true);
-      }
+    closeButton.addClickHandler(event -> {
+      dialogBox.hide();
+      sendButton.setEnabled(true);
+      sendButton.setFocus(true);
     });
 
     // Create a handler for the sendButton and nameField
@@ -140,6 +113,17 @@ public class Test implements EntryPoint {
        */
       public void onClick(ClickEvent event) {
         sendNameToServer();
+
+        greetingService.transformHtmlWithSection(area.getHTML(), new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable throwable) {}
+
+          @Override
+          public void onSuccess(String html) {
+            HTMLPanel htmlPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html));
+            RootPanel.get("htmlPanelContainer").add(htmlPanel);
+          }
+        });
       }
 
       /**

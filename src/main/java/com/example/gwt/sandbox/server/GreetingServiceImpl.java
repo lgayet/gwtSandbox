@@ -4,7 +4,11 @@ import com.example.gwt.sandbox.client.GreetingService;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.google.gwt.thirdparty.guava.common.base.Joiner;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import org.apache.commons.lang3.StringUtils;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.UUID;
 
@@ -15,19 +19,6 @@ import java.util.UUID;
 public class GreetingServiceImpl extends RemoteServiceServlet implements GreetingService {
 
     private final GestionSectionService gestionSectionService;
-
-    private static final String TEMPLATE_SECTION =
-        "<div>" +
-            "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection(''{0}'', true)\" title=\"Ouvrir {1}\"> <b>{1}</b> &#9660; </button>\n" +
-            "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection(''{0}'', false)\" title=\"Fermer {1}\"> <b>{1}</b> &#9650; </button>\n" +
-            "<div id=\"{0}\" class=\"section\" style=\"display:none;\">" +
-                "<br>" +
-                "{2}" +
-                "<br>" +
-                "<br>" +
-                "{3}" +
-            "</div>" +
-        "</div>";
 
     public GreetingServiceImpl() {
         this.gestionSectionService = new GestionSectionService();
@@ -55,7 +46,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
     @Override
     public String transformHtmlWithSection(String html) {
-        return gestionSectionService.transformHtml(html);
+        try {
+            return gestionSectionService.transformHtml(html);
+        } catch (IOException | SAXException e) {
+            e.printStackTrace();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**

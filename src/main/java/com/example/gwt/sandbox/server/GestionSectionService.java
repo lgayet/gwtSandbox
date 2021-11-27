@@ -1,14 +1,24 @@
 package com.example.gwt.sandbox.server;
 
 import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class GestionSectionService {
+
+    private static final String SECTION = "section";
 
     private static final String TEMPLATE_SECTION =
         "<div>" +
@@ -21,6 +31,8 @@ public class GestionSectionService {
                 "{3}" +
             "</div>" +
         "</div>";
+
+    private DocumentBuilder db;
 
     private static class Section {
         private final String titre;
@@ -52,9 +64,23 @@ public class GestionSectionService {
         }
     }
 
-    public String transformHtml(String html) {
+    public GestionSectionService() {
+        try {
+            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+    }
 
-        List<Section> sections =
+    public String transformHtml(String html) throws IOException, SAXException {
+
+        //Lecture du html
+        Document doc = db.parse(new InputSource(new StringReader(html)));
+        doc.getDocumentElement().normalize();
+
+        List<Section> sections = parserSectionsEnfant(doc.getChildNodes());
+
+        /*sections =
             Arrays.asList(
                 new Section(
                     "Section 1",
@@ -69,8 +95,35 @@ public class GestionSectionService {
                             )
                     )
                 ),
-                new Section("Section 2", "du texte, encore du texte"));
+                new Section("Section 2", "du texte, encore du texte"));*/
 
         return Section.write(sections);
+    }
+
+    private static List<Section> parserSectionsEnfant(NodeList list) {
+        List<Section> sections = new ArrayList<>();
+        for (int i = 0; i < list.getLength(); i++) {
+            Node node = list.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(SECTION)) {
+                Element element = (Element) node;
+                sections.add(
+                    new Section(
+                        ((Element)node).getAttribute("titre"),
+                        getFirstLevelTextContent(node),
+                        parserSectionsEnfant(node.getChildNodes())));
+            }
+        }
+        return sections;
+    }
+
+    private static String getFirstLevelTextContent(Node node) {
+        NodeList list = node.getChildNodes();
+        StringBuilder textContent = new StringBuilder();
+        for (int i = 0; i < list.getLength(); ++i) {
+            Node child = list.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE)
+                textContent.append(child.getTextContent());
+        }
+        return textContent.toString();
     }
 }
