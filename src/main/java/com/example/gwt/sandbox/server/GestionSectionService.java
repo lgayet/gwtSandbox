@@ -105,10 +105,9 @@ public class GestionSectionService {
         for (int i = 0; i < list.getLength(); i++) {
             Node node = list.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(SECTION)) {
-                Element element = (Element) node;
                 sections.add(
                     new Section(
-                        ((Element)node).getAttribute("titre"),
+                        ((Element) node).getAttribute("titre"),
                         getFirstLevelTextContent(node),
                         parserSectionsEnfant(node.getChildNodes())));
             }
