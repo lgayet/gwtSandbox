@@ -25,9 +25,7 @@ public class GestionSectionService {
             "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection(''{0}'', true)\" title=\"Ouvrir {1}\"> <b>{1}</b> &#9660; </button>\n" +
             "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection(''{0}'', false)\" title=\"Fermer {1}\"> <b>{1}</b> &#9650; </button>\n" +
             "<div id=\"{0}\" class=\"section\" style=\"display:none;\">" +
-                "<br>" +
                 "{2}" +
-                "<br>" +
                 "{3}" +
             "</div>" +
         "</div>";
@@ -77,67 +75,70 @@ public class GestionSectionService {
         // Traitement du html pour qu'il soit lu comme du XML correct
         String htmlNormalise = html
                 .replaceAll("<br>", "<br/>")
+                .replaceAll("<br/></div><div>", "<br/>")
+                .replaceAll("</div><div>", "<br/>")
+                .replaceAll("<div>", "")
+                .replaceAll("</div>", "")
                 .replaceAll("&lt;", "<")
-                .replaceAll("&gt;", ">");
+                .replaceAll("&gt;", ">")
+                .replaceAll("&nbsp;", "")
+                .replaceAll("<br/><" + SECTION, "<" + SECTION);
 
-        htmlNormalise = "<html>" + htmlNormalise + "</html>";
+        if (!htmlNormalise.startsWith("<html>"))
+            htmlNormalise = "<html>" + htmlNormalise + "</html>";
 
         // Lecture du html
         Document doc = db.parse(new InputSource(new StringReader(htmlNormalise)));
         doc.getDocumentElement().normalize();
 
-        List<Section> sections = parserSectionsEnfant(doc.getChildNodes().item(0).getChildNodes());
+        // Recherche des sections sur le premier niveau uniquement
+        List<Section> sections = parserSectionsEnfant(doc.getDocumentElement().getChildNodes());
 
-        /*sections =
-            Arrays.asList(
-                new Section(
-                    "Section 1",
-                    "Le contenu de la première section",
-                    Arrays.asList(
-                            new Section("Section 1.1","Le contenu de la section 1.1"),
-                            new Section("Section 1.2",
-                                    "Le contenu de la section 1.2",
-                                    Arrays.asList(
-                                            new Section("Section 1.2.1", "Le contenu de la section 1.2.1"),
-                                            new Section("Section 1.2.1", "Le contenu de la section 1.2.2"))
-                            )
-                    )
-                ),
-                new Section("Section 2", "du texte, encore du texte"));*/
-
-        return Section.write(sections);
+        // Réécriture du html avec remplacement des sections
+        return "<html>" + getTexteJusquaPremiereBaliseSection(doc.getDocumentElement()) + Section.write(sections) + "</html>";
     }
 
     /**
      * Permet de récupérer toutes les sections enfant d'une liste de noeud
      */
-    private static List<Section> parserSectionsEnfant(NodeList list) {
+    private static List<Section> parserSectionsEnfant(NodeList nodes) {
         List<Section> sections = new ArrayList<>();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node node = list.item(i);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
             if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(SECTION)) {
                 sections.add(
                     new Section(
-                        ((Element) node).getAttribute("titre"),
-                        getFirstLevelTextContent(node),
-                        parserSectionsEnfant(node.getChildNodes())));
+                            ((Element) node).getAttribute("titre"),
+                            // On supprime le premier saut de ligne car il est remplacé par une balise div
+                            getTexteJusquaPremiereBaliseSection_sansPremierRetourALaLigne(node),
+                            parserSectionsEnfant(node.getChildNodes())));
             }
         }
         return sections;
     }
 
     /**
-     * Permet de ne récupérer que le contenu de type texte du noeud courant
-     * sans le contenu des noeuds enfant
+     * Permet de récupérer le texte concaténé element par element jusqu'au premier element section trouvé
      */
-    private static String getFirstLevelTextContent(Node node) {
+    private static String getTexteJusquaPremiereBaliseSection(Node node) {
         NodeList list = node.getChildNodes();
         StringBuilder textContent = new StringBuilder();
-        for (int i = 0; i < list.getLength(); ++i) {
+        for (int i = 0; i < list.getLength(); i++) {
             Node child = list.item(i);
             if (child.getNodeType() == Node.TEXT_NODE)
                 textContent.append(child.getTextContent());
+            if (child.getNodeType() == Node.ELEMENT_NODE) {
+                if (!child.getNodeName().equals(SECTION))
+                    textContent.append("<").append(child.getNodeName()).append(">");
+                else
+                    break;
+            }
         }
         return textContent.toString();
+    }
+
+    private static String getTexteJusquaPremiereBaliseSection_sansPremierRetourALaLigne(Node node) {
+        String texte = getTexteJusquaPremiereBaliseSection(node);
+        return texte.startsWith("<br>") ? texte.substring(4) : texte;
     }
 }

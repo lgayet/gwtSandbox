@@ -80,13 +80,10 @@ public class Test implements EntryPoint {
     toolbar.setWidth("100%");
 
     // Add the components to a panel
-    Grid grid = new Grid(2, 20);
-    grid.setStyleName("cw-RichText");
-    grid.setWidget(0, 0, toolbar);
-    grid.setWidget(1, 0, area);
-    RootPanel.get("richTextContainer").add(grid);
-
+    RootPanel.get("richTextContainer").add(area);
     area.setHTML(HTML);
+
+    RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));
 
     // Create the popup dialog box
     final DialogBox dialogBox = new DialogBox();
@@ -128,8 +125,8 @@ public class Test implements EntryPoint {
 
           @Override
           public void onSuccess(String html) {
-            HTMLPanel htmlPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html));
-            RootPanel.get("htmlPanelContainer").add(htmlPanel);
+            RootPanel.get("htmlPanelContainer").remove(0);
+            RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html)));
           }
         });
       }
