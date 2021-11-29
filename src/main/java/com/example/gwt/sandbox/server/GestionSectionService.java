@@ -72,6 +72,9 @@ public class GestionSectionService {
 
     public String transformHtml(String html) throws IOException, SAXException {
 
+        if (!html.contains("&lt;" + SECTION))
+            return html;
+
         // Traitement du html pour qu'il soit lu comme du XML correct
         String htmlNormalise = html
                 .replaceAll("<br>", "<br/>")
