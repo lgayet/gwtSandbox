@@ -20,15 +20,15 @@ public class Test implements EntryPoint {
 
   private static final String HTML =
     "<html>" +
-    "&lt;section titre=\"section 1\"&gt;<br>" +
+    "&lt;section section 1&gt;<br>" +
       "contenu section 1 <br>" +
-      "&lt;section titre=\"section 1.1\"&gt;<br>" +
+      "&lt;section section 1.1&gt;<br>" +
         "contenu section 1.1<br>" +
       "&lt;/section&gt;<br>" +
     "&lt;/section&gt;<br>" +
-    "&lt;section titre=\"section 2\"&gt;<br>" +
+    "&lt;section section 2&gt;<br>" +
       "contenu section 2<br>" +
-      "&lt;section titre=\"section 2.1\"&gt;<br>" +
+      "&lt;section section 2.1&gt;<br>" +
         "contenu section 2.1<br>" +
       "&lt;/section&gt;<br>" +
     "&lt;/section&gt;<br>" +

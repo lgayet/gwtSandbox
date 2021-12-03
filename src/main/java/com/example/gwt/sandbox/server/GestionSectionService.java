@@ -1,24 +1,20 @@
 package com.example.gwt.sandbox.server;
 
 import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
-import java.io.StringReader;
 import java.text.MessageFormat;
 import java.util.*;
+
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class GestionSectionService {
 
     private static final String SECTION = "section";
+    private static final String BALISE_OUVRANTE_SECTION = "&lt;" + SECTION + " ";
+    private static final String BALISE_FERMANTE = "&gt;";
+    private static final String BALISE_FERMANTE_SECTION = "&lt;/" + SECTION + "&gt;";
+    private static final String BR = "<br>";
 
     private static final String TEMPLATE_SECTION =
         "<div>" +
@@ -26,57 +22,58 @@ public class GestionSectionService {
             "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection(''{0}'', false)\" title=\"Fermer {1}\"> <b>{1}</b> &#9650; </button>\n" +
             "<div id=\"{0}\" class=\"section\" style=\"display:none;\">" +
                 "{2}" +
-                "{3}" +
             "</div>" +
         "</div>";
 
-    private DocumentBuilder db;
+    private interface ISection {
+        String write();
 
-    private static class Section {
-        private final String titre;
+        static String write(List<ISection> sections) {
+            return sections.stream()
+                    .map(ISection::write)
+                    .filter(StringUtils::isNotBlank)
+                    .reduce(StringUtils.EMPTY, (s1, s2) -> s1 + s2);
+        }
+    }
+
+    private static class SectionTexte implements ISection {
         private final String contenu;
-        private final List<Section> sectionsEnfant;
 
-        public Section(String titre, String contenu, List<Section> sectionsEnfant) {
-            this.titre = titre;
+        private SectionTexte(String contenu) {
             this.contenu = contenu;
+        }
+
+        @Override
+        public String write() {
+            return contenu;
+        }
+    }
+
+    private static class Section implements ISection {
+        private final String titre;
+        private final List<ISection> sectionsEnfant;
+
+        public Section(String titre, List<ISection> sectionsEnfant) {
+            this.titre = titre;
             this.sectionsEnfant = sectionsEnfant;
         }
 
-        public Section(String titre, String contenu) {
-            this(titre, contenu, new ArrayList<>());
-        }
-
-        static public String write(List<Section> sections) {
-            return sections.stream()
-                    .map(Section::write)
-                    .reduce(StringUtils.EMPTY, (s1, s2) -> s1 + "<br>" + s2);
-        }
-
+        @Override
         public String write() {
             return MessageFormat.format(TEMPLATE_SECTION,
                     "section" + UUID.randomUUID(),
                     titre,
-                    contenu,
-                    write(sectionsEnfant));
-        }
-    }
-
-    public GestionSectionService() {
-        try {
-            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
+                    ISection.write(sectionsEnfant));
         }
     }
 
     public String transformHtml(String html) throws IOException, SAXException {
 
-        if (!html.contains("&lt;" + SECTION))
+        if (!html.contains(BALISE_OUVRANTE_SECTION))
             return html;
 
         // Traitement du html pour qu'il soit lu comme du XML correct
-        String htmlNormalise = html
+        /*String htmlNormalise = html
                 .replaceAll("<br>", "<br/>")
                 .replaceAll("<br/></div><div>", "<br/>")
                 .replaceAll("</div><div>", "<br/>")
@@ -85,63 +82,51 @@ public class GestionSectionService {
                 .replaceAll("&lt;", "<")
                 .replaceAll("&gt;", ">")
                 .replaceAll("&nbsp;", "")
-                .replaceAll("<br/><" + SECTION, "<" + SECTION);
+                .replaceAll("<br/><" + SECTION, "<" + SECTION);*/
 
-        if (!htmlNormalise.startsWith("<html>"))
-            htmlNormalise = "<html>" + htmlNormalise + "</html>";
-
-        // Lecture du html
-        Document doc = db.parse(new InputSource(new StringReader(htmlNormalise)));
-        doc.getDocumentElement().normalize();
-
-        // Recherche des sections sur le premier niveau uniquement
-        List<Section> sections = parserSectionsEnfant(doc.getDocumentElement().getChildNodes());
+        // Recherche des sections
+        List<ISection> sections = parserSections(html);
 
         // Réécriture du html avec remplacement des sections
-        return "<html>" + getTexteJusquaPremiereBaliseSection(doc.getDocumentElement()) + Section.write(sections) + "</html>";
+        html = ISection.write(sections);
+
+        return html;
     }
 
     /**
-     * Permet de récupérer toutes les sections enfant d'une liste de noeud
+     * Permet de récupérer toutes les sections de meme niveau
      */
-    private static List<Section> parserSectionsEnfant(NodeList nodes) {
-        List<Section> sections = new ArrayList<>();
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE && node.getNodeName().equals(SECTION)) {
-                sections.add(
-                    new Section(
-                            ((Element) node).getAttribute("titre"),
-                            // On supprime le premier saut de ligne car il est remplacé par une balise div
-                            getTexteJusquaPremiereBaliseSection_sansPremierRetourALaLigne(node),
-                            parserSectionsEnfant(node.getChildNodes())));
+    private static List<ISection> parserSections(String html) {
+        List<ISection> sections = new ArrayList<>();
+        String texteRestant = html;
+        while (isNotBlank(texteRestant)) {
+
+            boolean sectionFound = contains(texteRestant, BALISE_OUVRANTE_SECTION);
+            if (!sectionFound) {
+                sections.add(new SectionTexte(texteRestant));
+                return sections;
+            } else {
+                if (texteRestant.startsWith(BR)) texteRestant = substringAfter(texteRestant, BR);
+
+                // Ajout du texte avant la balise section
+                sections.add(new SectionTexte(substringBefore(texteRestant, BALISE_OUVRANTE_SECTION)));
+
+                // Recherche des attributs de la section
+                String titre = substringBetween(texteRestant, BALISE_OUVRANTE_SECTION, BALISE_FERMANTE);
+                texteRestant = substringAfter(texteRestant, BALISE_FERMANTE);
+
+                String contenuSection = substringBefore(texteRestant, BALISE_FERMANTE_SECTION);
+                if (contenuSection.startsWith(BR)) contenuSection = substringAfter(contenuSection, BR);
+                texteRestant = substringAfter(texteRestant, BALISE_FERMANTE_SECTION);
+                while (countMatches(contenuSection, BALISE_FERMANTE_SECTION) != countMatches(contenuSection, BALISE_OUVRANTE_SECTION) ) {
+                    contenuSection = contenuSection + BALISE_FERMANTE_SECTION + substringBefore(texteRestant, BALISE_FERMANTE_SECTION);
+                    texteRestant = substringAfter(texteRestant, BALISE_FERMANTE_SECTION);
+                }
+
+                // Ajout de la section
+                sections.add(new Section(titre, parserSections(contenuSection)));
             }
         }
         return sections;
-    }
-
-    /**
-     * Permet de récupérer le texte concaténé element par element jusqu'au premier element section trouvé
-     */
-    private static String getTexteJusquaPremiereBaliseSection(Node node) {
-        NodeList list = node.getChildNodes();
-        StringBuilder textContent = new StringBuilder();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node child = list.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE)
-                textContent.append(child.getTextContent());
-            if (child.getNodeType() == Node.ELEMENT_NODE) {
-                if (!child.getNodeName().equals(SECTION))
-                    textContent.append("<").append(child.getNodeName()).append(">");
-                else
-                    break;
-            }
-        }
-        return textContent.toString();
-    }
-
-    private static String getTexteJusquaPremiereBaliseSection_sansPremierRetourALaLigne(Node node) {
-        String texte = getTexteJusquaPremiereBaliseSection(node);
-        return texte.startsWith("<br>") ? texte.substring(4) : texte;
     }
 }
