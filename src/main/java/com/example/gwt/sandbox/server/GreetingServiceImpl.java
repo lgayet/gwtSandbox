@@ -48,10 +48,10 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
     public String transformHtmlWithSection(String html) {
         try {
             return gestionSectionService.transformHtml(html);
-        } catch (IOException | SAXException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return StringUtils.EMPTY;
+        return html;
     }
 
     /**

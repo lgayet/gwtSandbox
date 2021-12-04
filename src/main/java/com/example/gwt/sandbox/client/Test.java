@@ -80,7 +80,11 @@ public class Test implements EntryPoint {
     toolbar.setWidth("100%");
 
     // Add the components to a panel
-    RootPanel.get("richTextContainer").add(area);
+    Grid grid = new Grid(2, 20);
+    grid.setStyleName("cw-RichText");
+    grid.setWidget(0, 0, toolbar);
+    grid.setWidget(1, 0, area);
+    RootPanel.get("richTextContainer").add(grid);
     area.setHTML(HTML);
 
     RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));

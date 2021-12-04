@@ -1,8 +1,6 @@
 package com.example.gwt.sandbox.server;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xml.sax.SAXException;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -18,8 +16,8 @@ public class GestionSectionService {
 
     private static final String TEMPLATE_SECTION =
         "<div>" +
-            "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection(''{0}'', true)\" title=\"Ouvrir {1}\"> <b>{1}</b> &#9660; </button>\n" +
-            "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection(''{0}'', false)\" title=\"Fermer {1}\"> <b>{1}</b> &#9650; </button>\n" +
+            "<button id=\"{0}Show\" class=\"section-button\" onclick=\"showAndHideSection(''{0}'', true)\" title=\"Ouvrir {1}\"> {1} <i class=\"fa fa-angle-down\" aria-hidden=\"true\"></i> </button>\n" +
+            "<button id=\"{0}Hide\" class=\"section-button\" style=\"display:none;\" onclick=\"showAndHideSection(''{0}'', false)\" title=\"Fermer {1}\"> {1} <i class=\"fa fa-angle-up\" aria-hidden=\"true\"></i> </button>\n" +
             "<div id=\"{0}\" class=\"section\" style=\"display:none;\">" +
                 "{2}" +
             "</div>" +
@@ -67,30 +65,26 @@ public class GestionSectionService {
         }
     }
 
-    public String transformHtml(String html) throws IOException, SAXException {
+    public String transformHtml(String html) {
 
+        // SI pas de balise section alors on retourne le HTML donné sans transformation
         if (!html.contains(BALISE_OUVRANTE_SECTION))
             return html;
 
-        // Traitement du html pour qu'il soit lu comme du XML correct
-        /*String htmlNormalise = html
-                .replaceAll("<br>", "<br/>")
-                .replaceAll("<br/></div><div>", "<br/>")
-                .replaceAll("</div><div>", "<br/>")
+        if (countMatches(html, BALISE_OUVRANTE_SECTION) != countMatches(html, BALISE_FERMANTE_SECTION))
+            throw new IllegalStateException("Le texte est mal formaté, le nombre de balises ouvrantes n'est pas le meme que le nombre de balises fermantes");
+
+        // Traitement du html pour garder les retours à la ligne
+        String htmlNormalise = html
+                .replaceAll("<div> *<br> *</div>", "<br/>")
                 .replaceAll("<div>", "")
-                .replaceAll("</div>", "")
-                .replaceAll("&lt;", "<")
-                .replaceAll("&gt;", ">")
-                .replaceAll("&nbsp;", "")
-                .replaceAll("<br/><" + SECTION, "<" + SECTION);*/
+                .replaceAll("</div>", "");
 
         // Recherche des sections
-        List<ISection> sections = parserSections(html);
+        List<ISection> sections = parserSections(htmlNormalise);
 
         // Réécriture du html avec remplacement des sections
-        html = ISection.write(sections);
-
-        return html;
+        return ISection.write(sections);
     }
 
     /**
@@ -101,23 +95,26 @@ public class GestionSectionService {
         String texteRestant = html;
         while (isNotBlank(texteRestant)) {
 
+            if (texteRestant.startsWith(BR)) texteRestant = substringAfter(texteRestant, BR);
+
             boolean sectionFound = contains(texteRestant, BALISE_OUVRANTE_SECTION);
+            // Si plus de section trouvée, on récupère le texte restant comme du simple teste et on arrête de boucler
+            // en retournant la liste de sections
             if (!sectionFound) {
                 sections.add(new SectionTexte(texteRestant));
                 return sections;
             } else {
-                if (texteRestant.startsWith(BR)) texteRestant = substringAfter(texteRestant, BR);
-
                 // Ajout du texte avant la balise section
                 sections.add(new SectionTexte(substringBefore(texteRestant, BALISE_OUVRANTE_SECTION)));
 
-                // Recherche des attributs de la section
+                // Recherche des attributs de la section (titre + contenu)
                 String titre = substringBetween(texteRestant, BALISE_OUVRANTE_SECTION, BALISE_FERMANTE);
                 texteRestant = substringAfter(texteRestant, BALISE_FERMANTE);
 
                 String contenuSection = substringBefore(texteRestant, BALISE_FERMANTE_SECTION);
                 if (contenuSection.startsWith(BR)) contenuSection = substringAfter(contenuSection, BR);
                 texteRestant = substringAfter(texteRestant, BALISE_FERMANTE_SECTION);
+                // Tant que le nombre de balises ouvrantes n'est pas égale au nombre de balises fermantes, on concatene la suite du contenu
                 while (countMatches(contenuSection, BALISE_FERMANTE_SECTION) != countMatches(contenuSection, BALISE_OUVRANTE_SECTION) ) {
                     contenuSection = contenuSection + BALISE_FERMANTE_SECTION + substringBefore(texteRestant, BALISE_FERMANTE_SECTION);
                     texteRestant = substringAfter(texteRestant, BALISE_FERMANTE_SECTION);
