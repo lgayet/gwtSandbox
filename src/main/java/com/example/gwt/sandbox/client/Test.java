@@ -1,6 +1,7 @@
 package com.example.gwt.sandbox.client;
 
-import com.example.gwt.sandbox.client.richtext.RichTextToolbar;
+import com.example.gwt.sandbox.client.component.ChampHeureMinute;
+import com.example.gwt.sandbox.client.component.ChampNumeriqueFormate;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -9,7 +10,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 
@@ -71,8 +71,12 @@ public class Test implements EntryPoint {
     nameField.setFocus(true);
     nameField.selectAll();
 
+    //Champ time
+    final ChampNumeriqueFormate champTime = new ChampHeureMinute();
+    RootPanel.get("htmlPanelContainer").add(champTime);
+
     // Create the text area and toolbar
-    RichTextArea area = new RichTextArea();
+    /*RichTextArea area = new RichTextArea();
     area.ensureDebugId("cwRichText-area");
     area.setSize("100%", "14em");
     RichTextToolbar toolbar = new RichTextToolbar(area);
@@ -87,7 +91,7 @@ public class Test implements EntryPoint {
     RootPanel.get("richTextContainer").add(grid);
     area.setHTML(HTML);
 
-    RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));
+    RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));*/
 
     // Create the popup dialog box
     final DialogBox dialogBox = new DialogBox();
@@ -123,7 +127,7 @@ public class Test implements EntryPoint {
       public void onClick(ClickEvent event) {
         sendNameToServer();
 
-        greetingService.transformHtmlWithSection(area.getHTML(), new AsyncCallback<String>() {
+        /*greetingService.transformHtmlWithSection(area.getHTML(), new AsyncCallback<String>() {
           @Override
           public void onFailure(Throwable throwable) {}
 
@@ -132,7 +136,7 @@ public class Test implements EntryPoint {
             RootPanel.get("htmlPanelContainer").remove(0);
             RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html)));
           }
-        });
+        });*/
       }
 
       /**
