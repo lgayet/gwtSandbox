@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 public class ChampHeureMinute extends ChampNumeriqueFormate {
 
     private static final Logger LOGGER = Logger.getLogger(ChampHeureMinute.class.getName());
-    private static final int NB_CHAR_MAX = 5;
 
     private static final Character SEPARATOR = ':';
 
@@ -32,12 +31,11 @@ public class ChampHeureMinute extends ChampNumeriqueFormate {
                 return false;
             }
         }
-
         return true;
     }
 
     @Override
-    protected String modifyValueSaisie(String value) {
+    protected String modifieValeurSaisie(String value) {
 
         if (value.equals("24")) return value + SEPARATOR + "00";
 

@@ -3,8 +3,6 @@ package com.example.gwt.sandbox.client.component;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.ui.TextBox;
 
-import java.util.logging.Logger;
-
 public abstract class ChampNumeriqueFormate extends TextBox {
 
     public ChampNumeriqueFormate(int nbCharMax) {
@@ -20,14 +18,14 @@ public abstract class ChampNumeriqueFormate extends TextBox {
                 return;
             }
 
-            setValue(modifyValueSaisie(value));
+            setValue(modifieValeurSaisie(value));
         });
 
         this.addKeyUpHandler(event -> {
 
             if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_BACKSPACE) return;
 
-            setValue(modifyValueSaisie(getValue()));
+            setValue(modifieValeurSaisie(getValue()));
         });
 
         setMaxLength(nbCharMax);
@@ -35,7 +33,7 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
     protected abstract boolean autoriseCaractereSaisi(String value, char charCode);
 
-    protected abstract String modifyValueSaisie(String value);
+    protected abstract String modifieValeurSaisie(String value);
 
     private boolean isKeyNumerique(int keyCode) {
         return (keyCode >= KeyCodes.KEY_ZERO && keyCode <= KeyCodes.KEY_NINE);
