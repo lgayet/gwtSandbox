@@ -2,6 +2,7 @@ package com.example.gwt.sandbox.client;
 
 import com.example.gwt.sandbox.client.component.ChampHeureMinute;
 import com.example.gwt.sandbox.client.component.ChampNumeriqueFormate;
+import com.example.gwt.sandbox.client.component.ChampTelephone;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -71,9 +72,11 @@ public class Test implements EntryPoint {
     nameField.setFocus(true);
     nameField.selectAll();
 
-    //Champ time
-    final ChampNumeriqueFormate champTime = new ChampHeureMinute();
-    RootPanel.get("htmlPanelContainer").add(champTime);
+    //Champ Heure:Minute
+    RootPanel.get("heureMinuteContainer").add(new ChampHeureMinute());
+
+    //Champ Telephone
+    RootPanel.get("telephoneContainer").add(new ChampTelephone());
 
     // Create the text area and toolbar
     /*RichTextArea area = new RichTextArea();

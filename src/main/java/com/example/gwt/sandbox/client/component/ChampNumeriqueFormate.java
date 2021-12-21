@@ -8,24 +8,23 @@ public abstract class ChampNumeriqueFormate extends TextBox {
     public ChampNumeriqueFormate(int nbCharMax) {
         this.addKeyPressHandler(event -> {
 
-            int keyCode = event.getNativeEvent().getKeyCode();
-
             String value = getValue();
 
-            if (!isKeyNumerique(keyCode) || !autoriseCaractereSaisi(value, event.getCharCode())) {
+            if (!isKeyNumerique(event.getNativeEvent().getKeyCode())
+                    || !autoriseCaractereSaisi(value, event.getCharCode())) {
                 event.stopPropagation();
                 this.cancelKey();
                 return;
             }
 
-            setValue(modifieValeurSaisie(value));
+            setValue(modifieValeurSaisie(value, event.getCharCode()));
         });
 
         this.addKeyUpHandler(event -> {
 
             if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_BACKSPACE) return;
 
-            setValue(modifieValeurSaisie(getValue()));
+            setValue(modifieValeurSaisie(getValue(), '_'));
         });
 
         setMaxLength(nbCharMax);
@@ -33,7 +32,7 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
     protected abstract boolean autoriseCaractereSaisi(String value, char charCode);
 
-    protected abstract String modifieValeurSaisie(String value);
+    protected abstract String modifieValeurSaisie(String value, char charCode);
 
     private boolean isKeyNumerique(int keyCode) {
         return (keyCode >= KeyCodes.KEY_ZERO && keyCode <= KeyCodes.KEY_NINE);

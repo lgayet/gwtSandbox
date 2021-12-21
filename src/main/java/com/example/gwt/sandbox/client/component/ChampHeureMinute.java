@@ -35,7 +35,7 @@ public class ChampHeureMinute extends ChampNumeriqueFormate {
     }
 
     @Override
-    protected String modifieValeurSaisie(String value) {
+    protected String modifieValeurSaisie(String value, char charCode) {
 
         if (value.equals("24")) return value + SEPARATOR + "00";
 
@@ -45,14 +45,14 @@ public class ChampHeureMinute extends ChampNumeriqueFormate {
     }
 
     private boolean isCharAutorisePourDizaineHeure(char charCode) {
-        return (charCode >= '0' && charCode <= '2');
+        return charCode >= '0' && charCode <= '2';
     }
 
     private boolean isCharAutorisePourUniteHeureQuandDizaineHeureEst2(char charCode) {
-        return (charCode >= '0' && charCode <= '4');
+        return charCode >= '0' && charCode <= '4';
     }
 
     private boolean isCharAutorisePourDizaineMinute(char charCode) {
-        return (charCode >= '0' && charCode <= '5');
+        return charCode >= '0' && charCode <= '5';
     }
 }
