@@ -20,14 +20,14 @@ public abstract class ChampNumeriqueFormate extends TextBox {
                 return;
             }
 
-            setValue(modifyValueAvantSaisie(value));
+            setValue(modifyValueSaisie(value));
         });
 
         this.addKeyUpHandler(event -> {
 
             if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_BACKSPACE) return;
 
-            setValue(modifyValueApresSaisie(getValue()));
+            setValue(modifyValueSaisie(getValue()));
         });
 
         setMaxLength(nbCharMax);
@@ -35,10 +35,7 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
     protected abstract boolean autoriseCaractereSaisi(String value, char charCode);
 
-    protected abstract String modifyValueAvantSaisie(String value);
-
-    protected abstract String modifyValueApresSaisie(String value);
-
+    protected abstract String modifyValueSaisie(String value);
 
     private boolean isKeyNumerique(int keyCode) {
         return (keyCode >= KeyCodes.KEY_ZERO && keyCode <= KeyCodes.KEY_NINE);
