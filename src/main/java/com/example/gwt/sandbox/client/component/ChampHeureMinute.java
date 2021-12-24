@@ -9,7 +9,7 @@ public class ChampHeureMinute extends ChampNumeriqueFormate {
     private static final Character SEPARATOR = ':';
 
     public ChampHeureMinute() {
-        super(5);
+        super("__:__");
     }
 
     @Override

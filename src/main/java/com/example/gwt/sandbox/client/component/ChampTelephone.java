@@ -9,7 +9,7 @@ public class ChampTelephone extends ChampNumeriqueFormate {
     private static final Character SEPARATOR = ' ';
 
     public ChampTelephone() {
-        super(14);
+        super("0_ __ __ __ __", "0");
     }
 
     @Override
