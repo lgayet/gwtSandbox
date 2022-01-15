@@ -1,6 +1,7 @@
 package com.example.gwt.sandbox.client.component;
 
 import com.google.gwt.event.dom.client.*;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.ui.TextBox;
 
 import javax.validation.constraints.NotNull;
@@ -9,8 +10,13 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
     private static final String EMPTY = "";
 
-    protected String mask;
-    protected String startValue;
+    private static final String BCK_RED_COLOR = "#f8cfcf";
+    private static final String BCK_WHITE_COLOR = "white";
+
+    protected final String mask;
+    protected final String startValue;
+    private final RegExp regExp;
+
 
     public ChampNumeriqueFormate(String mask) { this(mask, EMPTY);}
 
@@ -18,6 +24,7 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
         this.mask = mask != null ? mask : EMPTY;
         this.startValue = startValue != null ? startValue : EMPTY;
+        this.regExp = RegExp.compile(this.mask.replaceAll("_", "\\\\d"));
 
         this.setValue(mask);
         this.setMaxLength(mask.length());
@@ -27,7 +34,13 @@ public abstract class ChampNumeriqueFormate extends TextBox {
         });
 
         this.addBlurHandler(blurEvent -> {
-            if (EMPTY.equals(getText()) || startValue.equals(getText())) setText(this.mask);
+            String backgroundColor = BCK_WHITE_COLOR;
+            if (EMPTY.equals(getText()) || startValue.equals(getText())) {
+                setText(this.mask);
+            } else if (!isValidValue()) {
+                backgroundColor = BCK_RED_COLOR;
+            }
+            getElement().getStyle().setBackgroundColor(backgroundColor);
         });
 
         this.addKeyPressHandler(event -> {
@@ -59,5 +72,9 @@ public abstract class ChampNumeriqueFormate extends TextBox {
 
     private boolean isKeyNumerique(int keyCode) {
         return (keyCode >= KeyCodes.KEY_ZERO && keyCode <= KeyCodes.KEY_NINE);
+    }
+
+    private boolean isValidValue() {
+        return regExp.exec(getText()) != null;
     }
 }
