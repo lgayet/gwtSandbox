@@ -58,12 +58,25 @@ public abstract class ChampNumeriqueFormate extends TextBox {
         this.addKeyUpHandler(event -> {
             if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_BACKSPACE) return;
             setValue(modifieValeurSaisie(getValue(), '_'));
+
+            // Ajoute le reste du mask (pas encore au point)
+            /*String value = modifieValeurSaisie(getValue(), '_');
+
+            int position = getCursorPos();
+            if (position < mask.length() - 1) {
+                value += mask.substring(getCursorPos());
+            }
+            setValue(value);
+            setCursorPos(position);*/
         });
     }
 
     @Override
     public String getValue() {
-        return this.mask.equals(super.getValue()) ? EMPTY : super.getValue();
+        if (this.mask.equals(super.getValue())) return EMPTY;
+        // Permet d'enlever le surplus lié au mask (pas encore au point)
+        //else if (getCursorPos() < mask.length() - 1) return super.getValue().substring(0, getCursorPos());
+        else return super.getValue();
     }
 
     protected abstract boolean autoriseCaractereSaisi(String value, char charCode);
