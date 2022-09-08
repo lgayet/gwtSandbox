@@ -52,6 +52,12 @@
       <artifactId>gwt-dev</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.vaadin.addons/gwt-graphics -->
+    <dependency>
+      <groupId>com.github.jjYBdx4IL.gwt</groupId>
+      <artifactId>gwt-graphics</artifactId>
+      <version>1.0</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

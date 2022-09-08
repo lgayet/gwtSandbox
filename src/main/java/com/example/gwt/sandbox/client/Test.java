@@ -1,23 +1,22 @@
 package com.example.gwt.sandbox.client;
 
 import com.example.gwt.sandbox.client.component.ChampHeureMinute;
-import com.example.gwt.sandbox.client.component.ChampNumeriqueFormate;
 import com.example.gwt.sandbox.client.component.ChampTelephone;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
+import org.vaadin.gwtgraphics.client.DrawingArea;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class Test implements EntryPoint {
+
+  public static MoveContext MOVE_CONTEXT = new MoveContext();
 
   private static final String HTML =
     "<html>" +
@@ -54,6 +53,38 @@ public class Test implements EntryPoint {
    * This is the entry point method.
    */
   public void onModuleLoad() {
+
+    final DrawingArea canvas = new DrawingArea(900, 300);
+    canvas.getElement().getStyle().setBorderColor("black");
+    canvas.getElement().getStyle().setBorderStyle(Style.BorderStyle.SOLID);
+    canvas.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+    RootPanel.get("CanvasContainer").add(canvas);
+
+    Tache tache1 = new Tache(canvas,50,50,200, 50, "tâche 1");
+    tache1.setFillColor("red");
+
+    Tache tache2 = new Tache(canvas,100,50,200, 50, "tâche 2");
+    tache2.setFillColor("blue");
+
+    //DialogBox box = new DialogBox(true, true);
+
+    /*AtomicBoolean bascule = new AtomicBoolean(true);
+    rect.addClickHandler(event -> {
+      box.setText("X : "+event.getClientX() + ", Y : "+event.getClientY());
+      box.show();
+      bascule.set(!bascule.get());
+      rect.setFillColor(bascule.get() ? "green" : "blue");
+    });*/
+
+    canvas.addMouseMoveHandler(event -> {
+      MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
+    });
+
+    canvas.addMouseUpHandler(event -> {
+      MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
+    });
+
+
     final Button sendButton = new Button("Send");
     final TextBox nameField = new TextBox();
     nameField.setText("GWT User");
