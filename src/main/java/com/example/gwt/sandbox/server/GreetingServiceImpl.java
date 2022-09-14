@@ -2,15 +2,8 @@ package com.example.gwt.sandbox.server;
 
 import com.example.gwt.sandbox.client.GreetingService;
 import com.example.gwt.sandbox.shared.FieldVerifier;
-import com.google.gwt.thirdparty.guava.common.base.Joiner;
+import com.example.gwt.sandbox.shared.Selection;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import org.apache.commons.lang3.StringUtils;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.UUID;
 
 /**
  * The server-side implementation of the RPC service.
@@ -42,6 +35,10 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
 
         return "Hello, " + input + "!<br><br>I am running " + serverInfo
                 + ".<br><br>It looks like you are using:<br>" + userAgent;
+    }
+    @Override
+    public Selection creerSelection(String param){
+        return null;
     }
 
     @Override

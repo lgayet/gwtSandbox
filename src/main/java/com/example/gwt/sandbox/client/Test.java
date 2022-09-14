@@ -1,15 +1,18 @@
 package com.example.gwt.sandbox.client;
 
-import com.example.gwt.sandbox.client.component.ChampHeureMinute;
-import com.example.gwt.sandbox.client.component.ChampTelephone;
-import com.example.gwt.sandbox.shared.FieldVerifier;
+import com.example.gwt.sandbox.shared.Selection;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.*;
+import com.google.gwt.user.client.ui.RootPanel;
 import org.vaadin.gwtgraphics.client.DrawingArea;
+import org.vaadin.gwtgraphics.client.Line;
+import org.vaadin.gwtgraphics.client.shape.Text;
+
+import java.util.Date;
+import java.util.logging.Logger;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -17,30 +20,43 @@ import org.vaadin.gwtgraphics.client.DrawingArea;
 public class Test implements EntryPoint {
 
   public static MoveContext MOVE_CONTEXT = new MoveContext();
-
-  private static final String HTML =
-    "<html>" +
-    "&lt;section section 1&gt;<br>" +
-      "contenu section 1 <br>" +
-      "&lt;section section 1.1&gt;<br>" +
-        "contenu section 1.1<br>" +
-      "&lt;/section&gt;<br>" +
-    "&lt;/section&gt;<br>" +
-    "&lt;section section 2&gt;<br>" +
-      "contenu section 2<br>" +
-      "&lt;section section 2.1&gt;<br>" +
-        "contenu section 2.1<br>" +
-      "&lt;/section&gt;<br>" +
-    "&lt;/section&gt;<br>" +
-    "</html>";
-
-  /**
-   * The message displayed to the user when the server cannot be reached or
-   * returns an error.
+  private final int LARGEUR_PANEL = 1900;
+  private final int HAUTEUR_PANEL = 600;
+  private final int HAUTEUR_ENTETES_COLONNES = 50;
+  private final int LARGEUR_ENTETE_SALARIES = 250;
+  private final DrawingArea canvas = new DrawingArea(LARGEUR_PANEL, HAUTEUR_PANEL);
+  private final double OPACITY = 0.3D;
+  private Enum<ChoixAffichage> choixAffichage;
+  private Text labelCentre;
+  private double largeurPanel = Double.valueOf(LARGEUR_PANEL+"");
+  private double hauteurPanel = Double.valueOf(HAUTEUR_PANEL+"");
+  private double hauteurEntetesColonnes = Double.valueOf(HAUTEUR_ENTETES_COLONNES);
+  private double largeurEntetesSalaries = Double.valueOf(LARGEUR_ENTETE_SALARIES);
+  private double nbCols = 1.0D;
+//  Informations pour affichage des dates
+  public final String[]tJours = {"XXX","Dim","Lun","Mar","Mer","Jeu","Ven","Sam"};
+  public final String[]tMois ={"Jan","Fev","Mar","Avr","Mai","Juin","Juil","Aou","Sep","Oct","Nov","Dec"};
+//  pour construire les objets
+  /*
+    TODO Marc: 13/9/2022: première implémentation: selection de 3 mois pleins
    */
-  private static final String SERVER_ERROR = "An error occurred while "
-      + "attempting to contact the server. Please check your network "
-      + "connection and try again.";
+  private Date débutSelection;
+//  déplacement dans la selection
+  private int numJourCourant;
+  private int numSemCourante;
+  private int numMoisCourant;
+  private int anneeCourante;
+//  Les choix d'affichage ENTREPRISE/UTILISATEUR
+  private final double HEURE_DEBUT_JOUR = 6.0;
+  private final double HEURE_FIN_JOUR = 22.5;
+  private final double PLAGE_HORARAIRE = HEURE_FIN_JOUR - HEURE_DEBUT_JOUR;
+  // les contenus modifiables du tableau
+  private Line[]tLVCols = new Line[0];
+  private Line[]tLVHor = new Line[0];
+  private Text[]tLVLabel = new Text[0];
+//  les objets servant au dépôt et au déplacement des tâches
+  private Colonne[] colonnes = new Colonne[92];//TODO: le nombre maximum de jours d'une Selection (3 mois)
+  private Salarie[] salaries = new Salarie[0];
 
   //private static final TemplateSection TEMPLATE_SECTION = GWT.create(TemplateSection.class);
 
@@ -48,33 +64,31 @@ public class Test implements EntryPoint {
    * Create a remote service proxy to talk to the server-side Greeting service.
    */
   private final GreetingServiceAsync greetingService = GWT.create(GreetingService.class);
-
+  private static final Logger logger = Logger.getLogger(Test.class.getName());
   /**
    * This is the entry point method.
    */
   public void onModuleLoad() {
 
-    final DrawingArea canvas = new DrawingArea(900, 300);
-    canvas.getElement().getStyle().setBorderColor("black");
-    canvas.getElement().getStyle().setBorderStyle(Style.BorderStyle.SOLID);
-    canvas.getElement().getStyle().setBorderWidth(1, Style.Unit.PX);
+    setStyleBordures(canvas.getElement());
     RootPanel.get("CanvasContainer").add(canvas);
 
-    Tache tache1 = new Tache(canvas,50,50,200, 50, "tâche 1");
-    tache1.setFillColor("red");
-
-    Tache tache2 = new Tache(canvas,100,50,200, 50, "tâche 2");
-    tache2.setFillColor("blue");
-
-    //DialogBox box = new DialogBox(true, true);
-
-    /*AtomicBoolean bascule = new AtomicBoolean(true);
-    rect.addClickHandler(event -> {
-      box.setText("X : "+event.getClientX() + ", Y : "+event.getClientY());
-      box.show();
-      bascule.set(!bascule.get());
-      rect.setFillColor(bascule.get() ? "green" : "blue");
-    });*/
+//    Debut de la construction graphique
+//  LH_Entete
+    ajoutLigne(0, HAUTEUR_ENTETES_COLONNES, LARGEUR_PANEL, HAUTEUR_ENTETES_COLONNES, OPACITY);
+//  LH_EnteteCol
+    ajoutLigne(0, HAUTEUR_ENTETES_COLONNES * 2, LARGEUR_PANEL, HAUTEUR_ENTETES_COLONNES *2, OPACITY);
+//  LV_EnteteSalaries
+    ajoutLigne( LARGEUR_ENTETE_SALARIES,50, LARGEUR_ENTETE_SALARIES, HAUTEUR_PANEL , OPACITY);
+//    Ajout des boutons choixAffichage
+    ButtonChoixAffichage boutJour = new ButtonChoixAffichage( this, canvas, 30, 10,50,30,ChoixAffichage.JOUR, "Jour");
+    ButtonChoixAffichage boutSem = new ButtonChoixAffichage( this, canvas, 90, 10,70,30,ChoixAffichage.SEMAINE, "Semaine");
+    ButtonChoixAffichage boutMois = new ButtonChoixAffichage( this, canvas, 170, 10,50,30,ChoixAffichage.MOIS, "Mois");
+    boutJour.setBoutons(boutSem, boutMois);
+    boutSem.setBoutons(boutJour, boutMois);
+    boutMois.setBoutons(boutJour, boutSem);
+//    Le label affichant la période affichée
+    labelCentre = ajoutLabel((((LARGEUR_PANEL-LARGEUR_ENTETE_SALARIES)/2)+LARGEUR_ENTETE_SALARIES),30,"du texte", 20, 1.0);
 
     canvas.addMouseMoveHandler(event -> {
       MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
@@ -84,144 +98,90 @@ public class Test implements EntryPoint {
       MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
     });
 
+  }
 
-    final Button sendButton = new Button("Send");
-    final TextBox nameField = new TextBox();
-    nameField.setText("GWT User");
-    final Label errorLabel = new Label();
+  public void creeColonnes(){
+  greetingService.creerSelection("", new AsyncCallback<Selection>() {
+    @Override
+    public void onFailure(Throwable caught) {
 
-    // We can add style names to widgets
-    sendButton.addStyleName("sendButton");
-
-    // Add the nameField and sendButton to the RootPanel
-    // Use RootPanel.get() to get the entire body element
-    RootPanel.get("nameFieldContainer").add(nameField);
-    RootPanel.get("sendButtonContainer").add(sendButton);
-    RootPanel.get("errorLabelContainer").add(errorLabel);
-
-    // Focus the cursor on the name field when the app loads
-    nameField.setFocus(true);
-    nameField.selectAll();
-
-    //Champ Heure:Minute
-    RootPanel.get("heureMinuteContainer").add(new ChampHeureMinute());
-
-    //Champ Telephone
-    RootPanel.get("telephoneContainer").add(new ChampTelephone());
-
-    // Create the text area and toolbar
-    /*RichTextArea area = new RichTextArea();
-    area.ensureDebugId("cwRichText-area");
-    area.setSize("100%", "14em");
-    RichTextToolbar toolbar = new RichTextToolbar(area);
-    toolbar.ensureDebugId("cwRichText-toolbar");
-    toolbar.setWidth("100%");
-
-    // Add the components to a panel
-    Grid grid = new Grid(2, 20);
-    grid.setStyleName("cw-RichText");
-    grid.setWidget(0, 0, toolbar);
-    grid.setWidget(1, 0, area);
-    RootPanel.get("richTextContainer").add(grid);
-    area.setHTML(HTML);
-
-    RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));*/
-
-    // Create the popup dialog box
-    final DialogBox dialogBox = new DialogBox();
-    dialogBox.setText("Remote Procedure Call");
-    dialogBox.setAnimationEnabled(true);
-    final Button closeButton = new Button("Close");
-    // We can set the id of a widget by accessing its Element
-    closeButton.getElement().setId("closeButton");
-    final Label textToServerLabel = new Label();
-    final HTML serverResponseLabel = new HTML();
-    VerticalPanel dialogVPanel = new VerticalPanel();
-    dialogVPanel.addStyleName("dialogVPanel");
-    dialogVPanel.add(new HTML("<b>Sending name to the server:</b>"));
-    dialogVPanel.add(textToServerLabel);
-    dialogVPanel.add(new HTML("<br><b>Server replies:</b>"));
-    dialogVPanel.add(serverResponseLabel);
-    dialogVPanel.setHorizontalAlignment(VerticalPanel.ALIGN_RIGHT);
-    dialogVPanel.add(closeButton);
-    dialogBox.setWidget(dialogVPanel);
-
-    // Add a handler to close the DialogBox
-    closeButton.addClickHandler(event -> {
-      dialogBox.hide();
-      sendButton.setEnabled(true);
-      sendButton.setFocus(true);
-    });
-
-    // Create a handler for the sendButton and nameField
-    class MyHandler implements ClickHandler, KeyUpHandler {
-      /**
-       * Fired when the user clicks on the sendButton.
-       */
-      public void onClick(ClickEvent event) {
-        sendNameToServer();
-
-        /*greetingService.transformHtmlWithSection(area.getHTML(), new AsyncCallback<String>() {
-          @Override
-          public void onFailure(Throwable throwable) {}
-
-          @Override
-          public void onSuccess(String html) {
-            RootPanel.get("htmlPanelContainer").remove(0);
-            RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html)));
-          }
-        });*/
-      }
-
-      /**
-       * Fired when the user types in the nameField.
-       */
-      public void onKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          sendNameToServer();
-        }
-      }
-
-      /**
-       * Send the name from the nameField to the server and wait for a response.
-       */
-      private void sendNameToServer() {
-        // First, we validate the input.
-        errorLabel.setText("");
-        String textToServer = nameField.getText();
-        if (!FieldVerifier.isValidName(textToServer)) {
-          errorLabel.setText("Please enter at least four characters");
-          return;
-        }
-        
-        // Then, we send the input to the server.
-        sendButton.setEnabled(false);
-        textToServerLabel.setText(textToServer);
-        serverResponseLabel.setText("");
-        greetingService.greetServer(textToServer, new AsyncCallback<String>() {
-          public void onFailure(Throwable caught) {
-            // Show the RPC error message to the user
-            dialogBox.setText("Remote Procedure Call - Failure");
-            serverResponseLabel.addStyleName("serverResponseLabelError");
-            serverResponseLabel.setHTML(SERVER_ERROR);
-            dialogBox.center();
-            closeButton.setFocus(true);
-          }
-
-          public void onSuccess(String result) {
-            dialogBox.setText("Remote Procedure Call");
-            serverResponseLabel.removeStyleName("serverResponseLabelError");
-            serverResponseLabel.setHTML(result);
-            dialogBox.center();
-            closeButton.setFocus(true);
-          }
-        });
-      }
     }
 
-    // Add a handler to send the name to the server
-    MyHandler handler = new MyHandler();
-    sendButton.addClickHandler(handler);
-    nameField.addKeyUpHandler(handler);
+    @Override
+    public void onSuccess(Selection result) {
+
+    }
+  });
+  }
+
+  public void setChoixAffichage(ChoixAffichage choixAffichage){
+    System.out.println("coucou setChoixAffichage avec "+choixAffichage);
+    labelCentre.setText(choixAffichage.toString());
+    if( choixAffichage != this.choixAffichage)modifChoixAffichage(choixAffichage);
+  }
+
+
+  private void modifChoixAffichage(ChoixAffichage choixAffichage){
+    this.choixAffichage = choixAffichage;
+    for(Line l: tLVCols){
+      canvas.remove(l);
+    }
+    for(Line l: tLVHor){
+      canvas.remove(l);
+    }
+    for(Text t: tLVLabel){
+      canvas.remove(t);
+    }
+    if(choixAffichage == ChoixAffichage.JOUR){
+      tLVCols = new Line[0];//TODO reste à afficher les heures
+      double largeurHoraire = (largeurPanel - largeurEntetesSalaries ) / PLAGE_HORARAIRE;
+      tLVHor = new Line[(int) PLAGE_HORARAIRE];
+      tLVLabel = new Text[(int) PLAGE_HORARAIRE];
+      int i = 0;
+      for(double h = 1.0; h < PLAGE_HORARAIRE; h +=1.0){
+        int decal = h+ (int) HEURE_DEBUT_JOUR  < 10 ? 3 : 6;
+        tLVHor[i] = ajoutLigne(LARGEUR_ENTETE_SALARIES + (int) (h* largeurHoraire), HAUTEUR_ENTETES_COLONNES *2-20, LARGEUR_ENTETE_SALARIES + (int) (h * largeurHoraire), HAUTEUR_PANEL, OPACITY);
+        tLVLabel[i] = ajoutLabel(LARGEUR_ENTETE_SALARIES + (int) (h* largeurHoraire) - decal, HAUTEUR_ENTETES_COLONNES *2 - 30, (int) h+ HEURE_DEBUT_JOUR+ "" , 12, 0.5);
+        i ++;
+      }
+
+    }else if(choixAffichage == ChoixAffichage.SEMAINE) {
+      tLVCols = new Line[6];
+      double largCol = (largeurPanel - largeurEntetesSalaries) / 7.0;
+      for (int i = 0; i < 6; i++) {
+        int x = (int) (largeurEntetesSalaries + (largCol * Double.valueOf((i+1)+"")));
+        tLVCols[i] = ajoutLigne(x, HAUTEUR_ENTETES_COLONNES , x, HAUTEUR_PANEL, OPACITY);
+      }
+    }
+      else if(choixAffichage == ChoixAffichage.MOIS){//TODO: il faudra etablir le nombre de jours enj fonction du mois
+        tLVCols = new Line[30];
+        double largCol = (largeurPanel - largeurEntetesSalaries)/ 31.0;
+        for(int i = 0; i< 30; i ++ ){
+          int x = (int)(largeurEntetesSalaries + (largCol * Double.valueOf((i+1)+"")));
+          tLVCols[i]= ajoutLigne(x, HAUTEUR_ENTETES_COLONNES, x, HAUTEUR_PANEL, OPACITY);
+        }
+    }
+  }
+
+  private Text ajoutLabel(int x, int y, String text, int size, double opacity){
+    Text t = new Text(x,y,text);
+    t.setFontSize(size);
+    t.setStrokeOpacity(opacity);
+    canvas.add(t);
+    return t;
+  }
+
+  private Line ajoutLigne(int x1, int y1, int x2, int y2, double opacity){
+    Line l = new Line(x1,y1,x2,y2);
+    l.setStrokeOpacity(OPACITY);
+    canvas.add(l);
+    return l;
+  }
+
+  private void setStyleBordures(Element element){
+    element .getStyle().setBorderColor("black");
+    element.getStyle().setBorderStyle(Style.BorderStyle.SOLID);
+    element.getStyle().setBorderWidth(1, Style.Unit.PX);
+
   }
 }

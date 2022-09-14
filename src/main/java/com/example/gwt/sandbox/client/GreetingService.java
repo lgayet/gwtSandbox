@@ -1,5 +1,6 @@
 package com.example.gwt.sandbox.client;
 
+import com.example.gwt.sandbox.shared.Selection;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
@@ -11,4 +12,6 @@ public interface GreetingService extends RemoteService {
   String greetServer(String name) throws IllegalArgumentException;
 
   String transformHtmlWithSection(String html);
+
+  Selection creerSelection(String param);
 }

@@ -1,8 +1,11 @@
 package com.example.gwt.sandbox.server;
 
 import org.apache.commons.lang3.StringUtils;
+
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.StringUtils.*;
 
@@ -36,7 +39,6 @@ public class GestionSectionService {
 
     private static class SectionTexte implements ISection {
         private final String contenu;
-
         private SectionTexte(String contenu) {
             this.contenu = contenu;
         }
