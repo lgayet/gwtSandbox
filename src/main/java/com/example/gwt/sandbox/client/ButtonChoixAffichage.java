@@ -42,7 +42,7 @@ public class ButtonChoixAffichage extends VectorObject implements Positionable {
         b = true;
             b1.setDeSelected();
             b2.setDeSelected();
-        rectangle.setFillOpacity(1.0D);
+        rectangle.setFillOpacity(1.0D);// TODO: pour 'enfoncer' le bouton
     }
     public void setBoutons(ButtonChoixAffichage b1, ButtonChoixAffichage b2){
         this.b1 = b1;

@@ -11,5 +11,5 @@ public interface GreetingServiceAsync {
 
   void transformHtmlWithSection(String html, AsyncCallback<String> callback);
 
-  void creerSelection(String selection, AsyncCallback<Selection> callback);
+  void creerSelection(int anneDebut, int moisDebut, int anneeFin, int moisFin, AsyncCallback<Selection> callback);
 }

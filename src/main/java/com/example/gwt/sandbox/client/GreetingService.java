@@ -13,5 +13,5 @@ public interface GreetingService extends RemoteService {
 
   String transformHtmlWithSection(String html);
 
-  Selection creerSelection(String param);
+  Selection creerSelection(int anneDebut, int moisDebut, int anneeFin, int moisFin);
 }

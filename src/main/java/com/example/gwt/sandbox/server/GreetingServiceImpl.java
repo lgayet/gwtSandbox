@@ -37,8 +37,9 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
                 + ".<br><br>It looks like you are using:<br>" + userAgent;
     }
     @Override
-    public Selection creerSelection(String param){
-        return null;
+    public Selection creerSelection(int anneDebut, int moisDebut, int anneeFin, int moisFin){
+        SelectionDTO selectionDTO = new SelectionDTO();
+        return selectionDTO.construitSelection(anneDebut, moisDebut, anneeFin, moisFin);
     }
 
     @Override

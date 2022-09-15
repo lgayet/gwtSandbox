@@ -11,7 +11,6 @@ import org.vaadin.gwtgraphics.client.DrawingArea;
 import org.vaadin.gwtgraphics.client.Line;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
-import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -26,7 +25,7 @@ public class Test implements EntryPoint {
   private final int LARGEUR_ENTETE_SALARIES = 250;
   private final DrawingArea canvas = new DrawingArea(LARGEUR_PANEL, HAUTEUR_PANEL);
   private final double OPACITY = 0.3D;
-  private Enum<ChoixAffichage> choixAffichage;
+  private ChoixAffichage choixAffichage;
   private Text labelCentre;
   private double largeurPanel = Double.valueOf(LARGEUR_PANEL+"");
   private double hauteurPanel = Double.valueOf(HAUTEUR_PANEL+"");
@@ -34,13 +33,12 @@ public class Test implements EntryPoint {
   private double largeurEntetesSalaries = Double.valueOf(LARGEUR_ENTETE_SALARIES);
   private double nbCols = 1.0D;
 //  Informations pour affichage des dates
-  public final String[]tJours = {"XXX","Dim","Lun","Mar","Mer","Jeu","Ven","Sam"};
-  public final String[]tMois ={"Jan","Fev","Mar","Avr","Mai","Juin","Juil","Aou","Sep","Oct","Nov","Dec"};
+  public final String[]tJours = {"XXX","Lun","Mar","Mer","Jeu","Ven","Sam","Dim"};
+  public final String[]tMois ={"XXX","Jan","Fev","Mar","Avr","Mai","Juin","Juil","Aou","Sep","Oct","Nov","Dec"};
 //  pour construire les objets
   /*
     TODO Marc: 13/9/2022: première implémentation: selection de 3 mois pleins
    */
-  private Date débutSelection;
 //  déplacement dans la selection
   private int numJourCourant;
   private int numSemCourante;
@@ -55,7 +53,11 @@ public class Test implements EntryPoint {
   private Line[]tLVHor = new Line[0];
   private Text[]tLVLabel = new Text[0];
 //  les objets servant au dépôt et au déplacement des tâches
-  private Colonne[] colonnes = new Colonne[92];//TODO: le nombre maximum de jours d'une Selection (3 mois)
+  private Selection selection;
+  private int nbJoursSelection;
+  private int nbJoursAffiches;
+  private int indicePremiereCol = 0;
+  private Colonne[] tCols;//TODO: dimension= nbJours de la selection
   private Salarie[] salaries = new Salarie[0];
 
   //private static final TemplateSection TEMPLATE_SECTION = GWT.create(TemplateSection.class);
@@ -98,10 +100,12 @@ public class Test implements EntryPoint {
       MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
     });
 
+    creeColonnes();
+
   }
 
   public void creeColonnes(){
-  greetingService.creerSelection("", new AsyncCallback<Selection>() {
+  greetingService.creerSelection(2022,8,2022,10, new AsyncCallback<Selection>() {
     @Override
     public void onFailure(Throwable caught) {
 
@@ -109,6 +113,8 @@ public class Test implements EntryPoint {
 
     @Override
     public void onSuccess(Selection result) {
+//        nbJoursSelection = selection.getNbJours();
+//        tCols = selection.getTCols();
 
     }
   });
