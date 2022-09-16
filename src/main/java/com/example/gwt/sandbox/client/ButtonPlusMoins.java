@@ -6,17 +6,17 @@ import org.vaadin.gwtgraphics.client.VectorObject;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
-public class ButtonChoixAffichage extends VectorObject implements Positionable {
+public class ButtonPlusMoins extends VectorObject implements Positionable {
 
     private Test test;
     private Rectangle rectangle;
     private Text text;
-    private ChoixAffichage choixAffichage;
-    private boolean enfonce = false;
-    private ButtonChoixAffichage b1;
-    private ButtonChoixAffichage b2;
+    private boolean plus = false;
+    private boolean valid;
+    private ButtonPlusMoins b2;
 
-    public ButtonChoixAffichage(Test test, DrawingArea canvas, int x, int y, int width, int height, ChoixAffichage choix, String label) {
+
+    public ButtonPlusMoins(Test test, DrawingArea canvas, int x, int y, int width, int height, String label, boolean plus) {
         this.test = test;
         rectangle = new Rectangle(x, y , width, height);
         rectangle.setRoundedCorners(5);
@@ -26,29 +26,31 @@ public class ButtonChoixAffichage extends VectorObject implements Positionable {
             onClick();
         });
         canvas.add(rectangle);
-        this.choixAffichage = choix;
-        text = new Text(x+8, y+20, label);
+        text = new Text(x+10, y+20, label);
         text.setPropertyDouble("fontsize",14.0D);
         text.addClickHandler(event -> {
             onClick();
         });
         canvas.add(text);
-        this.b1 = b1;
-        this.b2 = b2;
+        this.plus = plus;
+        setValid(plus ? true : false);;
     }
 
     private void onClick(){
-        test.setChoixAffichage(choixAffichage);
-        enfonce = true;
-            b1.setDeSelected();
-            b2.setDeSelected();
-        rectangle.setFillOpacity(1.0D);// TODO: pour 'enfoncer' le bouton
-    }
-    public void setBoutons(ButtonChoixAffichage b1, ButtonChoixAffichage b2){
-        this.b1 = b1;
-        this.b2 = b2;
+        if(valid){
+            setValid(test.setPlusMoins(plus));
+            b2.setValid(true);
+        }
     }
 
+    public void setValid(boolean valid) {
+        this.valid = valid;
+        rectangle.setFillColor(valid ? "orange" : "black");
+    }
+
+    public void setButtonPlusMoins(ButtonPlusMoins b){
+        b2 = b;
+    }
 
     @Override
     public int getX() {
@@ -70,15 +72,6 @@ public class ButtonChoixAffichage extends VectorObject implements Positionable {
     public void setY(int i) {
         rectangle.setY(i);
         text.setY(i + rectangle.getHeight()/2);
-    }
-
-    public void setDeSelected(){
-        enfonce = false;
-        rectangle.setFillOpacity(0.2D);
-    }
-
-    public ChoixAffichage getChoixAffichage() {
-        return choixAffichage;
     }
 
     public void setFillColor(String color) {

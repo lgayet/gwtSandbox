@@ -40,11 +40,6 @@ public class Test implements EntryPoint {
   /*
     TODO Marc: 13/9/2022: première implémentation: selection de 3 mois pleins
    */
-//  déplacement dans la selection
-  private int numJourCourant;
-  private int numSemCourante;
-  private int numMoisCourant;
-  private int anneeCourante;
 //  Les choix d'affichage ENTREPRISE/UTILISATEUR
   private final double HEURE_DEBUT_JOUR = 6.0;
   private final double HEURE_FIN_JOUR = 22.5;
@@ -58,7 +53,8 @@ public class Test implements EntryPoint {
   private Selection selection;
   private int nbJoursSelection;
   private int nbJoursAffiches;
-  private int indicePremiereCol =28;
+  private int indicePremiereCol =0;
+  private int numJourCourant = 1;//TODO mémorie le jour de la semaine pour les retours Semaine ou mois vers Jour
   private double largCol;
   private Colonne[] tCols;//TODO: dimension= nbJours de la selection
   private Salarie[] salaries = new Salarie[0];
@@ -94,6 +90,11 @@ public class Test implements EntryPoint {
     boutJour.setBoutons(boutSem, boutMois);
     boutSem.setBoutons(boutJour, boutMois);
     boutMois.setBoutons(boutJour, boutSem);
+
+    ButtonPlusMoins boutMoins = new ButtonPlusMoins(this, canvas, 300,10,30, 30, "<", false);
+    ButtonPlusMoins boutPlus = new ButtonPlusMoins(this, canvas, 350,10,30, 30, ">", true);
+    boutMoins.setButtonPlusMoins(boutPlus);
+    boutPlus.setButtonPlusMoins(boutMoins);
 //    Le label affichant la période affichée
     labelCentre = ajoutLabel((((LARGEUR_PANEL-LARGEUR_ENTETE_SALARIES)/2)+LARGEUR_ENTETE_SALARIES),30,"du texte", 20, 1.0);
 
@@ -124,14 +125,37 @@ public class Test implements EntryPoint {
   });
   }
 
+  public boolean setPlusMoins(boolean plus){
+    if( ! plus && indicePremiereCol == 0)return false;
+    //TODO faire le cas plus
+    boolean plusValid = true;
+    boolean moinsValid = true;
+    switch(choixAffichage){
+      case JOUR: {
+        indicePremiereCol = plus ? indicePremiereCol + 1 : indicePremiereCol - 1;
+        numJourCourant = tCols[indicePremiereCol].getNumJourSem();
+      } break;
+      case SEMAINE: {
+        indicePremiereCol = plus ? indicePremiereCol + 7 : indicePremiereCol - 7;
+      } break;
+      case MOIS: {
+//        TODO dans le cas moins, on se décale du nombre de jours du mois précédent
+        int decal = plus ? getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois()): - getNbJoursMois(tCols[indicePremiereCol - 1].getAnnee(), tCols[indicePremiereCol - 1].getNumMois());
+        indicePremiereCol = indicePremiereCol + decal;
+      } break;
+    }
+    affiche(choixAffichage, false);
+    return true;
+  }
+
   public void setChoixAffichage(ChoixAffichage choixAffichage){
     System.out.println("coucou setChoixAffichage avec "+choixAffichage);
 //    labelCentre.setText(choixAffichage.toString());
-    if( choixAffichage != this.choixAffichage)modifChoixAffichage(choixAffichage);
+    if( choixAffichage != this.choixAffichage) affiche(choixAffichage, true);
   }
 
 
-  private void modifChoixAffichage(ChoixAffichage choixAffichage){
+  private void affiche(ChoixAffichage choixAffichage, boolean modifChoix){
     this.choixAffichage = choixAffichage;
     canvas.remove(labelCentre);
     for(Line l: tLVCols){
@@ -144,6 +168,8 @@ public class Test implements EntryPoint {
       if(t != null)canvas.remove(t);
     }
     if(choixAffichage == ChoixAffichage.JOUR){
+      int ajout = modifChoix ? numJourCourant -1 : 0;
+      indicePremiereCol += ajout;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
@@ -162,7 +188,7 @@ public class Test implements EntryPoint {
       }
 
     }else if(choixAffichage == ChoixAffichage.SEMAINE) {
-      indicePremiereCol = (indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1) > 0 ? indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1 : 1;
+      indicePremiereCol = indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       Colonne cFin = tCols[indicePremiereCol+6];
