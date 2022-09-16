@@ -5,6 +5,7 @@ import com.example.gwt.sandbox.client.Colonne;
 import java.io.Serializable;
 
 public class Selection  implements Serializable {
+    private static final long serialVersionUID = 294851328L;
     private int anneeDebut;
     private int moisDebut;
     private int anneeFin;
@@ -13,8 +14,14 @@ public class Selection  implements Serializable {
     private int nbJours;
     private Colonne[] tCols;
 
+    private String label;
+
     public Selection(){
 
+    }
+
+    public Selection(String label) {
+        this.label = label;
     }
 
     public Selection(int anneeDebut, int moisDebut, int anneeFin, int moisFin, int nbJours, Colonne[] tCols) {
@@ -26,6 +33,10 @@ public class Selection  implements Serializable {
         this.tCols = tCols;
     }
 
+
+    public String getLabel() {
+        return label;
+    }
 
     public int getAnneeDebut() {
         return anneeDebut;

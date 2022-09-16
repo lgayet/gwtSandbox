@@ -10,7 +10,7 @@ import java.io.Serializable;
 public class Colonne implements Serializable {
     private int numCol;
     public int positionX;
-    public int largeur;//TODO Marc 12/9/2022: la largeur n'est pas issue du calcul largeurPanneau/nbCol mais de PositionCol[numCol+1]- positionX
+    public double largeur;//TODO Marc 12/9/2022: A voir: si problèmes d'affichage: la largeur n'est pas issue du calcul largeurPanneau/nbCol mais de PositionCol[numCol+1]- positionX
     private int annee;
     private int numMois;
     private int numJourMois;
@@ -67,11 +67,11 @@ public class Colonne implements Serializable {
         this.positionX = positionX;
     }
 
-    public int getLargeur() {
+    public double getLargeur() {
         return largeur;
     }
 
-    public void setLargeur(int largeur) {
+    public void setLargeur(double largeur) {
         this.largeur = largeur;
     }
 

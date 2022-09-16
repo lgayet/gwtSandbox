@@ -3,6 +3,7 @@ package com.example.gwt.sandbox.server;
 import com.example.gwt.sandbox.client.GreetingService;
 import com.example.gwt.sandbox.shared.FieldVerifier;
 import com.example.gwt.sandbox.shared.Selection;
+import com.example.gwt.sandbox.shared.Selection2;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -40,6 +41,12 @@ public class GreetingServiceImpl extends RemoteServiceServlet implements Greetin
     public Selection creerSelection(int anneDebut, int moisDebut, int anneeFin, int moisFin){
         SelectionDTO selectionDTO = new SelectionDTO();
         return selectionDTO.construitSelection(anneDebut, moisDebut, anneeFin, moisFin);
+    }
+
+    @Override
+    public Selection2 lireJours(){
+        SelectionDTO selectionDTO = new SelectionDTO();
+        return selectionDTO.construitJours();
     }
 
     @Override
