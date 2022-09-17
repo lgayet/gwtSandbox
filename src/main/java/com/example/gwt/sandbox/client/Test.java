@@ -53,12 +53,15 @@ public class Test implements EntryPoint {
   private Selection selection;
   private int nbJoursSelection;
   private int nbJoursAffiches;
-  private int indicePremiereCol =0;
-  private int numJourCourant = 1;//TODO mémorie le jour de la semaine pour les retours Semaine ou mois vers Jour
+  private int indicePremiereCol = 0;
+  private int indiceJourCourant = 0;//TODO pour les retours Semaine ou mois vers Jour (premier jour de la semaine ou du mois)
   private double largCol;
   private Colonne[] tCols;//TODO: dimension= nbJours de la selection
   private Salarie[] salaries = new Salarie[0];
   private String label;
+//
+  private ButtonPlusMoins boutMoins;
+  private ButtonPlusMoins boutPlus;
 
   //private static final TemplateSection TEMPLATE_SECTION = GWT.create(TemplateSection.class);
 
@@ -91,8 +94,8 @@ public class Test implements EntryPoint {
     boutSem.setBoutons(boutJour, boutMois);
     boutMois.setBoutons(boutJour, boutSem);
 
-    ButtonPlusMoins boutMoins = new ButtonPlusMoins(this, canvas, 300,10,30, 30, "<", false);
-    ButtonPlusMoins boutPlus = new ButtonPlusMoins(this, canvas, 350,10,30, 30, ">", true);
+    boutMoins = new ButtonPlusMoins(this, canvas, 300,10,30, 30, "<", false);
+    boutPlus = new ButtonPlusMoins(this, canvas, 350,10,30, 30, ">", true);
     boutMoins.setButtonPlusMoins(boutPlus);
     boutPlus.setButtonPlusMoins(boutMoins);
 //    Le label affichant la période affichée
@@ -128,21 +131,31 @@ public class Test implements EntryPoint {
   public boolean setPlusMoins(boolean plus){
     if( ! plus && indicePremiereCol == 0)return false;
     //TODO faire le cas plus
-    boolean plusValid = true;
-    boolean moinsValid = true;
+    int nbJoursAffiches = 1;
     switch(choixAffichage){
       case JOUR: {
         indicePremiereCol = plus ? indicePremiereCol + 1 : indicePremiereCol - 1;
-        numJourCourant = tCols[indicePremiereCol].getNumJourSem();
+        indiceJourCourant = tCols[indicePremiereCol].getNumJourSem();
       } break;
       case SEMAINE: {
         indicePremiereCol = plus ? indicePremiereCol + 7 : indicePremiereCol - 7;
+        nbJoursAffiches = 7;
       } break;
       case MOIS: {
 //        TODO dans le cas moins, on se décale du nombre de jours du mois précédent
-        int decal = plus ? getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois()): - getNbJoursMois(tCols[indicePremiereCol - 1].getAnnee(), tCols[indicePremiereCol - 1].getNumMois());
+        nbJoursAffiches = getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois());
+        int decal = plus ? nbJoursAffiches: - getNbJoursMois(tCols[indicePremiereCol - 1].getAnnee(), tCols[indicePremiereCol - 1].getNumMois());
         indicePremiereCol = indicePremiereCol + decal;
+        indiceJourCourant = 1;//TODO: pour éviter certains plantages, on revient systématiquement sur lundi
       } break;
+    }
+    if(indicePremiereCol <= 0) {
+      indicePremiereCol = 0;
+      boutMoins.setValid((false));
+    }
+    if(indicePremiereCol+ nbJoursAffiches >= tCols.length){
+      indicePremiereCol = tCols.length -1;
+      boutPlus.setValid(false);
     }
     affiche(choixAffichage, false);
     return true;
@@ -168,8 +181,9 @@ public class Test implements EntryPoint {
       if(t != null)canvas.remove(t);
     }
     if(choixAffichage == ChoixAffichage.JOUR){
-      int ajout = modifChoix ? numJourCourant -1 : 0;
+      int ajout = modifChoix ? indiceJourCourant - tCols[indicePremiereCol].getNumJourSem() : 0;//TODO pour gérér le retour depuis SEMAINE ou Mois si on s'était préalablement positionné sur un jour
       indicePremiereCol += ajout;
+      if(indicePremiereCol < 0)indicePremiereCol = 0;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
@@ -188,7 +202,7 @@ public class Test implements EntryPoint {
       }
 
     }else if(choixAffichage == ChoixAffichage.SEMAINE) {
-      indicePremiereCol = indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1;
+      indicePremiereCol = indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1;//TODO: se positionne sur lundi
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       Colonne cFin = tCols[indicePremiereCol+6];

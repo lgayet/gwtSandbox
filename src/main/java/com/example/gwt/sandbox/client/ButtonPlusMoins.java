@@ -44,8 +44,10 @@ public class ButtonPlusMoins extends VectorObject implements Positionable {
     }
 
     public void setValid(boolean valid) {
-        this.valid = valid;
-        rectangle.setFillColor(valid ? "orange" : "black");
+        if( this.valid != valid){
+            rectangle.setFillColor(valid ? "orange" : "black");
+            this.valid = valid;
+        }
     }
 
     public void setButtonPlusMoins(ButtonPlusMoins b){
