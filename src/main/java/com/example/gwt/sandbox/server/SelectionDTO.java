@@ -1,6 +1,6 @@
 package com.example.gwt.sandbox.server;
 
-import com.example.gwt.sandbox.client.Colonne;
+import com.example.gwt.sandbox.shared.Colonne;
 import com.example.gwt.sandbox.shared.Salarie;
 import com.example.gwt.sandbox.shared.Selection;
 import com.example.gwt.sandbox.shared.Tache;
@@ -40,13 +40,15 @@ public class SelectionDTO implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-        aTaches.add(generationTache(selection,tSals[0]));
-//        for(Salarie sal: tSals){
-//            for(int i = 0; i < 10; i++) {
-//                aTaches.add(generationTache(selection, sal));
-//            }
-//            sal.creTTaches();
-//        }
+//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,8,0,13,45));
+//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,10,0,16,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,9,0,11,30));
+//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,16,30,20,0));
+        for(Salarie sal: tSals){
+            for(int i = 0; i < 50; i++) {
+                aTaches.add(generationTache(selection, sal));
+            }
+        }
         selection.setTSals(tSals);
         selection.setTTache(aTaches.toArray(new Tache[aTaches.size()]));
         return selection;
@@ -58,9 +60,19 @@ public class SelectionDTO implements Serializable {
         String[]noms = {"Salarié 1","Salarié 2","Salarié 3","Salarié 4","Salarié 5"};
         Salarie[] tSals = new Salarie[noms.length];
         for(int i = 0; i< noms.length; i++){
-            tSals[i] = new Salarie(selection, i, noms[i], nbJours);
+            tSals[i] = new Salarie(noms[i], nbJours);
         }
         return tSals;
+    }
+
+    private Tache generationTacheFixe(Selection selection, Salarie salarie, int annee, int mois, int jour, int heure, int minute, int hFin, int mnFin){
+        LocalDateTime d = LocalDateTime.of(annee,mois,jour,heure,minute);
+        LocalDateTime d2 = LocalDateTime.of(annee,mois,jour,hFin,mnFin);
+        LocalDate d3 = LocalDate.of(annee,mois,jour);
+        int numCol = (int)(d3.toEpochDay() - debut.toEpochDay());
+        Tache t = new Tache(selection.getAndIncrNumTache(), d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numCol);
+        salarie.ajoutTaches(t);
+        return t;
     }
 
 
@@ -81,10 +93,12 @@ public class SelectionDTO implements Serializable {
         d2 = d2.plusMinutes(genererInt(0,6) * 10);
         d3 = LocalDate.of(d.getYear(), d.getMonthValue(), d.getDayOfMonth());
         int numCol = (int)(d3.toEpochDay() - debut.toEpochDay());
-        Tache t = new Tache(selection.getAndIncrNumTache(), salarie.getNumSal(), d.getYear(), d.getMonthValue(), d.getDayOfYear(), d.getMinute(), d.getSecond(), d.getLong(ChronoField.NANO_OF_DAY),d2.getYear(), d2.getMonthValue(), d2.getDayOfYear(), d2.getMinute(), d2.getSecond(), d2.getLong(ChronoField.NANO_OF_DAY), numCol);
+        Tache t = new Tache(selection.getAndIncrNumTache(), d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numCol);
         salarie.ajoutTaches(t);
         return t;
     }
+
+
 
     private LocalDateTime positionnerPremierLundi(LocalDateTime dat){
         LocalDateTime d = dat;

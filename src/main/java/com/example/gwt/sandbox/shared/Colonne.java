@@ -1,9 +1,11 @@
-package com.example.gwt.sandbox.client;
+package com.example.gwt.sandbox.shared;
 
 /*
     TODO Marc 12/9/2022: quelque soit le choix d'affichage (JOUR,SEMAINE,MOIS,...), une colonne correspond à 1 jour
         Les tâches se positionnent par rapport à positionX et largeur, ce qui fait que l'affichage doit toujours être correct (sans vide ni débordement)
  */
+
+import com.example.gwt.sandbox.client.Test;
 
 import java.io.Serializable;
 

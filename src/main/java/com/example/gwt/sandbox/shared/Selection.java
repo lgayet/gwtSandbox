@@ -1,7 +1,5 @@
 package com.example.gwt.sandbox.shared;
 
-import com.example.gwt.sandbox.client.Colonne;
-
 import java.io.Serializable;
 
 public class Selection  implements Serializable {
@@ -15,7 +13,7 @@ public class Selection  implements Serializable {
     private Colonne[] tCols;
     private Salarie[] tSals;
     private Tache[] tTache;
-    private int numTache = 0;
+    private int numTache = 0;//pour numéroter les tâches
 
     public Selection(){
 
@@ -26,16 +24,6 @@ public class Selection  implements Serializable {
         this.moisDebut = moisDebut;
         this.anneeFin = anneeFin;
         this.moisFin = moisFin;
-    }
-
-    public Selection(int anneeDebut, int moisDebut, int anneeFin, int moisFin, int nbJours, Colonne[] tCols, Salarie[] tSals) {
-        this.anneeDebut = anneeDebut;
-        this.moisDebut = moisDebut;
-        this.anneeFin = anneeFin;
-        this.moisFin = moisFin;
-        this.nbJours = nbJours;
-        this.tCols = tCols;
-        this.tSals = tSals;
     }
 
     public void setNbJours(int nbJours) {
@@ -58,22 +46,6 @@ public class Selection  implements Serializable {
         this.tTache = tTache;
     }
 
-    public int getAnneeDebut() {
-        return anneeDebut;
-    }
-
-    public int getMoisDebut() {
-        return moisDebut;
-    }
-
-    public int getAnneeFin() {
-        return anneeFin;
-    }
-
-    public int getMoisFin() {
-        return moisFin;
-    }
-
     public int getNbJours() {
         return nbJours;
     }
@@ -85,9 +57,6 @@ public class Selection  implements Serializable {
     public Salarie[] getTSals() {
         return tSals;
     }
-     public void setTTaches(Tache[] taches){
-        this.tTache = taches;
-     }
 
     public int getAndIncrNumTache(){
         int num = numTache;

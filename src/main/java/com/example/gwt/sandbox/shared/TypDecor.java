@@ -1,4 +1,4 @@
-package com.example.gwt.sandbox.client;
+package com.example.gwt.sandbox.shared;
 
 public enum TypDecor { PLAGE_REALISATION, PAUSE, CONTROLE, PHOTOS,
 }

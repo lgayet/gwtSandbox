@@ -1,8 +1,6 @@
 package com.example.gwt.sandbox.shared;
 
-import com.example.gwt.sandbox.client.Colonne;
 import com.example.gwt.sandbox.client.Test;
-import com.example.gwt.sandbox.client.TypTache;
 import org.vaadin.gwtgraphics.client.DrawingArea;
 import org.vaadin.gwtgraphics.client.Positionable;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
@@ -15,7 +13,6 @@ public class Tache implements Serializable, Positionable {
     private transient Test test;
     private TypTache typTache;
     private int numTache;
-    private int numSal;
     private int anneDeb;
     private int moisDeb;
     private int jourDeb;
@@ -30,18 +27,19 @@ public class Tache implements Serializable, Positionable {
     private long longFin;
 //
     private int numCol;
+    private int niveau;// l'indice du niveau de dépôt de la tâche
+    private double decalX;//pour les contrôles de marges
     private transient Colonne colonne;
 //    les taches et intersection
-    private Tache[] tachesIntersect;
+    private Tache[] tachesIntersect = new Tache[0];
     private transient Rectangle rectangle;
     private transient Text text;
 
     public Tache() {
     }
 
-    public Tache(int numTache, int numSal, int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numCol) {
+    public Tache(int numTache, int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numCol) {
         this.numTache = numTache;
-        this.numSal = numSal;
         this.anneDeb = anneDeb;
         this.moisDeb = moisDeb;
         this.jourDeb = jourDeb;
@@ -83,60 +81,56 @@ public class Tache implements Serializable, Positionable {
         return colonne;
     }
 
-
-    public int getAnneDeb() {
-        return anneDeb;
-    }
-
-    public int getMoisDeb() {
-        return moisDeb;
-    }
-
-    public int getJourDeb() {
-        return jourDeb;
-    }
-
-    public int gethDeb() {
-        return hDeb;
-    }
-
-    public int getMnDeb() {
-        return mnDeb;
-    }
-
     public long getLongDeb() {
         return longDeb;
-    }
-
-    public int getAnneFin() {
-        return anneFin;
-    }
-
-    public int getMoisFin() {
-        return moisFin;
-    }
-
-    public int getJourFin() {
-        return jourFin;
-    }
-
-    public int gethFin() {
-        return hFin;
-    }
-
-    public int getMnFin() {
-        return mnFin;
     }
 
     public long getLongFin() {
         return longFin;
     }
 
-    public void ajoutTacheIntersect(Tache tache){
-
+    public int getNiveau() {
+        return niveau;
     }
+
+    public void setNiveau(int niveau) {
+        this.niveau = niveau;
+    }
+
+    public int getIndiceMax(){
+        int iMax = niveau;
+        for(Tache t: tachesIntersect){
+            if(t.getNiveau() > iMax)iMax = t.getNiveau();
+        }
+        return iMax;
+    }
+
+    public void ajoutTacheIntersect(Tache tache){
+        for(Tache t: tachesIntersect){
+            if(t == tache)return;
+        }
+        Tache[] t = new Tache[tachesIntersect.length +1];
+        for(int i = 0; i < tachesIntersect.length; i++){
+            t[i] = tachesIntersect[i];
+        }
+        t[tachesIntersect.length]= tache;
+        tachesIntersect = t;
+    }
+
     public void retraitTacheIntersect(Tache tache){
 
+    }
+    public int getPositionXDeb(int positionXCol, double largCol, double heureDebJour, double heureFinJour){
+        double hDebut = hDeb + mnDeb  / 60.0;
+        decalX =  (hDebut - heureDebJour) * largCol / (heureFinJour - heureDebJour);
+         int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
+         return x;
+    }
+
+    public int getLargeur(double largCol, double nbHeuresJour){
+        double nbHeuresTache = hFin +  mnFin / 60.0 - (hDeb + mnDeb / 60.0 );
+        double w = decalX + largCol * nbHeuresTache / nbHeuresJour;
+        return (int)(largCol * nbHeuresTache / nbHeuresJour);
     }
 
     @Override

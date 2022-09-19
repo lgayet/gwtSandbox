@@ -1,15 +1,15 @@
 package com.example.gwt.sandbox.shared;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+
 
 public class Niveau implements Serializable {
-    private int numSal;
-    private int numNiv;// indice
-    private transient Salarie salarie;
+
+    private int indice;// indice
     private NivCol[] nivCols = new NivCol[0];
-    private Integer[] taches;
-    private transient ArrayList<Integer> aNumTaches = new ArrayList<>();
+//    pour positionner les Taches lorsque les nivCols n'ont pas de chevauchement
+    private int positionY;
+    private int hauteurNiveau;
     /*
         TODO: le niveau est géré par le Salarié, à partir de la liste de selection
             son indice est local au Salarié
@@ -18,10 +18,8 @@ public class Niveau implements Serializable {
     public Niveau() {
     }
 
-    public Niveau(Salarie salarie, int numNiv, int nbJours){
-        this.salarie = salarie;
-        numSal = salarie.getNumSal();
-        this.numNiv = numNiv;
+    public Niveau(int indice, int nbJours){
+        this.indice = indice;
         nivCols = new NivCol[nbJours];
     }
 
@@ -29,15 +27,24 @@ public class Niveau implements Serializable {
         return nivCols;
     }
 
-    public void ajoutTache(Tache tache){
-        aNumTaches.add(tache.getNumTache());
+    public boolean essaiAjoutTache( Tache tache){
         int numCol = tache.getNumCol();
         if(nivCols[numCol] == null)nivCols[numCol] = new NivCol(numCol);
-        nivCols[numCol].ajoutTache(tache.getNumTache());
+        if( ! nivCols[numCol].essaiAjoutTache(tache, indice))return false;
+        return true;
     }
 
-    public void creTTache(){
-        taches = aNumTaches.toArray(new Integer[aNumTaches.size()]);
+
+    public int getIndice() {
+        return indice;
     }
 
+    public void setPositionYetHauteur(int positionY, int hauteurNiveau) {
+        this.positionY = positionY;
+        this.hauteurNiveau = hauteurNiveau;
+    }
+
+    public int getHauteurNiveau() {
+        return hauteurNiveau;
+    }
 }

@@ -5,7 +5,9 @@ import java.io.Serializable;
 public class NivCol implements Serializable {
 
     private int numCol;
-    private int[] numsTache = new int[0];
+    private Tache[] taches = new Tache[0];
+    //    pour positionner les Taches
+
 
 
     public NivCol() {
@@ -20,17 +22,26 @@ public class NivCol implements Serializable {
         return numCol;
     }
 
-    public int[] getNumsTache() {
-        return numsTache;
+    public Tache[] getTaches() {
+        return taches;
     }
 
-    public void ajoutTache(int numTache){
-       int[] t = new int[numsTache.length + 1];
-       for(int i = 0; i < numsTache.length; i ++){
-           t[i] = numsTache[i];
+    public boolean essaiAjoutTache(Tache tache, int indice){
+        for(Tache t: taches){
+            if(t.getLongDeb() < tache.getLongFin() && t.getLongFin() > tache.getLongDeb()) {
+                t.ajoutTacheIntersect(tache);
+                tache.ajoutTacheIntersect(t);
+                return false;
+            }
+        }
+       Tache[] t = new Tache[taches.length + 1];
+       for(int i = 0; i < taches.length; i ++){
+           t[i] = taches[i];
        }
-       t[numsTache.length] = numTache;
-       numsTache = t;
+       tache.setNiveau(indice);
+       t[taches.length] = tache;
+       taches = t;
+       return true;
     }
 }
 

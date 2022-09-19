@@ -9,6 +9,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import org.vaadin.gwtgraphics.client.DrawingArea;
 import org.vaadin.gwtgraphics.client.Line;
+import org.vaadin.gwtgraphics.client.VectorObject;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
@@ -24,7 +25,7 @@ public class Test implements EntryPoint {
   private final int LARGEUR_PANEL = 1900;
   private final int HAUTEUR_PANEL = 600;
   private final int HAUTEUR_ENTETES_COLONNES = 50;
-  private final int LARGEUR_ENTETE_SALARIES = 250;
+  private final int LARGEUR_ENTETE_SALARIES = LARGEUR_PANEL / 8;
   private final DrawingArea canvas = new DrawingArea(LARGEUR_PANEL, HAUTEUR_PANEL);
   private final double OPACITY = 0.3D;
   private ChoixAffichage choixAffichage;
@@ -43,17 +44,14 @@ public class Test implements EntryPoint {
     TODO Marc: 13/9/2022: première implémentation: selection de 3 mois pleins
    */
 //  Les choix d'affichage ENTREPRISE/UTILISATEUR
-  private final double HEURE_DEBUT_JOUR = 6.0;
+  private final double HEURE_DEBUT_JOUR = 6.0;//TODO  petit modif a prévoir si début n'est pas une heure exacte
   private final double HEURE_FIN_JOUR = 22.5;
   private final double PLAGE_HORARAIRE = HEURE_FIN_JOUR - HEURE_DEBUT_JOUR;
   // les contenus modifiables du tableau
   private Text labelCentre;
-  private Line[]tLVCols = new Line[0];
-  private Line[]tLVHor = new Line[0];
-  private Text[]tLabel = new Text[0];
   private Line[]tLHSals = new Line[0];
   private Text[]tNomsSal = new Text[0];
-  private ArrayList<Rectangle> aTaches = new ArrayList<>();
+  private ArrayList<VectorObject> aCanv = new ArrayList<>();
 //  les objets servant au dépôt et au déplacement des tâches
   private Selection selection;
   private int nbJoursSelection;
@@ -135,7 +133,7 @@ public class Test implements EntryPoint {
         tLHSals = new Line[nbSal];
         tNomsSal = new Text[nbSal];
         for(int i = 0; i < nbSal; i++){
-          tSals[i].setPositionY((int)(hauteurSal * i) + HAUTEUR_ENTETES_COLONNES * 2);
+          tSals[i].setPositionY((int)(hauteurSal * i) + HAUTEUR_ENTETES_COLONNES * 2, hauteurSal);
           tLHSals[i] = ajoutLigne(0,tSals[i].getPositionY(), LARGEUR_PANEL, tSals[i].getPositionY(), OPACITY);
           tNomsSal[i] = ajoutLabel( LARGEUR_ENTETE_SALARIES / 4, tSals[i].getPositionY() + (int) hauteurSal / 2 + 5 , tSals[i].getNomSal(), 14, 0.8);
         }
@@ -199,37 +197,20 @@ public class Test implements EntryPoint {
   private void affiche(ChoixAffichage choixAffichage){
     this.choixAffichage = choixAffichage;
     canvas.remove(labelCentre);
-    for(Line l: tLVCols){
-      if(l != null)canvas.remove(l);
-    }
-    for(Line l: tLVHor){
-      if(l != null)canvas.remove(l);
-    }
-    for(Text t: tLabel){
-      if(t != null)canvas.remove(t);
-    }
-    for(Rectangle r: aTaches){
-      if(r != null)canvas.remove(r);
-    }
-    aTaches.clear();
+    for(VectorObject r: aCanv)canvas.remove(r);
+    aCanv.clear();
 
     if(choixAffichage == ChoixAffichage.JOUR){
       nbJoursAffiches = 1;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
-
-      tLVCols = new Line[0];//TODO reste à afficher les heures
+      largCol = largeurPanel - largeurEntetesSalaries;
       double largeurHoraire = (largeurPanel - largeurEntetesSalaries ) / PLAGE_HORARAIRE;
-      tLVHor = new Line[(int) PLAGE_HORARAIRE];
-      tLabel = new Text[(int) PLAGE_HORARAIRE];
-      tLabel[0] = labelCentre;
-      int i = 0;
       for(double h = 1.0; h < PLAGE_HORARAIRE; h +=1.0){
         int decalX = h+ (int) HEURE_DEBUT_JOUR  < 10 ? 3 : 6;
-        tLVHor[i] = ajoutLigne(c.getPositionX() + (int) (h* largeurHoraire), HAUTEUR_ENTETES_COLONNES  + 30, c.getPositionX() + (int) (h * largeurHoraire), HAUTEUR_PANEL, OPACITY);
-        tLabel[i] = ajoutLabel(c.getPositionX() + (int) (h* largeurHoraire) - decalX, HAUTEUR_ENTETES_COLONNES + 20, (int) h+ HEURE_DEBUT_JOUR+ "" , 12, 0.5);
-        i ++;
+        aCanv.add( ajoutLigne(c.getPositionX() + (int) (h* largeurHoraire), HAUTEUR_ENTETES_COLONNES  + 30, c.getPositionX() + (int) (h * largeurHoraire), HAUTEUR_PANEL, OPACITY));
+        aCanv.add(ajoutLabel(c.getPositionX() + (int) (h* largeurHoraire) - decalX, HAUTEUR_ENTETES_COLONNES + 20, (int) h+ HEURE_DEBUT_JOUR+ "" , 12, 0.5));
       }
 
     }else if(choixAffichage == ChoixAffichage.SEMAINE) {
@@ -243,10 +224,7 @@ public class Test implements EntryPoint {
       boolean moisFin = cFin.getNumMois() != c.getNumMois();
       int decalX = anneeFin ? 150 : moisFin ? 100 : 50;
       String text = anneeFin ? (tMoisLong[c.getNumMois()]+"  " + c.getAnnee() +"  -  "+ tMoisLong[cFin.getNumMois()] + "  "+ cFin.getAnnee() ) : ( moisFin ?  tMoisLong[c.getNumMois()] +"  -  " + tMoisLong[cFin.getNumMois()]+ "  "+ c.getAnnee() : tMoisLong[c.getNumMois()]+"  "+c.getAnnee());
-
       labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - decalX,30, text , 20, 1.0);
-      tLVCols = new Line[6];
-      tLabel = new Text[7];
       largCol = (largeurPanel - largeurEntetesSalaries) / 7.0;
       double decal2X = 20.0;
       Colonne c2;
@@ -254,8 +232,8 @@ public class Test implements EntryPoint {
         double x = largeurEntetesSalaries + (largCol * i );// TODO: pour dessiner la ligne à gauche de la colonne
         c2 = tCols[c.getNumCol()+ i];
         c2.setPositionX((int)x);
-        if(i > 0)tLVCols[i] = ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES , c2.getPositionX(), HAUTEUR_PANEL, OPACITY);
-        tLabel[i] = ajoutLabel((int)( c2.getPositionX() + largCol / 2.0 - decal2X ), HAUTEUR_ENTETES_COLONNES + 30 , tJours[tCols[indicePremiereCol+i].getNumJourSem()]+ " "+tCols[indicePremiereCol+i].getNumJourMois() , 14, 0.5D);
+        if(i > 0)aCanv.add(ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES , c2.getPositionX(), HAUTEUR_PANEL, OPACITY));
+        aCanv.add(ajoutLabel((int)( c2.getPositionX() + largCol / 2.0 - decal2X ), HAUTEUR_ENTETES_COLONNES + 30 , tJours[tCols[indicePremiereCol+i].getNumJourSem()]+ " "+tCols[indicePremiereCol+i].getNumJourMois() , 14, 0.5D));
       }
     }
       else if(choixAffichage == ChoixAffichage.MOIS){//TODO: il faudra etablir le nombre de jours enj fonction du mois
@@ -265,8 +243,6 @@ public class Test implements EntryPoint {
         int nbJoursMois = getNbJoursMois(c.getAnnee(), c.getNumMois());
         nbJoursAffiches = nbJoursMois;
         labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 50,30, tMoisLong[c.getNumMois()]+"  "+c.getAnnee() , 20, 1.0);
-        tLVCols = new Line[nbJoursMois -1];
-        tLabel = new Text[nbJoursMois * 2 ];
         largCol = (largeurPanel - largeurEntetesSalaries)/ nbJoursMois;
         for(int i = 0; i< nbJoursMois; i++ ){
           double x = largeurEntetesSalaries + (largCol * (i));
@@ -274,9 +250,9 @@ public class Test implements EntryPoint {
           c2.setPositionX((int)x);
           double opacite = c2.getNumJourMois() > 1 && c2.getNumJourSem() == 1.0 ? 0.5 : OPACITY;
           int decalX = c2.getNumJourMois() >= 10 ? 7 : 5;
-          if(i > 0)tLVCols[i]= ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES, (int)x, HAUTEUR_PANEL, opacite);
-          tLabel[i * 2] = ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - 10), HAUTEUR_ENTETES_COLONNES + 20, tJours[c2.getNumJourSem()], 12, OPACITY);
-          tLabel[i * 2 + 1] = ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - decalX) , HAUTEUR_ENTETES_COLONNES + 40, c2.getNumJourMois()+"", 12,OPACITY);
+          if(i > 0)aCanv.add(ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES, (int)x, HAUTEUR_PANEL, opacite));
+          aCanv.add(ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - 10), HAUTEUR_ENTETES_COLONNES + 20, tJours[c2.getNumJourSem()], 12, OPACITY));
+          aCanv.add(ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - decalX) , HAUTEUR_ENTETES_COLONNES + 40, c2.getNumJourMois()+"", 12,OPACITY));
         }
     }
 //      affichage des Tâches
@@ -284,13 +260,15 @@ public class Test implements EntryPoint {
     for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
       c = tCols[i];
       for (Salarie s : tSals) {
-        for (Niveau n : s.getNiveaux()) {
+        int nivs = s.getTNbNiv()[i];// nombre de niveaux actifs pour la cellule
+        for (int j = 0; j < nivs; j++) {
+          Niveau n = s.getNiveau(j);
           NivCol nc = n.getNivCols()[i];
-          if(nc != null && nc.getNumCol() == i){
-            for(int numTache: nc.getNumsTache()){
-              Tache tache = tTaches[numTache];
-              aTaches.add(ajoutTache(c.getPositionX(),s.getPositionY(),20,10,"blue"));
+          if(nc != null ){
+            for(Tache tache: nc.getTaches()){
+              aCanv.add(ajoutTache(tache.getPositionXDeb(c.getPositionX(), largCol, HEURE_DEBUT_JOUR, HEURE_FIN_JOUR),(int)(s.getPositionY()+ s.getHauteurSal() * j / nivs + 3),tache.getLargeur(largCol, HEURE_FIN_JOUR - HEURE_DEBUT_JOUR),(int)(s.getHauteurSal() / nivs -6),"blue"));
             }
+
           }
         }
       }
@@ -315,6 +293,8 @@ public class Test implements EntryPoint {
   private Rectangle ajoutTache(int x, int y, int w, int h, String c){
     Rectangle r = new Rectangle(x,y, w, h);
     r.setFillColor(c);
+    r.setFillOpacity(0.5);
+    r.setStrokeWidth(0);
     canvas.add(r);
     return r;
   }

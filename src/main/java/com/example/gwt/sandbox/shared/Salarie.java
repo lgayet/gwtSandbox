@@ -1,49 +1,48 @@
 package com.example.gwt.sandbox.shared;
 
-import com.example.gwt.sandbox.client.Test;
-
 import java.io.Serializable;
 
 public class Salarie implements Serializable {
-    private int numSal;
+
     private String nomSal;
     private int nbJours;
-    private transient Test test;
     private Niveau[] niveaux = new Niveau[1];
+//    pour l'affichage
+    double hauteurSal;
     private int positionY;
-    private transient Selection selection;
+    private int[] tNbNiv;
 
     public Salarie() {
     }
 
-    public Salarie(Selection selection, int numSal, String nomSal, int nbJours) {
-        this.selection = selection;
-        this.numSal = numSal;
+    public Salarie( String nomSal, int nbJours) {
         this.nomSal = nomSal;
         this.nbJours = nbJours;
-        niveaux[0] = new Niveau(this, 0, nbJours);
+        niveaux[0] = new Niveau(0, nbJours);
+        tNbNiv = new int[nbJours];
+        for(int i = 0; i < nbJours; i++){
+            tNbNiv[i] = 0;
+        }
     }
 
     public String getNomSal() {
         return nomSal;
     }
 
-    public int getNumSal() {
-        return numSal;
-    }
 
     public Niveau[] getNiveaux(){
         return niveaux;
     }
 
     public Niveau getNiveau(int niv){
-        if(niv <= niveaux.length)return niveaux[niv];
+        if(niv < niveaux.length)return niveaux[niv];
         else return ajoutNiveau();
     }
 
     private Niveau ajoutNiveau(){
-        Niveau nouv = new Niveau(this, niveaux.length, nbJours);
-        Niveau[] t = new Niveau[niveaux.length + 1];
+        int newNbNiv = niveaux.length + 1 ;
+        Niveau nouv = new Niveau(niveaux.length, nbJours);
+        Niveau[] t = new Niveau[newNbNiv];
         for(int i = 0; i < niveaux.length; i++){
             t[i] = niveaux[i];
         }
@@ -52,23 +51,37 @@ public class Salarie implements Serializable {
         return nouv;
     }
 
+    public int[] getTNbNiv() {
+        return tNbNiv;
+    }
+
     public int getPositionY() {
         return positionY;
     }
 
-    public void setPositionY(int positionY) {
+    public double getHauteurSal() {
+        return hauteurSal;
+    }
+
+    public void setPositionY(int positionY, double hauteurSal) {
         this.positionY = positionY;
+        this.hauteurSal = hauteurSal;
+        int hauteurNiveau = (int) (hauteurSal / niveaux.length);
+        for(int i = 0; i< niveaux.length; i++){
+            niveaux[i].setPositionYetHauteur(positionY + hauteurNiveau * i ,hauteurNiveau );
+        }
     }
 
     public void ajoutTaches(Tache tache){
-        niveaux[0].ajoutTache(tache);
-    }
-
-    public void creTTaches(){
-        for(Niveau n: niveaux){
-            n.creTTache();
+        boolean b = false;
+        int i = 0;
+        while( ! b ){
+            b = getNiveau(i).essaiAjoutTache(tache);
+            if(b && i +1 > tNbNiv[tache.getNumCol()])tNbNiv[tache.getNumCol()] = i +1;// on place le niveau maximun atteint pour cette colonne
+            i++;
         }
     }
+
 
 
 
