@@ -38,7 +38,7 @@ public class ButtonPlusMoins extends VectorObject implements Positionable {
 
     private void onClick(){
         if(valid){
-            setValid(test.setPlusMoins(plus));
+            test.setPlusMoins(plus);
             b2.setValid(true);
         }
     }

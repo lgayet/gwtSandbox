@@ -3,6 +3,7 @@ package com.example.gwt.sandbox.client;
 import com.example.gwt.sandbox.client.component.ChampHeureMinute;
 import com.example.gwt.sandbox.client.component.ChampTelephone;
 import com.example.gwt.sandbox.shared.FieldVerifier;
+import com.example.gwt.sandbox.shared.Tache;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;

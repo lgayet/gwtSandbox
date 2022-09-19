@@ -1,5 +1,8 @@
 package com.example.gwt.sandbox.client;
 
+import com.example.gwt.sandbox.shared.Salarie;
+import com.example.gwt.sandbox.shared.Tache;
+
 public class CelluleSalCol {
     private int numCell;
     private Test test;

@@ -13,29 +13,49 @@ public class Selection  implements Serializable {
 //
     private int nbJours;
     private Colonne[] tCols;
-
-    private String label;
+    private Salarie[] tSals;
+    private Tache[] tTache;
+    private int numTache = 0;
 
     public Selection(){
 
     }
 
-    public Selection(String label) {
-        this.label = label;
+    public Selection(int anneeDebut, int moisDebut, int anneeFin, int moisFin) {
+        this.anneeDebut = anneeDebut;
+        this.moisDebut = moisDebut;
+        this.anneeFin = anneeFin;
+        this.moisFin = moisFin;
     }
 
-    public Selection(int anneeDebut, int moisDebut, int anneeFin, int moisFin, int nbJours, Colonne[] tCols) {
+    public Selection(int anneeDebut, int moisDebut, int anneeFin, int moisFin, int nbJours, Colonne[] tCols, Salarie[] tSals) {
         this.anneeDebut = anneeDebut;
         this.moisDebut = moisDebut;
         this.anneeFin = anneeFin;
         this.moisFin = moisFin;
         this.nbJours = nbJours;
         this.tCols = tCols;
+        this.tSals = tSals;
     }
 
+    public void setNbJours(int nbJours) {
+        this.nbJours = nbJours;
+    }
 
-    public String getLabel() {
-        return label;
+    public void setTCols(Colonne[] tCols) {
+        this.tCols = tCols;
+    }
+
+    public void setTSals(Salarie[] tSals) {
+        this.tSals = tSals;
+    }
+
+    public Tache[] getTTache() {
+        return tTache;
+    }
+
+    public void setTTache(Tache[] tTache) {
+        this.tTache = tTache;
     }
 
     public int getAnneeDebut() {
@@ -60,5 +80,18 @@ public class Selection  implements Serializable {
 
     public Colonne[] getTCols() {
         return tCols;
+    }
+
+    public Salarie[] getTSals() {
+        return tSals;
+    }
+     public void setTTaches(Tache[] taches){
+        this.tTache = taches;
+     }
+
+    public int getAndIncrNumTache(){
+        int num = numTache;
+        numTache ++;
+        return num;
     }
 }

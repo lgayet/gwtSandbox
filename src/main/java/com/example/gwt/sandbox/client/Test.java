@@ -1,6 +1,6 @@
 package com.example.gwt.sandbox.client;
 
-import com.example.gwt.sandbox.shared.Selection;
+import com.example.gwt.sandbox.shared.*;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
@@ -9,8 +9,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import org.vaadin.gwtgraphics.client.DrawingArea;
 import org.vaadin.gwtgraphics.client.Line;
+import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -48,7 +50,10 @@ public class Test implements EntryPoint {
   private Text labelCentre;
   private Line[]tLVCols = new Line[0];
   private Line[]tLVHor = new Line[0];
-  private Text[] tLabel = new Text[0];
+  private Text[]tLabel = new Text[0];
+  private Line[]tLHSals = new Line[0];
+  private Text[]tNomsSal = new Text[0];
+  private ArrayList<Rectangle> aTaches = new ArrayList<>();
 //  les objets servant au dépôt et au déplacement des tâches
   private Selection selection;
   private int nbJoursSelection;
@@ -57,7 +62,8 @@ public class Test implements EntryPoint {
   private int indiceJourCourant = 0;//TODO pour les retours Semaine ou mois vers Jour (premier jour de la semaine ou du mois)
   private double largCol;
   private Colonne[] tCols;//TODO: dimension= nbJours de la selection
-  private Salarie[] salaries = new Salarie[0];
+  private Salarie[] tSals;
+  private Tache[] tTaches;
   private String label;
 //
   private ButtonPlusMoins boutMoins;
@@ -82,8 +88,6 @@ public class Test implements EntryPoint {
 //    Debut de la construction graphique
 //  LH_Entete
     ajoutLigne(0, HAUTEUR_ENTETES_COLONNES, LARGEUR_PANEL, HAUTEUR_ENTETES_COLONNES, OPACITY);
-//  LH_EnteteCol
-    ajoutLigne(0, HAUTEUR_ENTETES_COLONNES * 2, LARGEUR_PANEL, HAUTEUR_ENTETES_COLONNES *2, OPACITY);
 //  LV_EnteteSalaries
     ajoutLigne( LARGEUR_ENTETE_SALARIES,50, LARGEUR_ENTETE_SALARIES, HAUTEUR_PANEL , OPACITY);
 //    Ajout des boutons choixAffichage
@@ -124,51 +128,75 @@ public class Test implements EntryPoint {
     public void onSuccess(Selection result) {
         nbJoursSelection = result.getNbJours();
         tCols = result.getTCols();
+        tSals = result.getTSals();
+        tTaches = result.getTTache();
+        int nbSal = tSals.length;
+        double hauteurSal = (HAUTEUR_PANEL - HAUTEUR_ENTETES_COLONNES * 2) / nbSal;
+        tLHSals = new Line[nbSal];
+        tNomsSal = new Text[nbSal];
+        for(int i = 0; i < nbSal; i++){
+          tSals[i].setPositionY((int)(hauteurSal * i) + HAUTEUR_ENTETES_COLONNES * 2);
+          tLHSals[i] = ajoutLigne(0,tSals[i].getPositionY(), LARGEUR_PANEL, tSals[i].getPositionY(), OPACITY);
+          tNomsSal[i] = ajoutLabel( LARGEUR_ENTETE_SALARIES / 4, tSals[i].getPositionY() + (int) hauteurSal / 2 + 5 , tSals[i].getNomSal(), 14, 0.8);
+        }
     }
   });
   }
 
-  public boolean setPlusMoins(boolean plus){
-    if( ! plus && indicePremiereCol == 0)return false;
-    //TODO faire le cas plus
-    int nbJoursAffiches = 1;
+  public void setPlusMoins(boolean plus){
+    if( ! plus && indicePremiereCol == 0){
+      boutMoins.setValid(false);
+      return;
+    }
     switch(choixAffichage){
       case JOUR: {
         indicePremiereCol = plus ? indicePremiereCol + 1 : indicePremiereCol - 1;
-        indiceJourCourant = tCols[indicePremiereCol].getNumJourSem();
+        indiceJourCourant = indicePremiereCol;
+        if(indicePremiereCol == 0)boutMoins.setValid(false);
+        if(indicePremiereCol == tCols.length -1)boutPlus.setValid(false);
       } break;
       case SEMAINE: {
         indicePremiereCol = plus ? indicePremiereCol + 7 : indicePremiereCol - 7;
         nbJoursAffiches = 7;
+        indiceJourCourant = indicePremiereCol;
+        if(indicePremiereCol <= 0){
+          boutMoins.setValid(false);
+          if(indicePremiereCol < 0)return;
+        }
+        if(indicePremiereCol + 7 >= tCols.length){
+          boutPlus.setValid(false);
+          if(indicePremiereCol + 7 > tCols.length)return;
+        }
+        //TODO: affichage des semaines incomplètes?
       } break;
       case MOIS: {
 //        TODO dans le cas moins, on se décale du nombre de jours du mois précédent
-        nbJoursAffiches = getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois());
+        nbJoursAffiches = getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois());//TODO du mois en cours
         int decal = plus ? nbJoursAffiches: - getNbJoursMois(tCols[indicePremiereCol - 1].getAnnee(), tCols[indicePremiereCol - 1].getNumMois());
         indicePremiereCol = indicePremiereCol + decal;
-        indiceJourCourant = 1;//TODO: pour éviter certains plantages, on revient systématiquement sur lundi
+        nbJoursAffiches = getNbJoursMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois());//TODO du nouveau mois
+        indiceJourCourant = indicePremiereCol;//TODO: pour éviter certains plantages, on revient systématiquement sur lundi
+        if(indicePremiereCol <= 0){
+          boutMoins.setValid(false);
+          if(indicePremiereCol < 0)return;
+        }
+        if(indicePremiereCol + nbJoursAffiches >= tCols.length){
+          boutPlus.setValid(false);
+          if(indicePremiereCol + nbJoursAffiches > tCols.length)return;
+        }
       } break;
     }
-    if(indicePremiereCol <= 0) {
-      indicePremiereCol = 0;
-      boutMoins.setValid((false));
-    }
-    if(indicePremiereCol+ nbJoursAffiches >= tCols.length){
-      indicePremiereCol = tCols.length -1;
-      boutPlus.setValid(false);
-    }
-    affiche(choixAffichage, false);
-    return true;
+    affiche(choixAffichage);
   }
 
   public void setChoixAffichage(ChoixAffichage choixAffichage){
     System.out.println("coucou setChoixAffichage avec "+choixAffichage);
 //    labelCentre.setText(choixAffichage.toString());
-    if( choixAffichage != this.choixAffichage) affiche(choixAffichage, true);
+    if( choixAffichage != this.choixAffichage) affiche(choixAffichage);
   }
 
 
-  private void affiche(ChoixAffichage choixAffichage, boolean modifChoix){
+  private void affiche(ChoixAffichage choixAffichage){
     this.choixAffichage = choixAffichage;
     canvas.remove(labelCentre);
     for(Line l: tLVCols){
@@ -180,10 +208,13 @@ public class Test implements EntryPoint {
     for(Text t: tLabel){
       if(t != null)canvas.remove(t);
     }
+    for(Rectangle r: aTaches){
+      if(r != null)canvas.remove(r);
+    }
+    aTaches.clear();
+
     if(choixAffichage == ChoixAffichage.JOUR){
-      int ajout = modifChoix ? indiceJourCourant - tCols[indicePremiereCol].getNumJourSem() : 0;//TODO pour gérér le retour depuis SEMAINE ou Mois si on s'était préalablement positionné sur un jour
-      indicePremiereCol += ajout;
-      if(indicePremiereCol < 0)indicePremiereCol = 0;
+      nbJoursAffiches = 1;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
@@ -202,7 +233,9 @@ public class Test implements EntryPoint {
       }
 
     }else if(choixAffichage == ChoixAffichage.SEMAINE) {
-      indicePremiereCol = indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1;//TODO: se positionne sur lundi
+      nbJoursAffiches = 7;
+      indicePremiereCol = indicePremiereCol - tCols[indicePremiereCol].getNumJourSem() + 1 ;//TODO: se positionne sur lundi
+      indicePremiereCol = indicePremiereCol < 0 ? 0 : indicePremiereCol;
       Colonne c = tCols[indicePremiereCol];
       c.setPositionX(LARGEUR_ENTETE_SALARIES);
       Colonne cFin = tCols[indicePremiereCol+6];
@@ -227,8 +260,10 @@ public class Test implements EntryPoint {
     }
       else if(choixAffichage == ChoixAffichage.MOIS){//TODO: il faudra etablir le nombre de jours enj fonction du mois
         Colonne c = getPremierJourMois(tCols[indicePremiereCol].getAnnee(), tCols[indicePremiereCol].getNumMois());
+        indicePremiereCol = c.getNumCol();
         Colonne c2;
         int nbJoursMois = getNbJoursMois(c.getAnnee(), c.getNumMois());
+        nbJoursAffiches = nbJoursMois;
         labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 50,30, tMoisLong[c.getNumMois()]+"  "+c.getAnnee() , 20, 1.0);
         tLVCols = new Line[nbJoursMois -1];
         tLabel = new Text[nbJoursMois * 2 ];
@@ -243,6 +278,22 @@ public class Test implements EntryPoint {
           tLabel[i * 2] = ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - 10), HAUTEUR_ENTETES_COLONNES + 20, tJours[c2.getNumJourSem()], 12, OPACITY);
           tLabel[i * 2 + 1] = ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - decalX) , HAUTEUR_ENTETES_COLONNES + 40, c2.getNumJourMois()+"", 12,OPACITY);
         }
+    }
+//      affichage des Tâches
+    Colonne c;
+    for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
+      c = tCols[i];
+      for (Salarie s : tSals) {
+        for (Niveau n : s.getNiveaux()) {
+          NivCol nc = n.getNivCols()[i];
+          if(nc != null && nc.getNumCol() == i){
+            for(int numTache: nc.getNumsTache()){
+              Tache tache = tTaches[numTache];
+              aTaches.add(ajoutTache(c.getPositionX(),s.getPositionY(),20,10,"blue"));
+            }
+          }
+        }
+      }
     }
   }
 
@@ -259,6 +310,13 @@ public class Test implements EntryPoint {
       if(c.getAnnee() == annee && c.getNumMois() == numMois && c.getNumJourMois() == 1)return c;
     }
     return null;
+  }
+
+  private Rectangle ajoutTache(int x, int y, int w, int h, String c){
+    Rectangle r = new Rectangle(x,y, w, h);
+    r.setFillColor(c);
+    canvas.add(r);
+    return r;
   }
 
   private Text ajoutLabel(int x, int y, String text, int size, double opacity){
