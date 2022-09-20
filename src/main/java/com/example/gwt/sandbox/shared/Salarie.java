@@ -1,16 +1,20 @@
 package com.example.gwt.sandbox.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Salarie implements Serializable {
 
     private String nomSal;
     private int nbJours;
-    private Niveau[] niveaux = new Niveau[1];
+    private int numInter= 0;
+    private transient ArrayList<Intersection> aInter = new ArrayList<>();
+    private Intersection[] intersections;
+    private SalCol[] salCols;
 //    pour l'affichage
     double hauteurSal;
     private int positionY;
-    private int[] tNbNiv;
+
 
     public Salarie() {
     }
@@ -18,10 +22,9 @@ public class Salarie implements Serializable {
     public Salarie( String nomSal, int nbJours) {
         this.nomSal = nomSal;
         this.nbJours = nbJours;
-        niveaux[0] = new Niveau(0, nbJours);
-        tNbNiv = new int[nbJours];
-        for(int i = 0; i < nbJours; i++){
-            tNbNiv[i] = 0;
+        salCols = new SalCol[nbJours];
+        for(int i = 0; i< nbJours; i++){
+            salCols[i] = new SalCol();
         }
     }
 
@@ -29,31 +32,23 @@ public class Salarie implements Serializable {
         return nomSal;
     }
 
-
-    public Niveau[] getNiveaux(){
-        return niveaux;
+    public SalCol[] getSalCols() {
+        return salCols;
     }
 
-    public Niveau getNiveau(int niv){
-        if(niv < niveaux.length)return niveaux[niv];
-        else return ajoutNiveau();
-    }
 
-    private Niveau ajoutNiveau(){
-        int newNbNiv = niveaux.length + 1 ;
-        Niveau nouv = new Niveau(niveaux.length, nbJours);
-        Niveau[] t = new Niveau[newNbNiv];
-        for(int i = 0; i < niveaux.length; i++){
-            t[i] = niveaux[i];
+    public Intersection getIntersection(Integer numInter){
+        if(intersections != null)return intersections[numInter];// on est sur GWT
+        for(Intersection i: aInter){// on est en création des tâches
+            if(i.getNumIntersec() == numInter)return i;
         }
-        t[niveaux.length] = nouv;
-        niveaux = t;
-        return nouv;
+        return null;
     }
 
-    public int[] getTNbNiv() {
-        return tNbNiv;
+    public void ajoutIntersection(Intersection intersection){
+        aInter.add(intersection);
     }
+
 
     public int getPositionY() {
         return positionY;
@@ -66,20 +61,22 @@ public class Salarie implements Serializable {
     public void setPositionY(int positionY, double hauteurSal) {
         this.positionY = positionY;
         this.hauteurSal = hauteurSal;
-        int hauteurNiveau = (int) (hauteurSal / niveaux.length);
-        for(int i = 0; i< niveaux.length; i++){
-            niveaux[i].setPositionYetHauteur(positionY + hauteurNiveau * i ,hauteurNiveau );
-        }
+    }
+    public void ajoutTaches(Tache tache){
+        salCols[tache.getNumColDeb()].ajoutTache(this, tache);
+        if(tache.getNumColDeb() != tache.getNumColFin())salCols[tache.getNumColFin()].ajoutTache(this, tache);
     }
 
-    public void ajoutTaches(Tache tache){
-        boolean b = false;
-        int i = 0;
-        while( ! b ){
-            b = getNiveau(i).essaiAjoutTache(tache);
-            if(b && i +1 > tNbNiv[tache.getNumCol()])tNbNiv[tache.getNumCol()] = i +1;// on place le niveau maximun atteint pour cette colonne
-            i++;
-        }
+    public void setTInterSal(){
+        intersections = aInter.toArray(new Intersection[aInter.size()]);
+    }
+
+
+
+    public int getNumInter(){
+        int n = numInter;
+        numInter++;
+        return n;
     }
 
 

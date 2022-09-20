@@ -50,6 +50,9 @@ public class SelectionDTO implements Serializable {
             }
         }
         selection.setTSals(tSals);
+        for(Salarie sa: tSals){
+            sa.setTInterSal();
+        }
         selection.setTTache(aTaches.toArray(new Tache[aTaches.size()]));
         return selection;
 
@@ -69,8 +72,10 @@ public class SelectionDTO implements Serializable {
         LocalDateTime d = LocalDateTime.of(annee,mois,jour,heure,minute);
         LocalDateTime d2 = LocalDateTime.of(annee,mois,jour,hFin,mnFin);
         LocalDate d3 = LocalDate.of(annee,mois,jour);
-        int numCol = (int)(d3.toEpochDay() - debut.toEpochDay());
-        Tache t = new Tache(selection.getAndIncrNumTache(), d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numCol);
+        LocalDate d4 = LocalDate.of(annee,mois,jour);
+        int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
+        int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
+        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);
         salarie.ajoutTaches(t);
         return t;
     }
@@ -83,6 +88,7 @@ public class SelectionDTO implements Serializable {
         LocalDateTime d;
         LocalDateTime d2;
         LocalDate d3;
+        LocalDate d4;
         d = dRef;
         d = d.plusDays(genererInt(1,6));
         d = d.plusWeeks(genererInt(0,13));
@@ -92,8 +98,10 @@ public class SelectionDTO implements Serializable {
         d2 = d2.plusHours(genererInt(1,7));
         d2 = d2.plusMinutes(genererInt(0,6) * 10);
         d3 = LocalDate.of(d.getYear(), d.getMonthValue(), d.getDayOfMonth());
-        int numCol = (int)(d3.toEpochDay() - debut.toEpochDay());
-        Tache t = new Tache(selection.getAndIncrNumTache(), d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numCol);
+        d4 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
+        int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
+        int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
+        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);
         salarie.ajoutTaches(t);
         return t;
     }

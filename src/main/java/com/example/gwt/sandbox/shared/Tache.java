@@ -26,11 +26,13 @@ public class Tache implements Serializable, Positionable {
     private int mnFin;
     private long longFin;
 //
-    private int numCol;
+    private int numColDeb;
+    private int numColFin;
     private int niveau;// l'indice du niveau de dépôt de la tâche
     private double decalX;//pour les contrôles de marges
     private transient Colonne colonne;
 //    les taches et intersection
+    private Integer numIntersection;
     private Tache[] tachesIntersect = new Tache[0];
     private transient Rectangle rectangle;
     private transient Text text;
@@ -38,7 +40,7 @@ public class Tache implements Serializable, Positionable {
     public Tache() {
     }
 
-    public Tache(int numTache, int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numCol) {
+    public Tache(int numTache, int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numColDeb, int numColFin) {
         this.numTache = numTache;
         this.anneDeb = anneDeb;
         this.moisDeb = moisDeb;
@@ -52,7 +54,8 @@ public class Tache implements Serializable, Positionable {
         this.hFin = hFin;
         this.mnFin = mnFin;
         this.longFin = longFin;
-        this.numCol = numCol;
+        this.numColDeb = numColDeb;
+        this.numColFin = numColFin;
     }
 
     public Tache(DrawingArea canvas, int x, int y, int width, int height, String label) {
@@ -73,8 +76,12 @@ public class Tache implements Serializable, Positionable {
         return numTache;
     }
 
-    public int getNumCol() {
-        return numCol;
+    public int getNumColDeb() {
+        return numColDeb;
+    }
+
+    public int getNumColFin() {
+        return numColFin;
     }
 
     public Colonne getColonne() {
@@ -97,14 +104,17 @@ public class Tache implements Serializable, Positionable {
         this.niveau = niveau;
     }
 
-    public int getIndiceMax(){
-        int iMax = niveau;
-        for(Tache t: tachesIntersect){
-            if(t.getNiveau() > iMax)iMax = t.getNiveau();
-        }
-        return iMax;
+    public Integer getNumIntersection(){
+        return numIntersection;
     }
 
+    public void setNumIntersection(Integer numIntersection) {
+        this.numIntersection = numIntersection;
+    }
+
+    public boolean isIntersection(){
+        return numIntersection != null;
+    }
     public void ajoutTacheIntersect(Tache tache){
         for(Tache t: tachesIntersect){
             if(t == tache)return;

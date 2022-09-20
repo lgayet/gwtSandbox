@@ -260,16 +260,11 @@ public class Test implements EntryPoint {
     for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
       c = tCols[i];
       for (Salarie s : tSals) {
-        int nivs = s.getTNbNiv()[i];// nombre de niveaux actifs pour la cellule
-        for (int j = 0; j < nivs; j++) {
-          Niveau n = s.getNiveau(j);
-          NivCol nc = n.getNivCols()[i];
-          if(nc != null ){
-            for(Tache tache: nc.getTaches()){
-              aCanv.add(ajoutTache(tache.getPositionXDeb(c.getPositionX(), largCol, HEURE_DEBUT_JOUR, HEURE_FIN_JOUR),(int)(s.getPositionY()+ s.getHauteurSal() * j / nivs + 3),tache.getLargeur(largCol, HEURE_FIN_JOUR - HEURE_DEBUT_JOUR),(int)(s.getHauteurSal() / nivs -6),"blue"));
-            }
-
-          }
+        SalCol sc = s.getSalCols()[i];
+        for(Tache tache: sc.getTaches()){
+          Intersection is = tache.isIntersection() ? s.getIntersection(tache.getNumIntersection()) : null;
+          int maxNiv = is != null ? is.getmaxNiv() : 1;
+          aCanv.add(ajoutTache(tache.getPositionXDeb(c.getPositionX(), largCol, HEURE_DEBUT_JOUR, HEURE_FIN_JOUR),(int)(s.getPositionY()+ s.getHauteurSal() * tache.getNiveau() / maxNiv + 3),tache.getLargeur(largCol, HEURE_FIN_JOUR - HEURE_DEBUT_JOUR),(int)(s.getHauteurSal() / maxNiv -6),"blue"));
         }
       }
     }

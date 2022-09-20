@@ -1,6 +1,7 @@
 package com.example.gwt.sandbox.shared;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Selection  implements Serializable {
     private static final long serialVersionUID = 294851328L;
@@ -13,6 +14,7 @@ public class Selection  implements Serializable {
     private Colonne[] tCols;
     private Salarie[] tSals;
     private Tache[] tTache;
+    private transient ArrayList<Tache> aTaches;
     private int numTache = 0;//pour numéroter les tâches
 
     public Selection(){
@@ -24,6 +26,12 @@ public class Selection  implements Serializable {
         this.moisDebut = moisDebut;
         this.anneeFin = anneeFin;
         this.moisFin = moisFin;
+    }
+    public Tache ajouTache(int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numColDeb, int numColFin){
+        if(aTaches == null)aTaches = new ArrayList<>();
+        Tache t = new Tache(getAndIncrNumTache(), anneDeb, moisDeb, jourDeb, hDeb, mnDeb, longDeb, anneFin, moisFin, jourFin, hFin, mnFin, longFin, numColDeb, numColFin);
+        aTaches.add(t);
+        return t;
     }
 
     public void setNbJours(int nbJours) {
