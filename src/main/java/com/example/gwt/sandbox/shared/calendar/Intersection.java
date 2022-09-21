@@ -1,4 +1,4 @@
-package com.example.gwt.sandbox.shared;
+package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
 

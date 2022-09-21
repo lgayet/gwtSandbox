@@ -1,6 +1,6 @@
 package com.example.gwt.sandbox.client;
 
-import com.example.gwt.sandbox.shared.Selection;
+import com.example.gwt.sandbox.shared.calendar.Selection;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**

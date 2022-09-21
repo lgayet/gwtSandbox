@@ -1,9 +1,9 @@
 package com.example.gwt.sandbox.server;
 
-import com.example.gwt.sandbox.shared.Colonne;
-import com.example.gwt.sandbox.shared.Salarie;
-import com.example.gwt.sandbox.shared.Selection;
-import com.example.gwt.sandbox.shared.Tache;
+import com.example.gwt.sandbox.shared.calendar.Colonne;
+import com.example.gwt.sandbox.shared.calendar.Salarie;
+import com.example.gwt.sandbox.shared.calendar.Selection;
+import com.example.gwt.sandbox.shared.calendar.Tache;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -12,16 +12,11 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SelectionDTO implements Serializable {
+public class SelectionBuilder implements Serializable {
 
     private transient ArrayList<Tache> aTaches = new ArrayList<>();
     private LocalDate debut;
-    public SelectionDTO(){
-        
-    }
 
-
-    
     public Selection construitSelection(int anneeDebut, int moisDebut, int anneeFin, int moisFin){
         Selection selection = new Selection(anneeDebut, moisDebut, anneeFin, moisFin);
         debut = LocalDate.of(anneeDebut,moisDebut,1);
@@ -40,10 +35,12 @@ public class SelectionDTO implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,8,0,13,45));
-//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,10,0,16,0));
-//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,9,0,11,30));
-//        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,16,30,20,0));
+        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,8,0,2022,8,2,13,45));
+        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,10,0,2022,8,2,16,0));
+        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,9,0,2022,8,2,11,30));
+        aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,16,30,2022,8,2,20,0));
+        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,6,0,2022,8,4,10,0));
+        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,7,30,2022,8,3,8,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
                 aTaches.add(generationTache(selection, sal));
@@ -68,11 +65,11 @@ public class SelectionDTO implements Serializable {
         return tSals;
     }
 
-    private Tache generationTacheFixe(Selection selection, Salarie salarie, int annee, int mois, int jour, int heure, int minute, int hFin, int mnFin){
+    private Tache generationTacheFixe(Selection selection, Salarie salarie, int annee, int mois, int jour, int heure, int minute, int anneeFin, int moisFin, int jourFin, int hFin, int mnFin){
         LocalDateTime d = LocalDateTime.of(annee,mois,jour,heure,minute);
-        LocalDateTime d2 = LocalDateTime.of(annee,mois,jour,hFin,mnFin);
+        LocalDateTime d2 = LocalDateTime.of(anneeFin,moisFin,jourFin,hFin,mnFin);
         LocalDate d3 = LocalDate.of(annee,mois,jour);
-        LocalDate d4 = LocalDate.of(annee,mois,jour);
+        LocalDate d4 = LocalDate.of(anneeFin,moisFin,jourFin);
         int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
         Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);

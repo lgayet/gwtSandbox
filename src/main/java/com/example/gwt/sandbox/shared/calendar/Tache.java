@@ -1,16 +1,9 @@
-package com.example.gwt.sandbox.shared;
-
-import com.example.gwt.sandbox.client.Test;
-import org.vaadin.gwtgraphics.client.DrawingArea;
-import org.vaadin.gwtgraphics.client.Positionable;
-import org.vaadin.gwtgraphics.client.shape.Rectangle;
-import org.vaadin.gwtgraphics.client.shape.Text;
+package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
 
-public class Tache implements Serializable, Positionable {
+public class Tache implements Serializable {
 
-    private transient Test test;
     private TypTache typTache;
     private int numTache;
     private int anneDeb;
@@ -34,8 +27,6 @@ public class Tache implements Serializable, Positionable {
 //    les taches et intersection
     private Integer numIntersection;
     private Tache[] tachesIntersect = new Tache[0];
-    private transient Rectangle rectangle;
-    private transient Text text;
 
     public Tache() {
     }
@@ -56,20 +47,6 @@ public class Tache implements Serializable, Positionable {
         this.longFin = longFin;
         this.numColDeb = numColDeb;
         this.numColFin = numColFin;
-    }
-
-    public Tache(DrawingArea canvas, int x, int y, int width, int height, String label) {
-        rectangle = new Rectangle(x, y , width, height);
-        rectangle.addMouseDownHandler(event -> {
-//            MOVE_CONTEXT.start(this, event.getClientX(), event.getClientY());
-        });
-//        canvas.add(rectangle);
-        text = new Text(x + width/2, y + height/2, label);
-        text.addMouseDownHandler(event -> {
-//            MOVE_CONTEXT.start(this, event.getClientX(), event.getClientY());
-        });
-//        canvas.add(text);
-
     }
 
     public int getNumTache() {
@@ -130,42 +107,38 @@ public class Tache implements Serializable, Positionable {
     public void retraitTacheIntersect(Tache tache){
 
     }
-    public int getPositionXDeb(int positionXCol, double largCol, double heureDebJour, double heureFinJour){
-        double hDebut = hDeb + mnDeb  / 60.0;
-        decalX =  (hDebut - heureDebJour) * largCol / (heureFinJour - heureDebJour);
-         int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
-         return x;
+    public boolean isDessinable(int numCol, double heureDebJour, double heureFinJour){
+        if((numColDeb == numCol || numColDeb == numColFin) && getHDeb() < heureFinJour && getHFin() > heureDebJour)return true;
+        if(numColFin == numCol && getHFin() > heureDebJour)return true;
+        return false;
     }
 
-    public int getLargeur(double largCol, double nbHeuresJour){
-        double nbHeuresTache = hFin +  mnFin / 60.0 - (hDeb + mnDeb / 60.0 );
-        double w = decalX + largCol * nbHeuresTache / nbHeuresJour;
-        return (int)(largCol * nbHeuresTache / nbHeuresJour);
+    public int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
+        if(numColDeb ==  numCol){
+            decalX =  (getHDeb() - heureDebJour) * largCol / (heureFinJour - heureDebJour);
+            int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
+            return x;
+        }else{//on est donc sur numColFin
+            return positionXCol +3;
+        }
     }
 
-    @Override
-    public int getX() {
-        return rectangle.getX();
+    public int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
+        double nbHeuresJour = heureFinJour - heureDebJour;
+        if(numColDeb == numCol) {
+            double nbHeuresTache = numColDeb == numColFin ? (getHFin() - getHDeb()) : ( heureFinJour - getHDeb());
+            return (int) (largCol * nbHeuresTache / nbHeuresJour);
+        }else{
+            double nbHeuresTache = getHFin() - heureDebJour;
+            return (int) (largCol * nbHeuresTache / nbHeuresJour);
+        }
     }
 
-    @Override
-    public void setX(int i) {
-        rectangle.setX(i);
-        text.setX(i + rectangle.getWidth()/2);
+    private double getHDeb(){
+        return hDeb + mnDeb / 60.0;
     }
+    private double getHFin(){
+        return hFin +  mnFin / 60.0;
+     }
 
-    @Override
-    public int getY() {
-        return rectangle.getY();
-    }
-
-    @Override
-    public void setY(int i) {
-        rectangle.setY(i);
-        text.setY(i + rectangle.getHeight()/2);
-    }
-
-    public void setFillColor(String color) {
-        rectangle.setFillColor(color);
-    }
 }

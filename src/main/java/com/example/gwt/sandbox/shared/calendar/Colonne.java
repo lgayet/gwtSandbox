@@ -1,11 +1,9 @@
-package com.example.gwt.sandbox.shared;
+package com.example.gwt.sandbox.shared.calendar;
 
 /*
     TODO Marc 12/9/2022: quelque soit le choix d'affichage (JOUR,SEMAINE,MOIS,...), une colonne correspond à 1 jour
         Les tâches se positionnent par rapport à positionX et largeur, ce qui fait que l'affichage doit toujours être correct (sans vide ni débordement)
  */
-
-import com.example.gwt.sandbox.client.Test;
 
 import java.io.Serializable;
 
@@ -18,9 +16,6 @@ public class Colonne implements Serializable {
     private int numJourMois;
     private int numJourSem;//TODO pour accès direct à la colonne: indice relatif au début de la selection?(à approfondir)
     private boolean affichage0_24 = false;//TODO: l'affichage par défaut est un paramètre Entreprise ==> Utisateur
-
-//
-    private transient Test test;
 
     public Colonne() {
     }
@@ -51,14 +46,6 @@ public class Colonne implements Serializable {
 
     public int getNumJourSem() {
         return numJourSem;
-    }
-
-    public Test getTest() {
-        return test;
-    }
-
-    public void setTest(Test test) {
-        this.test = test;
     }
 
     public int getPositionX() {

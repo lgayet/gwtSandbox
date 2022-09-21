@@ -1,16 +1,16 @@
-package com.example.gwt.sandbox.client;
+package com.example.gwt.sandbox.client.calendar;
 
-import com.example.gwt.sandbox.shared.Tache;
+import org.vaadin.gwtgraphics.client.Positionable;
 
 public class MoveContext {
 
     private int xRef;
     private int yRef;
-    private Tache tache = null;
+    private Positionable positionable = null;
 
-    void start(Tache tache, int x, int y) {
+    void start(Positionable positionable, int x, int y) {
         if (!isBusy()) {
-            this.tache = tache;
+            this.positionable = positionable;
             xRef = x;
             yRef = y;
         }
@@ -18,8 +18,8 @@ public class MoveContext {
 
     boolean move(int x, int y) {
         if (isBusy()) {
-            tache.setX(tache.getX() + (x - xRef));
-            tache.setY(tache.getY() + (y - yRef));
+            positionable.setX(positionable.getX() + (x - xRef));
+            positionable.setY(positionable.getY() + (y - yRef));
             this.xRef = x;
             this.yRef = y;
             return true;
@@ -32,12 +32,12 @@ public class MoveContext {
     }
 
     boolean isBusy() {
-        return tache != null;
+        return positionable != null;
     }
 
     private void clear() {
         xRef = 0;
         yRef = 0;
-        tache = null;
+        positionable = null;
     }
 }
