@@ -11,6 +11,9 @@ import org.vaadin.gwtgraphics.client.shape.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Classe qui permet de dessiner un calendrier avec en colonnes les jours et les salariès en tant que lignes
+ */
 public class GCalendar {
 
     public static MoveContext MOVE_CONTEXT = new MoveContext();
