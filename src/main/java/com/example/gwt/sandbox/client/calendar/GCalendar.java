@@ -37,9 +37,9 @@ public class GCalendar {
     TODO Marc: 13/9/2022: première implémentation: selection de 3 mois pleins
    */
 //  Les choix d'affichage ENTREPRISE/UTILISATEUR
-    private final double HEURE_DEBUT_JOUR = 6.0;//TODO  petit modif a prévoir si début n'est pas une heure exacte
-    private final double HEURE_FIN_JOUR = 22.5;
-    private final double PLAGE_HORARAIRE = HEURE_FIN_JOUR - HEURE_DEBUT_JOUR;
+    private final double heureDebJour = 6.0;//TODO  petit modif a prévoir si début n'est pas une heure exacte
+    private final double heureFinJour = 22.5;
+    private final double PLAGE_HORARAIRE = heureFinJour - heureDebJour;
 
     // les contenus modifiables du tableau
     private Text labelCentre;
@@ -48,14 +48,14 @@ public class GCalendar {
 
     // Objets grahiques structurelles (ex: lignes, etc.) à supprimer lors d'un redessin (les taches graphiques sont gérés dans la liste taches)
     private List<VectorObject> objectsGraphiqueStructure = new ArrayList();
-    private List<GTache> taches = new ArrayList();
+    private List<GPartieTache> partiesTache = new ArrayList();
 
     private int nbJoursAffiches;
     private int indicePremiereCol = 0;
     private int indiceJourCourant = 0;//TODO pour les retours Semaine ou mois vers Jour (premier jour de la semaine ou du mois)
     private double largColD;
     private Colonne[] tCols;//TODO: dimension= nbJours de la selection
-    private Salarie[] tSals;
+    private GSalarie[] tSals;
 
     private GButtonPlusMoins boutMoins;
     private GButtonPlusMoins boutPlus;
@@ -95,9 +95,7 @@ public class GCalendar {
     }
 
     public void setSelection(Selection selection){
-
-        tCols = selection.getTCols();
-        tSals = selection.getTSals();
+        construit(selection);
         int nbSal = tSals.length;
         double hauteurSal = (HAUTEUR_PANEL - HAUTEUR_ENTETES_COLONNES * 2) / nbSal;
         tLHSals = new Line[nbSal];
@@ -177,9 +175,9 @@ public class GCalendar {
             largColD = LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES;
             double largeurHoraire = largColD / PLAGE_HORARAIRE;
             for(double h = 1.0; h < PLAGE_HORARAIRE; h +=1.0){
-                int decalX = h+ (int) HEURE_DEBUT_JOUR  < 10 ? 3 : 6;
+                int decalX = h+ (int) heureDebJour < 10 ? 3 : 6;
                 objectsGraphiqueStructure.add( ajoutLigne(c.getPositionX() + (int) (h* largeurHoraire), HAUTEUR_ENTETES_COLONNES  + 30, c.getPositionX() + (int) (h * largeurHoraire), HAUTEUR_PANEL, OPACITY));
-                objectsGraphiqueStructure.add(ajoutLabel(c.getPositionX() + (int) (h* largeurHoraire) - decalX, HAUTEUR_ENTETES_COLONNES + 20, (int) h+ HEURE_DEBUT_JOUR+ "" , 12, 0.5));
+                objectsGraphiqueStructure.add(ajoutLabel(c.getPositionX() + (int) (h* largeurHoraire) - decalX, HAUTEUR_ENTETES_COLONNES + 20, (int) h+ heureDebJour + "" , 12, 0.5));
             }
 
         }else if(choixAffichage == ChoixAffichage.SEMAINE) {
@@ -227,22 +225,25 @@ public class GCalendar {
 //      affichage des Tâches
         Colonne c;
         for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
+            System.out.println("boucle colonnes i= "+i);
             c = tCols[i];
-            for (Salarie s : tSals) {
+            for (GSalarie s : tSals) {
+                GSalCol gSalCol = s.getGSalCols()[i];
                 SalCol sc = s.getSalCols()[i];
+                int it =0;
                 for(Tache tache: sc.getTaches()){
-                    Intersection is = tache.isIntersection() ? s.getIntersection(tache.getNumIntersection()) : null;
-                    int maxNiv = is != null ? is.getmaxNiv() : 1;
-                    if(tache.isDessinable(i, HEURE_DEBUT_JOUR, HEURE_FIN_JOUR)) {
-                        afficherTache(
-                                tache,
-                                tache.getPositionXDeb(i, c.getPositionX(), largColD, HEURE_DEBUT_JOUR, HEURE_FIN_JOUR),
-                                (int) (s.getPositionY() + s.getHauteurSal() * tache.getNiveau() / maxNiv + 3),
-                                tache.getLargeur(i, largColD, HEURE_DEBUT_JOUR , HEURE_FIN_JOUR),
-                                (int) (s.getHauteurSal() / maxNiv - 6), "blue");
-                    }
+                    gSalCol.getPartieTaches()[it] = ajoutTache(s,tache,i,c.getPositionX(),largColD);
+                it ++;
                 }
             }
+        }
+    }
+    private void construit(Selection selection){
+        tCols = selection.getTCols();
+        Salarie[] salaries = selection.getTSals();
+        tSals = new GSalarie[salaries.length];
+        for (int i = 0; i< salaries.length; i++){
+            tSals[i] = new GSalarie(salaries[i]);
         }
     }
 
@@ -250,8 +251,8 @@ public class GCalendar {
         canvas.remove(labelCentre);
         objectsGraphiqueStructure.forEach(o -> canvas.remove(o));
         objectsGraphiqueStructure.clear();
-        taches.forEach(t -> t.remove(canvas));
-        taches.clear();
+        partiesTache.forEach(t -> t.remove(canvas));
+        partiesTache.clear();
     }
 
     private int getNbJoursMois(int annee, int numMois){
@@ -269,10 +270,11 @@ public class GCalendar {
         return null;
     }
 
-    private void afficherTache(Tache tache, int x, int y, int w, int h, String color){
-        GTache t = new GTache(canvas, tache, x, y, w, h, "");
-        t.setFillColor(color);
-        taches.add(t);
+    private GPartieTache ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, double largColD){
+        GPartieTache t = new GPartieTache(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, largColD);
+        t.setFillColor("blue");
+        partiesTache.add(t);
+        return t;
     }
 
     private Text ajoutLabel(int x, int y, String text, int size, double opacity){

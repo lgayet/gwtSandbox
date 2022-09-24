@@ -72,6 +72,7 @@ public class SelectionBuilder implements Serializable {
         LocalDate d4 = LocalDate.of(anneeFin,moisFin,jourFin);
         int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
+
         Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);
         salarie.ajoutTaches(t);
         return t;
@@ -87,13 +88,12 @@ public class SelectionBuilder implements Serializable {
         LocalDate d3;
         LocalDate d4;
         d = dRef;
-        d = d.plusDays(genererInt(1,6));
+        d = d.plusDays(genererInt(0,5));
         d = d.plusWeeks(genererInt(0,13));
         d = d.plusHours(genererInt(6,19));
         d = d.plusMinutes(genererInt(0,6) * 10);
         d2 = d;
-        d2 = d2.plusHours(genererInt(1,7));
-        d2 = d2.plusMinutes(genererInt(0,6) * 10);
+        d2 = d2.plusMinutes(genererInt(0,30) * 10);
         d3 = LocalDate.of(d.getYear(), d.getMonthValue(), d.getDayOfMonth());
         d4 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
         int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());

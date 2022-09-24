@@ -11,9 +11,7 @@ public class Salarie implements Serializable {
     private transient ArrayList<Intersection> aInter = new ArrayList<>();
     private Intersection[] intersections;
     private SalCol[] salCols;
-//    pour l'affichage
-    double hauteurSal;
-    private int positionY;
+
 
 
     public Salarie() {
@@ -50,21 +48,10 @@ public class Salarie implements Serializable {
     }
 
 
-    public int getPositionY() {
-        return positionY;
-    }
-
-    public double getHauteurSal() {
-        return hauteurSal;
-    }
-
-    public void setPositionY(int positionY, double hauteurSal) {
-        this.positionY = positionY;
-        this.hauteurSal = hauteurSal;
-    }
     public void ajoutTaches(Tache tache){
-        salCols[tache.getNumColDeb()].ajoutTache(this, tache);
-        if(tache.getNumColDeb() != tache.getNumColFin())salCols[tache.getNumColFin()].ajoutTache(this, tache);
+        for(int i = tache.getNumColDeb(); i <= tache.getNumColFin(); i++) {
+            salCols[i].ajoutTache(this, tache);
+        }
     }
 
     public void setTInterSal(){

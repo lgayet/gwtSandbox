@@ -1,6 +1,8 @@
 package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Intersection implements Serializable {
     private int numIntersec;
@@ -28,6 +30,19 @@ public class Intersection implements Serializable {
         }
         ajoutNiv(tache);
 
+    }
+    public void fusionne(Intersection intersection){
+        for(Tache t: intersection.getTaches()){
+            ajoutTache(t);
+        }
+    }
+
+    private Set<Tache> getTaches(){
+        Set<Tache> t = new HashSet<>();
+        for(Niv n: nivs){
+            for(Tache ta: n.getTaches())t.add(ta);
+        }
+        return t;
     }
 
     private void ajoutNiv(Tache tache){

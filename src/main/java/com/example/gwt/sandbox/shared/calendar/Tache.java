@@ -19,11 +19,11 @@ public class Tache implements Serializable {
     private int mnFin;
     private long longFin;
 //
-    private int numColDeb;
-    private int numColFin;
+    public int numColDeb;
+    public int numColFin;
     private int niveau;// l'indice du niveau de dépôt de la tâche
     private double decalX;//pour les contrôles de marges
-    private transient Colonne colonne;
+
 //    les taches et intersection
     private Integer numIntersection;
     private Tache[] tachesIntersect = new Tache[0];
@@ -61,10 +61,6 @@ public class Tache implements Serializable {
         return numColFin;
     }
 
-    public Colonne getColonne() {
-        return colonne;
-    }
-
     public long getLongDeb() {
         return longDeb;
     }
@@ -92,52 +88,14 @@ public class Tache implements Serializable {
     public boolean isIntersection(){
         return numIntersection != null;
     }
-    public void ajoutTacheIntersect(Tache tache){
-        for(Tache t: tachesIntersect){
-            if(t == tache)return;
-        }
-        Tache[] t = new Tache[tachesIntersect.length +1];
-        for(int i = 0; i < tachesIntersect.length; i++){
-            t[i] = tachesIntersect[i];
-        }
-        t[tachesIntersect.length]= tache;
-        tachesIntersect = t;
-    }
 
-    public void retraitTacheIntersect(Tache tache){
 
-    }
-    public boolean isDessinable(int numCol, double heureDebJour, double heureFinJour){
-        if((numColDeb == numCol || numColDeb == numColFin) && getHDeb() < heureFinJour && getHFin() > heureDebJour)return true;
-        if(numColFin == numCol && getHFin() > heureDebJour)return true;
-        return false;
-    }
 
-    public int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
-        if(numColDeb ==  numCol){
-            decalX =  (getHDeb() - heureDebJour) * largCol / (heureFinJour - heureDebJour);
-            int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
-            return x;
-        }else{//on est donc sur numColFin
-            return positionXCol +3;
-        }
-    }
 
-    public int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
-        double nbHeuresJour = heureFinJour - heureDebJour;
-        if(numColDeb == numCol) {
-            double nbHeuresTache = numColDeb == numColFin ? (getHFin() - getHDeb()) : ( heureFinJour - getHDeb());
-            return (int) (largCol * nbHeuresTache / nbHeuresJour);
-        }else{
-            double nbHeuresTache = getHFin() - heureDebJour;
-            return (int) (largCol * nbHeuresTache / nbHeuresJour);
-        }
-    }
-
-    private double getHDeb(){
+    public double getHDeb(){
         return hDeb + mnDeb / 60.0;
     }
-    private double getHFin(){
+    public double getHFin(){
         return hFin +  mnFin / 60.0;
      }
 
