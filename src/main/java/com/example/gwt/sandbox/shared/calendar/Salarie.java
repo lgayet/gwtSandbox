@@ -22,7 +22,7 @@ public class Salarie implements Serializable {
         this.nbJours = nbJours;
         salCols = new SalCol[nbJours];
         for(int i = 0; i< nbJours; i++){
-            salCols[i] = new SalCol();
+            salCols[i] = new SalCol(i);
         }
     }
 

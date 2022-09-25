@@ -48,13 +48,14 @@ public class GCalendar {
 
     // Objets grahiques structurelles (ex: lignes, etc.) à supprimer lors d'un redessin (les taches graphiques sont gérés dans la liste taches)
     private List<VectorObject> objectsGraphiqueStructure = new ArrayList();
-    private List<GPartieTache> partiesTache = new ArrayList();
+    private List<GTacheCol> tacheCols = new ArrayList();
 
     private int nbJoursAffiches;
     private int indicePremiereCol = 0;
     private int indiceJourCourant = 0;//TODO pour les retours Semaine ou mois vers Jour (premier jour de la semaine ou du mois)
     private double largColD;
     private Colonne[] tCols;//TODO: dimension= nbJours de la selection
+    private Tache[] taches;
     private GSalarie[] tSals;
 
     private GButtonPlusMoins boutMoins;
@@ -227,12 +228,12 @@ public class GCalendar {
         for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
             System.out.println("boucle colonnes i= "+i);
             c = tCols[i];
-            for (GSalarie s : tSals) {
-                GSalCol gSalCol = s.getGSalCols()[i];
-                SalCol sc = s.getSalCols()[i];
+            for (GSalarie gSalarie : tSals) {
+                GSalCol gSalCol = gSalarie.getGSalCols()[i];
+                SalCol salCol = gSalarie.getSalCols()[i];
                 int it =0;
-                for(Tache tache: sc.getTaches()){
-                    gSalCol.getPartieTaches()[it] = ajoutTache(s,tache,i,c.getPositionX(),largColD);
+                for(Tache tache: salCol.getTaches()){
+                    gSalCol.getTacheCols()[it] = ajoutTache(gSalarie,tache,i,c.getPositionX(),largColD);
                 it ++;
                 }
             }
@@ -240,19 +241,24 @@ public class GCalendar {
     }
     private void construit(Selection selection){
         tCols = selection.getTCols();
+        taches = selection.getTTache();
         Salarie[] salaries = selection.getTSals();
         tSals = new GSalarie[salaries.length];
         for (int i = 0; i< salaries.length; i++){
-            tSals[i] = new GSalarie(salaries[i]);
+            tSals[i] = new GSalarie(this, salaries[i]);
         }
+    }
+
+    public Tache[] getTaches() {
+        return taches;
     }
 
     private void effacerObjetsGraphiques() {
         canvas.remove(labelCentre);
         objectsGraphiqueStructure.forEach(o -> canvas.remove(o));
         objectsGraphiqueStructure.clear();
-        partiesTache.forEach(t -> t.remove(canvas));
-        partiesTache.clear();
+        tacheCols.forEach(t -> t.remove(canvas));
+        tacheCols.clear();
     }
 
     private int getNbJoursMois(int annee, int numMois){
@@ -270,10 +276,10 @@ public class GCalendar {
         return null;
     }
 
-    private GPartieTache ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, double largColD){
-        GPartieTache t = new GPartieTache(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, largColD);
+    private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, double largColD){
+        GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, largColD);
         t.setFillColor("blue");
-        partiesTache.add(t);
+        tacheCols.add(t);
         return t;
     }
 

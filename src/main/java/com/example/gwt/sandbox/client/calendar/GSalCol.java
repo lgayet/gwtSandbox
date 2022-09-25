@@ -5,7 +5,7 @@ import com.example.gwt.sandbox.shared.calendar.Tache;
 
 public class GSalCol {
     private SalCol salCol;
-    private GPartieTache[] partieTaches;
+    private GTacheCol[] tacheCols;
 
     public GSalCol() {
     }
@@ -13,15 +13,20 @@ public class GSalCol {
     public GSalCol(SalCol salCol) {
         this.salCol = salCol;
         Tache[]t = salCol.getTaches();
-        partieTaches = new GPartieTache[t.length];
+        tacheCols = new GTacheCol[t.length];
     }
 
 
-    public GPartieTache[] getPartieTaches() {
-        return partieTaches;
+    public GTacheCol getTacheCol(int numTache) {
+        for(GTacheCol tc: tacheCols)if(tc.getNumTache() == numTache)return tc;
+        return null;
     }
 
-    public void setPartieTaches(GPartieTache[] partieTaches) {
-        this.partieTaches = partieTaches;
+    public GTacheCol[] getTacheCols() {
+        return tacheCols;
+    }
+
+    public void setTacheCols(GTacheCol[] tacheCols) {
+        this.tacheCols = tacheCols;
     }
 }

@@ -5,7 +5,16 @@ import java.io.Serializable;
 public class SalCol implements Serializable {
 
 
+    private int numCol;
     private Tache[]taches = new Tache[0];
+
+
+    public SalCol() {
+    }
+
+    public SalCol(int numCol) {
+        this.numCol = numCol;
+    }
 
     public Tache[] getTaches() {
         return taches;

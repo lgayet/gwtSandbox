@@ -41,6 +41,8 @@ public class SelectionBuilder implements Serializable {
         aTaches.add(generationTacheFixe(selection,tSals[4], 2022,8,2,16,30,2022,8,2,20,0));
         aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,6,0,2022,8,4,10,0));
         aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,7,30,2022,8,3,8,0));
+        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
+        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
                 aTaches.add(generationTache(selection, sal));
@@ -73,7 +75,11 @@ public class SelectionBuilder implements Serializable {
         int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
 
-        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);
+        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(),
+                d.getLong(ChronoField.EPOCH_DAY)*24*3600+d.getLong(ChronoField.SECOND_OF_DAY),
+                d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(),
+                d2.getLong(ChronoField.EPOCH_DAY)*24*3600+d2.getLong(ChronoField.SECOND_OF_DAY),
+                numColDeb, numColFin);
         salarie.ajoutTaches(t);
         return t;
     }
@@ -98,7 +104,11 @@ public class SelectionBuilder implements Serializable {
         d4 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
         int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
-        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(), d.getLong(ChronoField.NANO_OF_DAY), d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(), d2.getLong(ChronoField.NANO_OF_DAY), numColDeb, numColFin);
+        Tache t = selection.ajouTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(),
+                d.getLong(ChronoField.EPOCH_DAY)*24*3600+d.getLong(ChronoField.SECOND_OF_DAY),
+                d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(),
+                d2.getLong(ChronoField.EPOCH_DAY)*24*3600+d2.getLong(ChronoField.SECOND_OF_DAY),
+                numColDeb, numColFin);
         salarie.ajoutTaches(t);
         return t;
     }

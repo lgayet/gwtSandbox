@@ -26,7 +26,6 @@ public class Tache implements Serializable {
 
 //    les taches et intersection
     private Integer numIntersection;
-    private Tache[] tachesIntersect = new Tache[0];
 
     public Tache() {
     }

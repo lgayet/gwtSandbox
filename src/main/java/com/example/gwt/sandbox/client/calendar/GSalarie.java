@@ -3,8 +3,13 @@ package com.example.gwt.sandbox.client.calendar;
 import com.example.gwt.sandbox.shared.calendar.Intersection;
 import com.example.gwt.sandbox.shared.calendar.SalCol;
 import com.example.gwt.sandbox.shared.calendar.Salarie;
+import com.example.gwt.sandbox.shared.calendar.Tache;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GSalarie {
+    private GCalendar calendar;
     private Salarie salarie;
     private GSalCol[] salCols;
 //    informations d'affichage
@@ -12,7 +17,8 @@ public class GSalarie {
     double hauteurSal;
 
 
-    public GSalarie(Salarie salarie) {
+    public GSalarie(GCalendar calendar, Salarie salarie) {
+        this.calendar = calendar;
         this.salarie = salarie;
         SalCol[] sc = salarie.getSalCols();
         this.salCols = new GSalCol[sc.length];
@@ -36,6 +42,15 @@ public class GSalarie {
 
     public SalCol[] getSalCols() {
         return salarie.getSalCols();
+    }
+
+    public GTacheCol[] getTachesCol(int numTache){
+        Tache ta = calendar.getTaches()[numTache];
+        List<GTacheCol> tc = new ArrayList<>();
+        for(int i = ta.getNumColDeb(); i <= ta.getNumColFin(); i++){
+            tc.add(salCols[i].getTacheCol(numTache));
+        }
+        return tc.toArray(new GTacheCol[tc.size()]);
     }
 
     public Intersection getIntersection(Integer numInter){

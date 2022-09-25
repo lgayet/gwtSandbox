@@ -6,9 +6,9 @@ public class MoveContext {
 
     private int xRef;
     private int yRef;
-    private Positionable positionable = null;
+    private Positionable[] positionable = null;
 
-    void start(Positionable positionable, int x, int y) {
+    void start(Positionable[] positionable, int x, int y) {
         if (!isBusy()) {
             this.positionable = positionable;
             xRef = x;
@@ -18,8 +18,11 @@ public class MoveContext {
 
     boolean move(int x, int y) {
         if (isBusy()) {
-            positionable.setX(positionable.getX() + (x - xRef));
-            positionable.setY(positionable.getY() + (y - yRef));
+            Positionable[] pos = positionable;// pour pouvoir ajouter des GTaches en cours de déplacement
+            for(Positionable p: pos) {
+                p.setX(p.getX() + (x - xRef));
+                p.setY(p.getY() + (y - yRef));
+            }
             this.xRef = x;
             this.yRef = y;
             return true;

@@ -13,10 +13,11 @@ import static com.example.gwt.sandbox.client.calendar.GCalendar.MOVE_CONTEXT;
     Une PartieTache est la partie de tâche qui est déposée dans une colonne
     Gère toute la partie graphique de l'affichage, quelque soit le mode de présentation retenu (HeureMin-HeureMax / 0-24)
  */
-public class GPartieTache implements Positionable {
+public class GTacheCol implements Positionable {
 
     private GSalarie salarie;
     private Tache tache;
+    private GTacheCol[] tacheEtAssociees = new GTacheCol[0];
     private Rectangle rectangle;
     private Text text;
 //    les informations d'affichage
@@ -24,7 +25,7 @@ public class GPartieTache implements Positionable {
     private double heureFinJour;
     private double plageHoraire;
 
-    public GPartieTache(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, double largColD) {
+    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, double largColD) {
         this.salarie = salarie;
         this.tache = tache;
         this.heureDebJour = heureDebJour;
@@ -46,12 +47,14 @@ public class GPartieTache implements Positionable {
             rectangle.setFillOpacity(0.5);
             rectangle.setStrokeWidth(0);
             rectangle.addMouseDownHandler(event -> {
-                MOVE_CONTEXT.start(this, event.getClientX(), event.getClientY());
+                tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
+                MOVE_CONTEXT.start(tacheEtAssociees, event.getClientX(), event.getClientY());
             });
             canvas.add(rectangle);
             text = new Text(x + w/2, y + h/2, "");//le label contiendra les informations tâche à afficher
             text.addMouseDownHandler(event -> {
-                MOVE_CONTEXT.start(this, event.getClientX(), event.getClientY());
+                tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
+                MOVE_CONTEXT.start(tacheEtAssociees, event.getClientX(), event.getClientY());
             });
             canvas.add(text);
         }
@@ -60,6 +63,7 @@ public class GPartieTache implements Positionable {
     public int getNumTache(){
         return tache.getNumTache();
     }
+
 
     public void remove(DrawingArea canvas) {
         canvas.remove(rectangle);
