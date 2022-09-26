@@ -8,7 +8,7 @@ import com.example.gwt.sandbox.shared.calendar.Tache;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GSalarie {
+public class GSalarie  {
     private GCalendar calendar;
     private Salarie salarie;
     private GSalCol[] salCols;

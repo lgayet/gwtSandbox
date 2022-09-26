@@ -22,7 +22,7 @@ public class Tache implements Serializable {
     public int numColDeb;
     public int numColFin;
     private int niveau;// l'indice du niveau de dépôt de la tâche
-    private double decalX;//pour les contrôles de marges
+
 
 //    les taches et intersection
     private Integer numIntersection;
@@ -47,6 +47,13 @@ public class Tache implements Serializable {
         this.numColDeb = numColDeb;
         this.numColFin = numColFin;
     }
+
+    public Tache copyTache(){
+        return new Tache(numTache, anneDeb, moisDeb, jourDeb, hDeb, mnDeb, longDeb, anneFin, moisFin, jourFin, hFin, mnFin, longFin, numColDeb, numColFin);
+    }
+
+
+
 
     public int getNumTache() {
         return numTache;
@@ -90,11 +97,42 @@ public class Tache implements Serializable {
 
 
 
+    public int gethDeb() {
+        return hDeb;
+    }
 
-    public double getHDeb(){
+    public int getMnDeb() {
+        return mnDeb;
+    }
+
+    public int gethFin() {
+        return hFin;
+    }
+
+    public int getMnFin() {
+        return mnFin;
+    }
+
+    public void setHDeb(int hDeb) {
+        this.hDeb = hDeb;
+    }
+
+    public void setMnDeb(int mnDeb) {
+        this.mnDeb = mnDeb;
+    }
+
+    public void setHFin(int hFin) {
+        this.hFin = hFin;
+    }
+
+    public void setMnFin(int mnFin) {
+        this.mnFin = mnFin;
+    }
+
+    public double getHDebDecim(){
         return hDeb + mnDeb / 60.0;
     }
-    public double getHFin(){
+    public double getHFinDecim(){
         return hFin +  mnFin / 60.0;
      }
 

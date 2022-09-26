@@ -53,7 +53,7 @@ public class GCalendar {
     private int nbJoursAffiches;
     private int indicePremiereCol = 0;
     private int indiceJourCourant = 0;//TODO pour les retours Semaine ou mois vers Jour (premier jour de la semaine ou du mois)
-    private double largColD;
+    private double largCol;
     private Colonne[] tCols;//TODO: dimension= nbJours de la selection
     private Tache[] taches;
     private GSalarie[] tSals;
@@ -84,10 +84,14 @@ public class GCalendar {
 
         canvas.addMouseMoveHandler(event -> {
             MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
+//            affiche(choixAffichage);
+            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie());
         });
 
         canvas.addMouseUpHandler(event -> {
             MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
+//            affiche(choixAffichage);
+            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie());
         });
     }
 
@@ -173,8 +177,8 @@ public class GCalendar {
             Colonne c = tCols[indicePremiereCol];
             c.setPositionX(LARGEUR_ENTETE_SALARIES);
             labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
-            largColD = LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES;
-            double largeurHoraire = largColD / PLAGE_HORARAIRE;
+            largCol = LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES;
+            double largeurHoraire = largCol / PLAGE_HORARAIRE;
             for(double h = 1.0; h < PLAGE_HORARAIRE; h +=1.0){
                 int decalX = h+ (int) heureDebJour < 10 ? 3 : 6;
                 objectsGraphiqueStructure.add( ajoutLigne(c.getPositionX() + (int) (h* largeurHoraire), HAUTEUR_ENTETES_COLONNES  + 30, c.getPositionX() + (int) (h * largeurHoraire), HAUTEUR_PANEL, OPACITY));
@@ -193,15 +197,15 @@ public class GCalendar {
             int decalX = anneeFin ? 150 : moisFin ? 100 : 50;
             String text = anneeFin ? (tMoisLong[c.getNumMois()]+"  " + c.getAnnee() +"  -  "+ tMoisLong[cFin.getNumMois()] + "  "+ cFin.getAnnee() ) : ( moisFin ?  tMoisLong[c.getNumMois()] +"  -  " + tMoisLong[cFin.getNumMois()]+ "  "+ c.getAnnee() : tMoisLong[c.getNumMois()]+"  "+c.getAnnee());
             labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - decalX,30, text , 20, 1.0);
-            largColD = ((double)LARGEUR_PANEL - (double)LARGEUR_ENTETE_SALARIES) / NB_JOURS_PAR_SEMAINE;
+            largCol = ((double)LARGEUR_PANEL - (double)LARGEUR_ENTETE_SALARIES) / NB_JOURS_PAR_SEMAINE;
             double decal2X = 20.0;
             Colonne c2;
             for (int i = 0; i < NB_JOURS_PAR_SEMAINE; i++) {
-                double x = LARGEUR_ENTETE_SALARIES + (largColD * i );// TODO: pour dessiner la ligne à gauche de la colonne
+                double x = LARGEUR_ENTETE_SALARIES + (largCol * i );// TODO: pour dessiner la ligne à gauche de la colonne
                 c2 = tCols[c.getNumCol()+ i];
                 c2.setPositionX((int)x);
                 if(i > 0)objectsGraphiqueStructure.add(ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES , c2.getPositionX(), HAUTEUR_PANEL, OPACITY));
-                objectsGraphiqueStructure.add(ajoutLabel((int)( c2.getPositionX() + largColD / 2.0 - decal2X ), HAUTEUR_ENTETES_COLONNES + 30 , tJours[tCols[indicePremiereCol+i].getNumJourSem()]+ " "+tCols[indicePremiereCol+i].getNumJourMois() , 14, 0.5D));
+                objectsGraphiqueStructure.add(ajoutLabel((int)( c2.getPositionX() + largCol / 2.0 - decal2X ), HAUTEUR_ENTETES_COLONNES + 30 , tJours[tCols[indicePremiereCol+i].getNumJourSem()]+ " "+tCols[indicePremiereCol+i].getNumJourMois() , 14, 0.5D));
             }
         }
         else if(choixAffichage == ChoixAffichage.MOIS){//TODO: il faudra etablir le nombre de jours enj fonction du mois
@@ -211,31 +215,50 @@ public class GCalendar {
             int nbJoursMois = getNbJoursMois(c.getAnnee(), c.getNumMois());
             nbJoursAffiches = nbJoursMois;
             labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 50,30, tMoisLong[c.getNumMois()]+"  "+c.getAnnee() , 20, 1.0);
-            largColD = ((double)LARGEUR_PANEL - (double)LARGEUR_ENTETE_SALARIES) / nbJoursMois;
+            largCol = ((double)LARGEUR_PANEL - (double)LARGEUR_ENTETE_SALARIES) / nbJoursMois;
             for(int i = 0; i< nbJoursMois; i++ ){
-                double x = LARGEUR_ENTETE_SALARIES + (largColD * (i));
+                double x = LARGEUR_ENTETE_SALARIES + (largCol * (i));
                 c2 = tCols[c.getNumCol() + i];
                 c2.setPositionX((int)x);
                 double opacite = c2.getNumJourMois() > 1 && c2.getNumJourSem() == 1.0 ? 0.5 : OPACITY;
                 int decalX = c2.getNumJourMois() >= 10 ? 7 : 5;
                 if(i > 0)objectsGraphiqueStructure.add(ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES, (int)x, HAUTEUR_PANEL, opacite));
-                objectsGraphiqueStructure.add(ajoutLabel((int)(c2.getPositionX() + largColD * 0.5 - 10), HAUTEUR_ENTETES_COLONNES + 20, tJours[c2.getNumJourSem()], 12, OPACITY));
-                objectsGraphiqueStructure.add(ajoutLabel((int)(c2.getPositionX() + largColD * 0.5 - decalX) , HAUTEUR_ENTETES_COLONNES + 40, c2.getNumJourMois()+"", 12,OPACITY));
+                objectsGraphiqueStructure.add(ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - 10), HAUTEUR_ENTETES_COLONNES + 20, tJours[c2.getNumJourSem()], 12, OPACITY));
+                objectsGraphiqueStructure.add(ajoutLabel((int)(c2.getPositionX() + largCol * 0.5 - decalX) , HAUTEUR_ENTETES_COLONNES + 40, c2.getNumJourMois()+"", 12,OPACITY));
             }
         }
 //      affichage des Tâches
         Colonne c;
         for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
-            System.out.println("boucle colonnes i= "+i);
             c = tCols[i];
             for (GSalarie gSalarie : tSals) {
                 GSalCol gSalCol = gSalarie.getGSalCols()[i];
-                SalCol salCol = gSalarie.getSalCols()[i];
+                SalCol salCol = gSalCol.getSalCol();
                 int it =0;
                 for(Tache tache: salCol.getTaches()){
-                    gSalCol.getTacheCols()[it] = ajoutTache(gSalarie,tache,i,c.getPositionX(),largColD);
+                    int posXPlus1 = i < nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
+                    gSalCol.getTacheCols()[it] = ajoutTache(gSalarie,tache,i,c.getPositionX(), posXPlus1, largCol);
                 it ++;
                 }
+            }
+        }
+    }
+
+    private void afficheSalCol(GSalarie salarie){
+        Colonne c;
+        for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
+            c = tCols[i];
+            GSalCol gSalCol = salarie.getGSalCols()[i];
+            for (GTacheCol t : gSalCol.getTacheCols()) {
+                t.remove(canvas);
+                tacheCols.remove(t);
+            }
+            SalCol salCol = gSalCol.getSalCol();
+            int it = 0;
+            for (Tache tache : salCol.getTaches()) {
+                int posXPlus1 = i < nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
+                gSalCol.getTacheCols()[it] = ajoutTache(salarie, tache, i, c.getPositionX(), posXPlus1, largCol);
+                it++;
             }
         }
     }
@@ -276,8 +299,8 @@ public class GCalendar {
         return null;
     }
 
-    private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, double largColD){
-        GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, largColD);
+    private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, int posXPlus1, double largCol){
+        GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, posXPlus1, largCol);
         t.setFillColor("blue");
         tacheCols.add(t);
         return t;

@@ -3,7 +3,7 @@ package com.example.gwt.sandbox.client.calendar;
 import com.example.gwt.sandbox.shared.calendar.SalCol;
 import com.example.gwt.sandbox.shared.calendar.Tache;
 
-public class GSalCol {
+public class GSalCol  {
     private SalCol salCol;
     private GTacheCol[] tacheCols;
 
@@ -16,6 +16,9 @@ public class GSalCol {
         tacheCols = new GTacheCol[t.length];
     }
 
+    public SalCol getSalCol() {
+        return salCol;
+    }
 
     public GTacheCol getTacheCol(int numTache) {
         for(GTacheCol tc: tacheCols)if(tc.getNumTache() == numTache)return tc;

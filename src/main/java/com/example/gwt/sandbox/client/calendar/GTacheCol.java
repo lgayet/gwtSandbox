@@ -24,23 +24,27 @@ public class GTacheCol implements Positionable {
     private double heureDebJour;//TODO  petit modif a prévoir si début n'est pas une heure exacte
     private double heureFinJour;
     private double plageHoraire;
+    private double largCol;
+    private int numCol;
 
-    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, double largColD) {
+    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, int positionXPlus1, double largCol) {
         this.salarie = salarie;
         this.tache = tache;
         this.heureDebJour = heureDebJour;
         this.heureFinJour = heureFinJour;
         plageHoraire = heureFinJour - heureDebJour;
-        construit(canvas, numCol, positionX, largColD);
+        construit(canvas, numCol, positionX, positionXPlus1, largCol);
     }
 
 
-    private void construit(DrawingArea canvas, int numCol, int positionX, double largColD){
+    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1,  double largCol){
+        this.largCol = largCol;
+        this.numCol = numCol;
         Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
         int maxNiv = is != null ? is.getmaxNiv() : 1;
-        int x = getPositionXDeb(numCol, positionX, largColD, heureDebJour, heureFinJour);
+        int x = getPositionXDeb(numCol, positionX, largCol, heureDebJour, heureFinJour);
         int w = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
-        int y = getLargeur(numCol, largColD, heureDebJour, heureFinJour);
+        int y = getLargeur(numCol, largCol, heureDebJour, heureFinJour);
         int h = (int) (salarie.getHauteurSal() / maxNiv - 6);
         if(isDessinable(numCol)){
             rectangle = new Rectangle(x,w,y,h);
@@ -48,13 +52,13 @@ public class GTacheCol implements Positionable {
             rectangle.setStrokeWidth(0);
             rectangle.addMouseDownHandler(event -> {
                 tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
-                MOVE_CONTEXT.start(tacheEtAssociees, event.getClientX(), event.getClientY());
+                MOVE_CONTEXT.start(salarie, tache, numCol, largCol, event.getClientX(), event.getClientY());
             });
             canvas.add(rectangle);
             text = new Text(x + w/2, y + h/2, "");//le label contiendra les informations tâche à afficher
             text.addMouseDownHandler(event -> {
                 tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
-                MOVE_CONTEXT.start(tacheEtAssociees, event.getClientX(), event.getClientY());
+                MOVE_CONTEXT.start(salarie, tache, numCol, largCol,  event.getClientX(), event.getClientY());
             });
             canvas.add(text);
         }
@@ -98,14 +102,14 @@ public class GTacheCol implements Positionable {
 
     private boolean isDessinable(int numCol){
         if(tache.numColDeb == tache.numColFin) {//c'est une intersection classique
-            if(tache.getHDeb() < heureFinJour && tache.getHFin() > heureDebJour)return true;
+            if(tache.getHDebDecim() < heureFinJour && tache.getHFinDecim() > heureDebJour)return true;
             return false;
         }
         if(tache.numColDeb == numCol){// on ne tiend compte que de l'heure de début (l'heure de fin est sur le lendemain
-            if(tache.getHDeb() < heureFinJour)return true;
+            if(tache.getHDebDecim() < heureFinJour)return true;
             return false;}
         if(tache.numColFin == numCol){
-            if(tache.getHFin() > heureDebJour)return true;
+            if(tache.getHFinDecim() > heureDebJour)return true;
         }
         return false;
     }
@@ -113,7 +117,7 @@ public class GTacheCol implements Positionable {
 
     public int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
         if(tache.getNumColDeb() ==  numCol){
-            int decalX =  (int)((tache.getHDeb() - heureDebJour) * largCol / (heureFinJour - heureDebJour));
+            int decalX =  (int)((tache.getHDebDecim() - heureDebJour) * largCol / (heureFinJour - heureDebJour));
             int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
             return x;
         }else{//on est donc sur numColFin
@@ -124,10 +128,10 @@ public class GTacheCol implements Positionable {
     public int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
         double nbHeuresJour = heureFinJour - heureDebJour;
         if(tache.getNumColDeb() == numCol) {
-            double nbHeuresTache = tache.getNumColDeb() == tache.getNumColFin() ? (tache.getHFin() - tache.getHDeb()) : ( heureFinJour - tache.getHDeb());
+            double nbHeuresTache = tache.getNumColDeb() == tache.getNumColFin() ? (tache.getHFinDecim() - tache.getHDebDecim()) : ( heureFinJour - tache.getHDebDecim());
             return (int) (largCol * nbHeuresTache / nbHeuresJour);
         }else{
-            double nbHeuresTache = tache.getHFin() - heureDebJour;
+            double nbHeuresTache = tache.getHFinDecim() - heureDebJour;
             return (int) (largCol * nbHeuresTache / nbHeuresJour);
         }
     }
