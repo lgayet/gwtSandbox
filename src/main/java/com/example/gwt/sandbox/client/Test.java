@@ -13,6 +13,8 @@ import com.google.gwt.event.dom.client.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 
+import java.time.LocalTime;
+
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
@@ -102,7 +104,10 @@ public class Test implements EntryPoint {
         nameField.selectAll();
 
         //Champ Heure:Minute
-        RootPanel.get("heureMinuteContainer").add(new ChampHeureMinute());
+        LocalTime localTime = LocalTime.now();
+        ChampHeureMinute champHeureMinute = new ChampHeureMinute();
+        champHeureMinute.setValue(localTime.getHour()+":"+localTime.getMinute());
+        RootPanel.get("heureMinuteContainer").add(champHeureMinute);
 
         //Champ Telephone
         RootPanel.get("telephoneContainer").add(new ChampTelephone());
