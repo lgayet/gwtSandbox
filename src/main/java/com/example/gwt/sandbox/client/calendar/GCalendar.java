@@ -10,11 +10,15 @@ import org.vaadin.gwtgraphics.client.shape.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Classe qui permet de dessiner un calendrier avec en colonnes les jours et les salariès en tant que lignes
  */
 public class GCalendar {
+
+    private static final Logger LOGGER = java.util.logging.Logger.getLogger(GCalendar.class.getName());
 
     public static MoveContext MOVE_CONTEXT = new MoveContext();
 
@@ -62,6 +66,7 @@ public class GCalendar {
     private GButtonPlusMoins boutPlus;
 
     public GCalendar() {
+        LOGGER.info("Construction de GCalendar");
         //    Debut de la construction graphique
         //  LH_Entete
         ajoutLigne(0, HAUTEUR_ENTETES_COLONNES, LARGEUR_PANEL, HAUTEUR_ENTETES_COLONNES, OPACITY);
