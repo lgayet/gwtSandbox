@@ -53,7 +53,29 @@ public class Tache implements Serializable {
     }
 
 
+    public int getAnneDeb() {
+        return anneDeb;
+    }
 
+    public int getMoisDeb() {
+        return moisDeb;
+    }
+
+    public int getJourDeb() {
+        return jourDeb;
+    }
+
+    public int getAnneFin() {
+        return anneFin;
+    }
+
+    public int getMoisFin() {
+        return moisFin;
+    }
+
+    public int getJourFin() {
+        return jourFin;
+    }
 
     public int getNumTache() {
         return numTache;

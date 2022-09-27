@@ -37,17 +37,18 @@ public class GTacheCol implements Positionable {
     }
 
 
-    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1,  double largCol){
+    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1, double largCol){
+        System.out.println("numCol= "+numCol+" positionX ="+positionX+" posXPlus1= "+posXPlus1);
         this.largCol = largCol;
         this.numCol = numCol;
         Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
         int maxNiv = is != null ? is.getmaxNiv() : 1;
         int x = getPositionXDeb(numCol, positionX, largCol, heureDebJour, heureFinJour);
-        int w = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
-        int y = getLargeur(numCol, largCol, heureDebJour, heureFinJour);
+        int y = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
+        int w = getLargeur(numCol, largCol, heureDebJour, heureFinJour);
         int h = (int) (salarie.getHauteurSal() / maxNiv - 6);
         if(isDessinable(numCol)){
-            rectangle = new Rectangle(x,w,y,h);
+            rectangle = new Rectangle(x,y,w,h);
             rectangle.setFillOpacity(0.5);
             rectangle.setStrokeWidth(0);
             rectangle.addMouseDownHandler(event -> {
@@ -115,7 +116,7 @@ public class GTacheCol implements Positionable {
     }
 
 
-    public int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
+    private int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
         if(tache.getNumColDeb() ==  numCol){
             int decalX =  (int)((tache.getHDebDecim() - heureDebJour) * largCol / (heureFinJour - heureDebJour));
             int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
@@ -125,7 +126,7 @@ public class GTacheCol implements Positionable {
         }
     }
 
-    public int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
+    private int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
         double nbHeuresJour = heureFinJour - heureDebJour;
         if(tache.getNumColDeb() == numCol) {
             double nbHeuresTache = tache.getNumColDeb() == tache.getNumColFin() ? (tache.getHFinDecim() - tache.getHDebDecim()) : ( heureFinJour - tache.getHDebDecim());

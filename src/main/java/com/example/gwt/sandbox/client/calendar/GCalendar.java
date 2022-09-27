@@ -202,7 +202,7 @@ public class GCalendar {
             Colonne c2;
             for (int i = 0; i < NB_JOURS_PAR_SEMAINE; i++) {
                 double x = LARGEUR_ENTETE_SALARIES + (largCol * i );// TODO: pour dessiner la ligne à gauche de la colonne
-                c2 = tCols[c.getNumCol()+ i];
+                c2 = tCols[indicePremiereCol+ i];
                 c2.setPositionX((int)x);
                 if(i > 0)objectsGraphiqueStructure.add(ajoutLigne(c2.getPositionX(), HAUTEUR_ENTETES_COLONNES , c2.getPositionX(), HAUTEUR_PANEL, OPACITY));
                 objectsGraphiqueStructure.add(ajoutLabel((int)( c2.getPositionX() + largCol / 2.0 - decal2X ), HAUTEUR_ENTETES_COLONNES + 30 , tJours[tCols[indicePremiereCol+i].getNumJourSem()]+ " "+tCols[indicePremiereCol+i].getNumJourMois() , 14, 0.5D));
@@ -236,8 +236,8 @@ public class GCalendar {
                 SalCol salCol = gSalCol.getSalCol();
                 int it =0;
                 for(Tache tache: salCol.getTaches()){
-                    int posXPlus1 = i < nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
-                    gSalCol.getTacheCols()[it] = ajoutTache(gSalarie,tache,i,c.getPositionX(), posXPlus1, largCol);
+                    int posXPlus1 = i < indicePremiereCol + nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
+                    gSalCol.getTacheCols()[it] = ajoutTache(gSalarie,tache,i,c.getPositionX(), posXPlus1);
                 it ++;
                 }
             }
@@ -256,8 +256,8 @@ public class GCalendar {
             SalCol salCol = gSalCol.getSalCol();
             int it = 0;
             for (Tache tache : salCol.getTaches()) {
-                int posXPlus1 = i < nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
-                gSalCol.getTacheCols()[it] = ajoutTache(salarie, tache, i, c.getPositionX(), posXPlus1, largCol);
+                int posXPlus1 = i < indicePremiereCol + nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
+                gSalCol.getTacheCols()[it] = ajoutTache(salarie, tache, i, c.getPositionX(), posXPlus1);
                 it++;
             }
         }
@@ -299,7 +299,7 @@ public class GCalendar {
         return null;
     }
 
-    private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, int posXPlus1, double largCol){
+    private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, int posXPlus1){
         GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, posXPlus1, largCol);
         t.setFillColor("blue");
         tacheCols.add(t);
