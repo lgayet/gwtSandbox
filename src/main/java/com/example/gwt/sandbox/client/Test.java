@@ -105,6 +105,7 @@ public class Test implements EntryPoint {
 
         //Champ Heure:Minute
         LocalTime localTime = LocalTime.now();
+        localTime = localTime.plusHours(2);
         ChampHeureMinute champHeureMinute = new ChampHeureMinute();
         champHeureMinute.setValue(localTime.getHour()+":"+localTime.getMinute());
         RootPanel.get("heureMinuteContainer").add(champHeureMinute);
