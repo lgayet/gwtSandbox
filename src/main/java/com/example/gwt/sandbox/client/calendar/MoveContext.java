@@ -63,8 +63,10 @@ public class MoveContext  {
     }
 
     void stop(int x, int y) {
-        tache.setMove(false);
-        if (move(x, y)) clear();
+        if (tache != null) {
+            tache.setMove(false);
+            if (move(x, y)) clear();
+        }
     }
 
     int getNumCol(){

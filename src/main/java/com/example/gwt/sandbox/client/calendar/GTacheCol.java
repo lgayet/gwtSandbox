@@ -102,7 +102,7 @@ public class GTacheCol implements Positionable {
     }
 
     public void setFillColor(String color) {
-        rectangle.setFillColor(color);
+        if (rectangle != null) rectangle.setFillColor(color);
     }
 
     private boolean isDessinable(int numCol){

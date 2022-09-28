@@ -74,16 +74,6 @@ public class Test implements EntryPoint {
             }
         });
 
-        //DialogBox box = new DialogBox(true, true);
-
-    /*AtomicBoolean bascule = new AtomicBoolean(true);
-    rect.addClickHandler(event -> {
-      box.setText("X : "+event.getClientX() + ", Y : "+event.getClientY());
-      box.show();
-      bascule.set(!bascule.get());
-      rect.setFillColor(bascule.get() ? "green" : "blue");
-    });*/
-
 
         final Button sendButton = new Button("Send");
         final TextBox nameField = new TextBox();
@@ -112,24 +102,6 @@ public class Test implements EntryPoint {
 
         //Champ Telephone
         RootPanel.get("telephoneContainer").add(new ChampTelephone());
-
-        // Create the text area and toolbar
-    /*RichTextArea area = new RichTextArea();
-    area.ensureDebugId("cwRichText-area");
-    area.setSize("100%", "14em");
-    RichTextToolbar toolbar = new RichTextToolbar(area);
-    toolbar.ensureDebugId("cwRichText-toolbar");
-    toolbar.setWidth("100%");
-
-    // Add the components to a panel
-    Grid grid = new Grid(2, 20);
-    grid.setStyleName("cw-RichText");
-    grid.setWidget(0, 0, toolbar);
-    grid.setWidget(1, 0, area);
-    RootPanel.get("richTextContainer").add(grid);
-    area.setHTML(HTML);
-
-    RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant("Pour l'instant c'est vide")));*/
 
         // Create the popup dialog box
         final DialogBox dialogBox = new DialogBox();
@@ -164,17 +136,6 @@ public class Test implements EntryPoint {
              */
             public void onClick(ClickEvent event) {
                 sendNameToServer();
-
-        /*greetingService.transformHtmlWithSection(area.getHTML(), new AsyncCallback<String>() {
-          @Override
-          public void onFailure(Throwable throwable) {}
-
-          @Override
-          public void onSuccess(String html) {
-            RootPanel.get("htmlPanelContainer").remove(0);
-            RootPanel.get("htmlPanelContainer").add(new HTMLPanel(SafeHtmlUtils.fromSafeConstant(html)));
-          }
-        });*/
             }
 
             /**
@@ -224,8 +185,8 @@ public class Test implements EntryPoint {
         }
 
         // Add a handler to send the name to the server
-        MyHandler handler = new MyHandler();
+        /*MyHandler handler = new MyHandler();
         sendButton.addClickHandler(handler);
-        nameField.addKeyUpHandler(handler);
+        nameField.addKeyUpHandler(handler);*/
     }
 }
