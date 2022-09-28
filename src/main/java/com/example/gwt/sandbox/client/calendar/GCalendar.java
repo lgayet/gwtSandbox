@@ -95,7 +95,7 @@ public class GCalendar {
         canvas.addMouseUpHandler(event -> {
             MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
 //            affiche(choixAffichage);
-            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
+            afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
         });
     }
 
