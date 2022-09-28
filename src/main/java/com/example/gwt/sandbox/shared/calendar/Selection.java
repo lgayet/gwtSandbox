@@ -27,9 +27,9 @@ public class Selection  implements Serializable {
         this.anneeFin = anneeFin;
         this.moisFin = moisFin;
     }
-    public Tache ajouTache(int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, long longDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, long longFin, int numColDeb, int numColFin){
+    public Tache ajoutTache(int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, int joursSelDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, int joursSelFin, int numColDeb, int numColFin){
         if(aTaches == null)aTaches = new ArrayList<>();
-        Tache t = new Tache(getAndIncrNumTache(), anneDeb, moisDeb, jourDeb, hDeb, mnDeb, longDeb, anneFin, moisFin, jourFin, hFin, mnFin, longFin, numColDeb, numColFin);
+        Tache t = new Tache(getAndIncrNumTache(), anneDeb, moisDeb, jourDeb, hDeb, mnDeb, joursSelDeb, anneFin, moisFin, jourFin, hFin, mnFin, joursSelFin, numColDeb, numColFin);
         aTaches.add(t);
         return t;
     }

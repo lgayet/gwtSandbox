@@ -10,7 +10,6 @@ import org.vaadin.gwtgraphics.client.shape.Text;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -90,13 +89,13 @@ public class GCalendar {
         canvas.addMouseMoveHandler(event -> {
             MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
 //            affiche(choixAffichage);
-            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie());
+            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
         });
 
         canvas.addMouseUpHandler(event -> {
             MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
 //            affiche(choixAffichage);
-            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie());
+            if(MOVE_CONTEXT.isBusy())afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
         });
     }
 
@@ -173,6 +172,8 @@ public class GCalendar {
     }
 
     private void affiche(ChoixAffichage choixAffichage){
+
+        System.out.println("affichage "+choixAffichage);
         this.choixAffichage = choixAffichage;
 
         effacerObjetsGraphiques();
@@ -249,9 +250,9 @@ public class GCalendar {
         }
     }
 
-    private void afficheSalCol(GSalarie salarie){
+    private void afficheSalCol(GSalarie salarie, int premCol, int dernCol){
         Colonne c;
-        for(int i = indicePremiereCol; i < indicePremiereCol + nbJoursAffiches; i++) {
+        for(int i = premCol; i <= dernCol; i++) {
             c = tCols[i];
             GSalCol gSalCol = salarie.getGSalCols()[i];
             for (GTacheCol t : gSalCol.getTacheCols()) {
@@ -305,8 +306,8 @@ public class GCalendar {
     }
 
     private GTacheCol ajoutTache(GSalarie salarie, Tache tache, int indiceJour, int positionX, int posXPlus1){
-        GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, posXPlus1, largCol);
-        t.setFillColor("blue");
+        GTacheCol t = new GTacheCol(canvas, salarie, tache, heureDebJour, heureFinJour, indiceJour, positionX, posXPlus1, largCol, indicePremiereCol, nbJoursAffiches);
+        t.setFillColor(tache.isMove() ? "red" : "blue");
         tacheCols.add(t);
         return t;
     }

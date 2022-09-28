@@ -5,11 +5,12 @@ import java.util.ArrayList;
 
 public class Salarie implements Serializable {
 
+    private int numSal;
     private String nomSal;
     private int nbJours;
-    private int numInter= 0;
-    private transient ArrayList<Intersection> aInter = new ArrayList<>();
-    private Intersection[] intersections;
+    private ArrayList<Intersection> aInter = new ArrayList<>();//TODO suppression du transient
+    private ArrayList<Intersection> aInterTempo = new ArrayList<>();// créées temporairement (non appliquée si impact non significatif)
+
     private SalCol[] salCols;
 
 
@@ -17,13 +18,18 @@ public class Salarie implements Serializable {
     public Salarie() {
     }
 
-    public Salarie( String nomSal, int nbJours) {
+    public Salarie(int numSal, String nomSal, int nbJours) {
+        this.numSal = numSal;
         this.nomSal = nomSal;
         this.nbJours = nbJours;
         salCols = new SalCol[nbJours];
         for(int i = 0; i< nbJours; i++){
             salCols[i] = new SalCol(i);
         }
+    }
+
+    public int getNumSal() {
+        return numSal;
     }
 
     public String getNomSal() {
@@ -36,15 +42,38 @@ public class Salarie implements Serializable {
 
 
     public Intersection getIntersection(Integer numInter){
-        if(intersections != null)return intersections[numInter];// on est sur GWT
+//        if(intersections != null)return intersections[numInter];// on est sur GWT
         for(Intersection i: aInter){// on est en création des tâches
             if(i.getNumIntersec() == numInter)return i;
         }
         return null;
     }
 
-    public void ajoutIntersection(Intersection intersection){
-        aInter.add(intersection);
+    public Intersection getIntersectionTempo(Integer numInter){
+//        if(intersections != null)return intersections[numInter];// on est sur GWT
+        for(Intersection i: aInterTempo){// on est en création des tâches
+            if(i.getNumIntersec() == numInter)return i;
+        }
+        return null;
+    }
+
+    public void removeIntersection(Intersection intersection){
+        aInter.remove(intersection);
+    }
+
+    public ArrayList<Intersection> getAInter() {
+        return aInter;
+    }
+
+    public ArrayList<Intersection> getAInterTempo() {
+        return aInterTempo;
+    }
+
+    public Intersection ajoutIntersection(Tache tache, boolean move){
+        Intersection i = new Intersection(numSal, move ? aInterTempo.size()+100 : aInter.size(), tache);
+        if(move)aInterTempo.add(i);
+        else aInter.add(i);
+        return i;
     }
 
 
@@ -54,17 +83,7 @@ public class Salarie implements Serializable {
         }
     }
 
-    public void setTInterSal(){
-        intersections = aInter.toArray(new Intersection[aInter.size()]);
-    }
 
-
-
-    public int getNumInter(){
-        int n = numInter;
-        numInter++;
-        return n;
-    }
 
 
 

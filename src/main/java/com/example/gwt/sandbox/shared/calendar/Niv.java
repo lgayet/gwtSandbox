@@ -29,7 +29,7 @@ public class Niv implements Serializable {
             if(tache == t)return true;// j'ai déjà déposé cette tâche, je ne fais rien
         }
         for(Tache t: taches){
-            if(t.getLongDeb() < tache.getLongFin() && t.getLongFin() > tache.getLongDeb()) {// je suis en intersection: je ne peux pas déposer cette tache sur ce niveau
+            if(t.getMnSelDeb() < tache.getMnSelFin() && t.getMnSelFin() > tache.getMnSelDeb()) {// je suis en intersection: je ne peux pas déposer cette tache sur ce niveau
                 return false;
             }
         }

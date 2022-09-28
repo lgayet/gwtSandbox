@@ -1,23 +1,27 @@
 package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 public class Intersection implements Serializable {
-    private int numIntersec;
+    private int numSalarie;
+    private int anumIntersec;
     private Niv[] nivs = new Niv[1];
 
     public Intersection() {
     }
 
-    public Intersection(int numIntersec, Tache tache) {
-        this.numIntersec = numIntersec;
+    public Intersection(int numSalarie, int numIntersec, Tache tache) {
+        this.numSalarie = numSalarie;
+        this.anumIntersec = numIntersec;
         nivs[0] = new Niv(numIntersec, 0, tache);
     }
 
     public int getNumIntersec() {
-        return numIntersec;
+        return anumIntersec;
+    }
+
+    public void setNumIntersec(int numIntersec) {
+        this.anumIntersec = numIntersec;
     }
 
     public int getmaxNiv() {
@@ -31,16 +35,41 @@ public class Intersection implements Serializable {
         ajoutNiv(tache);
 
     }
-    public void fusionne(Intersection intersection){
-        for(Tache t: intersection.getTaches()){
-            ajoutTache(t);
+
+    public int getSommeTachesIntersection(Tache tache){
+        int somme=0;
+        for(Niv n: nivs){
+            for(Tache ta: n.getTaches()){
+                if(tache.getMnSelDeb() < ta.getMnSelFin() && tache.getMnSelFin() > ta.getMnSelDeb()){
+                    somme += ta.getNumTache();
+                }
+            }
+        }
+        return somme;
+    }
+
+    public void appliqueTaches(){
+        int i=0;
+        for(Niv n: nivs){
+            for(Tache t: n.getTaches()){
+                t.setNiveau(i);
+                t.setNumIntersection(anumIntersec);
+            }
+            i++;
         }
     }
 
-    private Set<Tache> getTaches(){
-        Set<Tache> t = new HashSet<>();
+
+    public Tache[] getTaches(){
+        int nbTache =0;
+        for(Niv n: nivs)nbTache+=n.getTaches().length;
+        Tache[]t = new Tache[nbTache];
+        int i=0;
         for(Niv n: nivs){
-            for(Tache ta: n.getTaches())t.add(ta);
+            for(Tache ta: n.getTaches()){
+                t[i]=ta;
+                i++;
+            }
         }
         return t;
     }
@@ -50,8 +79,12 @@ public class Intersection implements Serializable {
         for(int i = 0; i < nivs.length; i ++){
             t[i] = nivs[i];
         }
-        Niv n = new Niv(numIntersec, nivs.length, tache);
+        Niv n = new Niv(anumIntersec, nivs.length, tache);
         t[nivs.length] = n;
         nivs = t;
+    }
+
+    public String toString(){
+        return "Intersection "+numSalarie+":"+anumIntersec;
     }
 }

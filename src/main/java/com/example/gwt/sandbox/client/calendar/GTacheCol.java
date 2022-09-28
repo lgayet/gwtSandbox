@@ -7,6 +7,8 @@ import org.vaadin.gwtgraphics.client.Positionable;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
+import java.util.logging.Logger;
+
 import static com.example.gwt.sandbox.client.calendar.GCalendar.MOVE_CONTEXT;
 
 /*
@@ -27,18 +29,20 @@ public class GTacheCol implements Positionable {
     private double largCol;
     private int numCol;
 
-    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, int positionXPlus1, double largCol) {
+    private static final Logger LOGGER = java.util.logging.Logger.getLogger(GTacheCol.class.getName());
+
+    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, int positionXPlus1, double largCol, int indicePremiereCol, int nbJoursAffiches) {
         this.salarie = salarie;
         this.tache = tache;
         this.heureDebJour = heureDebJour;
         this.heureFinJour = heureFinJour;
         plageHoraire = heureFinJour - heureDebJour;
-        construit(canvas, numCol, positionX, positionXPlus1, largCol);
+        construit(canvas, numCol, positionX, positionXPlus1, largCol, indicePremiereCol, nbJoursAffiches);
     }
 
 
-    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1, double largCol){
-        System.out.println("numCol= "+numCol+" positionX ="+positionX+" posXPlus1= "+posXPlus1);
+    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1, double largCol, int indicePremiereCol, int nbJoursAffiches){
+        LOGGER.info("numCol= "+numCol+" positionX ="+positionX+" posXPlus1= "+posXPlus1);
         this.largCol = largCol;
         this.numCol = numCol;
         Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
@@ -53,13 +57,13 @@ public class GTacheCol implements Positionable {
             rectangle.setStrokeWidth(0);
             rectangle.addMouseDownHandler(event -> {
                 tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
-                MOVE_CONTEXT.start(salarie, tache, numCol, largCol, event.getClientX(), event.getClientY());
+                MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches , event.getClientX(), event.getClientY());
             });
             canvas.add(rectangle);
             text = new Text(x + w/2, y + h/2, "");//le label contiendra les informations tâche à afficher
             text.addMouseDownHandler(event -> {
                 tacheEtAssociees = salarie.getTachesCol(tache.getNumTache());
-                MOVE_CONTEXT.start(salarie, tache, numCol, largCol,  event.getClientX(), event.getClientY());
+                MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches,  event.getClientX(), event.getClientY());
             });
             canvas.add(text);
         }

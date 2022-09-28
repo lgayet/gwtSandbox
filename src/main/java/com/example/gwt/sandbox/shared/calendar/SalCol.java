@@ -22,11 +22,10 @@ public class SalCol implements Serializable {
 
     public void ajoutTache(Salarie salarie, Tache tache){// pour le moment, les taches sont nouvelles, donc sans intersection
         for(Tache t: taches){
-            if(t.getLongDeb() < tache.getLongFin() && t.getLongFin() > tache.getLongDeb()) {
+            if(t.getMnSelDeb() < tache.getMnSelFin() && t.getMnSelFin() > tache.getMnSelDeb()) {
                 Intersection intersect;
                 if(t.getNumIntersection() == null){
-                    intersect = new Intersection(salarie.getNumInter(), t);//j'initialise l'intervention avec t
-                    salarie.ajoutIntersection(intersect);
+                    intersect = salarie.ajoutIntersection(t, false);
                 }
                 else {
                     intersect = salarie.getIntersection(t.getNumIntersection());
