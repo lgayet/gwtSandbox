@@ -76,9 +76,6 @@ public class MoveContext  {
         if (move(x, y)) clear();
     }
 
-    int getNumCol(){
-        return numCol;
-    }
 
     int getPremColAff(){
 //        if(tache == null)LOGGER.info("getPremColAff avec tache null");

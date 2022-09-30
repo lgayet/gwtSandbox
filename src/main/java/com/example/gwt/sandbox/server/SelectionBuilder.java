@@ -34,7 +34,7 @@ public class SelectionBuilder implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,14,0,2022,8,1,23,55));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,1,14,0));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,8,0,2022,8,2,13,45));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,10,0,2022,8,2,16,0));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,2,11,30));

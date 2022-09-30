@@ -113,20 +113,12 @@ public class Tache implements Serializable {
         numIntersection = null;
     }
 
-    public int gethDeb() {
-        return hDeb;
-    }
-
     public int getMnDeb() {
-        return mnDeb;
-    }
-
-    public int gethFin() {
-        return hFin;
+        return hDeb * 60 + mnDeb;
     }
 
     public int getMnFin() {
-        return mnFin;
+        return hFin * 60 + mnFin;
     }
 
     public void setHDeb(int hDeb) {
@@ -145,14 +137,6 @@ public class Tache implements Serializable {
         this.mnFin = mnFin;
     }
 
-
-
-    public double getHDebDecim(){
-        return hDeb + mnDeb / 60.0;
-    }
-    public double getHFinDecim(){
-        return hFin +  mnFin / 60.0;
-     }
 
      public String toString(){
         return "Tache "+aanumTache+" "+hDeb+":"+mnDeb+"<==>"+" "+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau+" jourSelDeb="+joursSelDeb+" jourSelFin= "+joursSelFin;
