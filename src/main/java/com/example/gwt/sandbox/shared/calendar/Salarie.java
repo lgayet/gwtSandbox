@@ -78,7 +78,7 @@ public class Salarie implements Serializable {
 
 
     public void ajoutTaches(Tache tache){
-        for(int i = tache.getNumColDeb(); i <= tache.getNumColFin(); i++) {
+        for(int i = tache.getJoursSelDeb(); i <= tache.getJoursSelFin(); i++) {
             salCols[i].ajoutTache(this, tache);
         }
     }

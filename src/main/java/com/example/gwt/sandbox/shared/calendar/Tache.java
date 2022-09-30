@@ -6,21 +6,13 @@ public class Tache implements Serializable {
 
     private TypTache typTache;
     private int aanumTache;
-    private int anneDeb;
-    private int moisDeb;
-    private int jourDeb;
+    private int joursSelDeb;
     private int hDeb;
     private int mnDeb;
-    private int joursSelDeb;
-    private int anneFin;
-    private int moisFin;
-    private int jourFin;
+    private int joursSelFin;
     private int hFin;
     private int mnFin;
-    private int joursSelFin;
 //
-    public int numColDeb;
-    public int numColFin;
     private int niveau;// l'indice du niveau de dépôt de la tâche
     private boolean move;
 //    les taches et intersection
@@ -31,26 +23,18 @@ public class Tache implements Serializable {
     public Tache() {
     }
 
-    public Tache(int numTache, int anneDeb, int moisDeb, int jourDeb, int hDeb, int mnDeb, int joursSelDeb, int anneFin, int moisFin, int jourFin, int hFin, int mnFin, int joursSelFin, int numColDeb, int numColFin) {
+    public Tache(int numTache, int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin) {
         this.aanumTache = numTache;
-        this.anneDeb = anneDeb;
-        this.moisDeb = moisDeb;
-        this.jourDeb = jourDeb;
+        this.joursSelDeb = joursSelDeb;
         this.hDeb = hDeb;
         this.mnDeb = mnDeb;
-        this.joursSelDeb = joursSelDeb;
-        this.anneFin = anneFin;
-        this.moisFin = moisFin;
-        this.jourFin = jourFin;
+        this.joursSelFin = joursSelFin;
         this.hFin = hFin;
         this.mnFin = mnFin;
-        this.joursSelFin = joursSelFin;
-        this.numColDeb = numColDeb;
-        this.numColFin = numColFin;
     }
 
     public Tache copyTache(){
-        return new Tache(aanumTache, anneDeb, moisDeb, jourDeb, hDeb, mnDeb, joursSelDeb, anneFin, moisFin, jourFin, hFin, mnFin, joursSelFin, numColDeb, numColFin);
+        return new Tache(aanumTache, joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
     }
 
     public boolean isMove() {
@@ -61,41 +45,12 @@ public class Tache implements Serializable {
         this.move = move;
     }
 
-    public int getAnneDeb() {
-        return anneDeb;
-    }
 
-    public int getMoisDeb() {
-        return moisDeb;
-    }
-
-    public int getJourDeb() {
-        return jourDeb;
-    }
-
-    public int getAnneFin() {
-        return anneFin;
-    }
-
-    public int getMoisFin() {
-        return moisFin;
-    }
-
-    public int getJourFin() {
-        return jourFin;
-    }
 
     public int getNumTache() {
         return aanumTache;
     }
 
-    public int getNumColDeb() {
-        return numColDeb;
-    }
-
-    public int getNumColFin() {
-        return numColFin;
-    }
 
     public int getMnSelDeb(){
         return joursSelDeb * 24 * 60 + hDeb * 60 + mnDeb;
@@ -105,12 +60,20 @@ public class Tache implements Serializable {
         return joursSelDeb;
     }
 
+    public void setJoursSelDeb(int joursSelDeb) {
+        this.joursSelDeb = joursSelDeb;
+    }
+
     public int getMnSelFin(){
         return joursSelFin * 24 * 60 + hFin * 60 + mnFin;
     }
 
     public int getJoursSelFin() {
         return joursSelFin;
+    }
+
+    public void setJoursSelFin(int joursSelFin) {
+        this.joursSelFin = joursSelFin;
     }
 
     public int getNiveau() {
@@ -192,7 +155,7 @@ public class Tache implements Serializable {
      }
 
      public String toString(){
-        return "Tache "+aanumTache+"-"+anneDeb+"-"+moisDeb+"-"+jourDeb+" "+hDeb+":"+mnDeb+"<==>"+anneFin+"-"+moisFin+"-"+jourFin+" "+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau;
+        return "Tache "+aanumTache+" "+hDeb+":"+mnDeb+"<==>"+" "+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau+" jourSelDeb="+joursSelDeb+" jourSelFin= "+joursSelFin;
      }
 
 }

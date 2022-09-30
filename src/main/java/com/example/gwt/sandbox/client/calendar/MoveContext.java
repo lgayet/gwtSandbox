@@ -2,6 +2,8 @@ package com.example.gwt.sandbox.client.calendar;
 
 import com.example.gwt.sandbox.shared.calendar.Tache;
 
+import java.util.logging.Logger;
+
 public class MoveContext  {
 
     private GSalarie salarie;
@@ -9,23 +11,22 @@ public class MoveContext  {
     private int numCol;
     private Tache tacheInitiale;
     private double largCol;
-    private int hDeb;
-    private int mnDeb;
-    private int hFin;
-    private int mnFin;
     private int xRef;
     private int yRef;
 //    pour le calcul des colonnes à afficher
     private int indicePremiereColonne;
     private int nbJoursAffiches;
-    private int premColAff;
-    private int dernColAff;
+    private int precedJourSelDeb;
+    private int precedJourSelFin;
+    private int iter = 0;
+    private static final Logger LOGGER = java.util.logging.Logger.getLogger(MoveContext.class.getName());
 //    valeurs de la tache pour le re-calcul
 
 
 
     void start(GSalarie salarie, Tache tache, int numCol, double largCol, int indicePremiereColonne, int nbJoursAffiches, int x, int y) {
         if (!isBusy()) {
+            LOGGER.info("start "+tache);
             this.salarie = salarie;
             this.tache = tache;
             tache.setMove(true);
@@ -36,37 +37,37 @@ public class MoveContext  {
             this.nbJoursAffiches = nbJoursAffiches;
             xRef = x;
             yRef = y;
-            hDeb = tache.gethDeb();
-            mnDeb = tache.getMnDeb();
-            hFin = tache.gethFin();
-            mnFin = tache.getMnFin();
-            premColAff = tache.getJoursSelDeb();
-            dernColAff = tache.getJoursSelFin();
+            precedJourSelDeb = tache.getJoursSelDeb();
+            precedJourSelFin = tache.getJoursSelFin();
         }
     }
 
     boolean move(int x, int y) {
         if (isBusy()) {
+            LOGGER.info("MC.move "+tache);
+            precedJourSelDeb = tache.getJoursSelDeb();
+            precedJourSelFin = tache.getJoursSelFin();
             int decalMn = (int)((x -xRef) * 1440 / largCol);
-            int mnD = hDeb * 60 + mnDeb;
-            int mnXD = mnD + decalMn;
-            tache.setHDeb(mnXD / 60);
-            tache.setMnDeb(mnXD % 60);
-            int mnF = hFin * 60 + mnFin;
-            int mnXF = mnF + decalMn;
-            tache.setHFin(mnXF / 60);
-            tache.setMnFin(mnXF % 60);
+            int mnSelDeb = tacheInitiale.getMnSelDeb() + decalMn;
+            tache.setJoursSelDeb(mnSelDeb / 1440);
+            tache.setHDeb(mnSelDeb % 1440 / 60 );
+            tache.setMnDeb(mnSelDeb % 1440 % 60 );
+            int mnSelFin = tacheInitiale.getMnSelFin() + decalMn;
+            tache.setJoursSelFin(mnSelFin / 1440);
+            tache.setHFin(mnSelFin % 1440 / 60 );
+            tache.setMnFin(mnSelFin % 1440 % 60);
             salarie.mouvTacheIntersect(tache);
+            LOGGER.info("MC.move jourSelDeb= "+tache.getJoursSelDeb()+" jourSelFin= "+tache.getJoursSelFin()+" precedJourSelDeb= "+precedJourSelDeb+" precedJourSelFin= "+precedJourSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
+            salarie.mouvTacheSalCol(tache, precedJourSelDeb, precedJourSelFin);
+            iter ++;
             return true;
         }
         return false;
     }
 
     void stop(int x, int y) {
-        if (tache != null) {
-            tache.setMove(false);
-            if (move(x, y)) clear();
-        }
+        tache.setMove(false);
+        if (move(x, y)) clear();
     }
 
     int getNumCol(){
@@ -74,11 +75,12 @@ public class MoveContext  {
     }
 
     int getPremColAff(){
-        return premColAff;
+//        if(tache == null)LOGGER.info("getPremColAff avec tache null");
+        return tache.getJoursSelDeb();
     }
 
     int getDernColAff(){
-        return dernColAff;
+        return tache.getJoursSelFin();
     }
 
     GSalarie getSalarie(){

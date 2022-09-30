@@ -51,7 +51,7 @@ public class GSalarie  {
     public GTacheCol[] getTachesCol(int numTache){
         Tache ta = calendar.getTaches()[numTache];
         List<GTacheCol> tc = new ArrayList<>();
-        for(int i = ta.getNumColDeb(); i <= ta.getNumColFin(); i++){
+        for(int i = ta.getJoursSelDeb(); i <= ta.getJoursSelFin(); i++){
             tc.add(salCols[i].getTacheCol(numTache));
         }
         return tc.toArray(new GTacheCol[tc.size()]);
@@ -59,6 +59,42 @@ public class GSalarie  {
 
     public Intersection getIntersection(Integer numInter){
         return salarie.getIntersection(numInter);
+    }
+
+    public void mouvTacheSalCol(Tache tache, int precedJourSelDeb, int precedJourSelFin){
+        GSalCol g;
+        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getJoursSelDeb()+" tache.joursSelFin= "+tache.getJoursSelFin()+" precedJoursSelDeb= "+precedJourSelDeb+" precedJoursSelFin= "+precedJourSelFin);
+        for(int i = Math.min(tache.getJoursSelDeb(), precedJourSelDeb); i<= Math.max(tache.getJoursSelFin(), precedJourSelFin); i++){
+//            pour chaque iteration, je vérifie la presence précédante et pour la tache
+            if(appatientPrecedEtNonTache(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+//                 je dois donc supprimer de SalCol et GSalCol
+                LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
+                g = salCols[i];
+                g.supprimeTacheCol(tache);// je ne la supprime pas en tant que GTacheCol, je ne veux implement plus créer de Rectangle
+            }
+            if(appatientTacheEtNonPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+                LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
+                g = salCols[i];
+                g.ajoutTacheCol(salarie, tache);
+            }
+            if(appatientTacheEtPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+                LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
+                g = salCols[i];
+                g.mouvTacheCol(salarie, tache);
+            }
+        }
+    }
+    private boolean appatientTacheEtPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+        if(i >= tacheJD && i <= tachejF && i >= precedJD && i <= precedJF)return true;
+        return false;
+    }
+    private boolean appatientTacheEtNonPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+        if(i >= tacheJD && i <= tachejF && (i < precedJD || i > precedJF))return true;
+        return false;
+    }
+    private boolean appatientPrecedEtNonTache(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+        if((i < tacheJD || i > tachejF) && i >= precedJD && i <= precedJF)return true;
+        return false;
     }
 
 
@@ -73,10 +109,9 @@ public class GSalarie  {
                     modif des taches
          */
         numMove++;
-        LOGGER.info("mouvTache "+tache.getNumTache()+" numMov= "+numMove+" pour "+this);
+//        LOGGER.info("mouvTache "+tache.getNumTache()+" numMov= "+numMove+" pour "+this);
         if(tache.isIntersection()){
             Intersection interBefore = salarie.getIntersection(tache.getNumIntersection());
-            int sommeTachesIntersect= interBefore.getSommeTachesIntersection(tache);
             Tache[] tachesIntersect = interBefore.getTaches();
             for(Tache t: tachesIntersect)t.sauvIntersect();
             Intersection intersect = null;
@@ -87,21 +122,18 @@ public class GSalarie  {
                             Integer numIntersection = t1.isIntersection() ? t1.getNumIntersection() : t2.isIntersection() ? t2.getNumIntersection() : null;
                             if(numIntersection == null){
                                 intersect = salarie.ajoutIntersection(t2, true);
-                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
+//                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
                             }
                             else {
                                 intersect = salarie.getIntersectionTempo(numIntersection);
                             }
                             intersect.ajoutTache(t1);
-                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
+//                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
                         }
                     }
                 }
             }
-            Integer somm1 = intersect != null ? intersect.getSommeTachesIntersection(tache) : null;
-            Integer somm2= salarie.getAInterTempo().size() == 1 ? salarie.getAInterTempo().get(0).getSommeTachesIntersection(tache): null;
-            LOGGER.finest("size= "+salarie.getAInterTempo().size()+" sommeTachesIntersect= "+sommeTachesIntersect+"  somm1= "+somm1+"  somm2= "+somm2);
-            if(salarie.getAInterTempo().size() == 1 && salarie.getAInterTempo().get(0).getSommeTachesIntersection(tache) == sommeTachesIntersect){
+            if(salarie.getAInterTempo().size() == 1 && salarie.getAInterTempo().get(0).isEquivalent(interBefore, tache)){
 //                dans ce cas, je n'ai rien à faire
                 for(Tache t: tachesIntersect)t.restaureIntersect();
                 salarie.getAInterTempo().clear();
@@ -109,7 +141,7 @@ public class GSalarie  {
             else{
                 for(Tache t: tachesIntersect)t.removeIntersection();
                 for(Intersection i: salarie.getAInterTempo()){
-                    LOGGER.finest("applique "+i);
+//                    LOGGER.finest("applique "+i);
                     i.setNumIntersec(salarie.getAInter().size());
                     i.appliqueTaches();
                     salarie.getAInterTempo().remove(i);

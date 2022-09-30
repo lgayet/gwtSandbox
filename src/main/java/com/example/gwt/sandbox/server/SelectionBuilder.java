@@ -17,7 +17,7 @@ public class SelectionBuilder implements Serializable {
     private LocalDate debut;
 
     public Selection construitSelection(int anneeDebut, int moisDebut, int anneeFin, int moisFin){
-        Selection selection = new Selection(anneeDebut, moisDebut, anneeFin, moisFin);
+        Selection selection = new Selection();
         debut = LocalDate.of(anneeDebut,moisDebut,1);
         LocalDate fin = LocalDate.of(anneeFin,moisFin,1);
         fin = fin.plusMonths(1);
@@ -34,17 +34,18 @@ public class SelectionBuilder implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,8,0,2022,8,2,13,45));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,10,0,2022,8,2,16,0));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,2,11,30));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,16,30,2022,8,2,20,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,6,0,2022,8,4,10,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,7,30,2022,8,3,8,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,14,0,2022,8,1,23,55));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,8,0,2022,8,2,13,45));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,10,0,2022,8,2,16,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,2,11,30));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,16,30,2022,8,2,20,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,6,0,2022,8,4,10,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,7,30,2022,8,3,8,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
-                aTaches.add(generationTache(selection, sal));
+//                aTaches.add(generationTache(selection, sal));
             }
         }
         selection.setTSals(tSals);
@@ -67,18 +68,13 @@ public class SelectionBuilder implements Serializable {
     }
 
     private Tache generationTacheFixe(Selection selection, Salarie salarie, int annee, int mois, int jour, int heure, int minute, int anneeFin, int moisFin, int jourFin, int hFin, int mnFin){
-        LocalDateTime d = LocalDateTime.of(annee,mois,jour,heure,minute);
-        LocalDateTime d2 = LocalDateTime.of(anneeFin,moisFin,jourFin,hFin,mnFin);
         LocalDate d3 = LocalDate.of(annee,mois,jour);
         LocalDate d4 = LocalDate.of(anneeFin,moisFin,jourFin);
-        int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
-        int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
+        int mnSelDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
+        int mnSelFin = (int)(d4.toEpochDay() - debut.toEpochDay());
 
-        Tache t = selection.ajoutTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(),
-                debut.until(d3).getDays(),
-                d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(),
-                debut.until(d4).getDays(),
-                numColDeb, numColFin);
+        Tache t = selection.ajoutTache( mnSelDeb, heure, minute,mnSelFin, hFin, mnFin
+               );
         salarie.ajoutTaches(t);
         return t;
     }
@@ -101,13 +97,9 @@ public class SelectionBuilder implements Serializable {
         d2 = d2.plusMinutes(genererInt(0,30) * 10);
         d3 = LocalDate.of(d.getYear(), d.getMonthValue(), d.getDayOfMonth());
         d4 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
-        int numColDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
-        int numColFin = (int)(d4.toEpochDay() - debut.toEpochDay());
-        Tache t = selection.ajoutTache(d.getYear(), d.getMonthValue(), d.getDayOfMonth(), d.getHour(), d.getMinute(),
-                debut.until(d3).getDays(),
-                d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth(), d2.getHour(), d2.getMinute(),
-                debut.until(d4).getDays(),
-                numColDeb, numColFin);
+        int mnSelDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
+        int mnSelFin = (int)(d4.toEpochDay() - debut.toEpochDay());
+        Tache t = selection.ajoutTache(mnSelDeb, d.getHour(), d.getMinute(), mnSelFin, d2.getHour(), d2.getMinute());
         salarie.ajoutTaches(t);
         return t;
     }

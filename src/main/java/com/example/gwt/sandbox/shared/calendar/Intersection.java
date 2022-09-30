@@ -1,11 +1,14 @@
 package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Intersection implements Serializable {
     private int numSalarie;
     private int anumIntersec;
     private Niv[] nivs = new Niv[1];
+    private List<Tache> aTache = new ArrayList<>();//pour recalculer l'intersection dans le même ordre (eviter le clignotement)
 
     public Intersection() {
     }
@@ -14,6 +17,7 @@ public class Intersection implements Serializable {
         this.numSalarie = numSalarie;
         this.anumIntersec = numIntersec;
         nivs[0] = new Niv(numIntersec, 0, tache);
+        aTache.add(tache);
     }
 
     public int getNumIntersec() {
@@ -30,10 +34,29 @@ public class Intersection implements Serializable {
 
     public void ajoutTache(Tache tache){
         for(Niv n: nivs){
-            if(n.controleEtAjout(tache))return;
+            if(n.controleEtAjout(this, tache))return;
         }
         ajoutNiv(tache);
+        aTache.add(tache);
+    }
 
+    public void ajoutArray(Tache tache){
+        aTache.add(tache);
+    }
+
+    public boolean isEquivalent(Intersection inter, Tache tache){
+        return inter.getSommeTachesIntersection(tache) == getSommeTachesIntersection(tache)
+                && inter.getSommeNiv(tache) == getSommeNiv(tache);
+    }
+
+    public int getSommeNiv(Tache tache){
+        int somme=0;
+        int i = 1;
+        for(Niv n: nivs){
+            somme = somme +n.getTaches().length * i;
+            i++;
+        }
+        return somme;
     }
 
     public int getSommeTachesIntersection(Tache tache){
@@ -58,7 +81,9 @@ public class Intersection implements Serializable {
             i++;
         }
     }
-
+    public Tache[] getTaches2(){
+        return aTache.toArray(new Tache[aTache.size()]);
+    }
 
     public Tache[] getTaches(){
         int nbTache =0;

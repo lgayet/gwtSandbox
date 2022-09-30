@@ -24,7 +24,7 @@ public class Niv implements Serializable {
         taches[0] = tache;
     }
 
-    public boolean controleEtAjout(Tache tache){
+    public boolean controleEtAjout(Intersection inter, Tache tache){
         for(Tache t: taches){
             if(tache == t)return true;// j'ai déjà déposé cette tâche, je ne fais rien
         }
@@ -41,6 +41,7 @@ public class Niv implements Serializable {
         tache.setNiveau(indice);
         t[taches.length] = tache;
         taches = t;
+        inter.ajoutArray(tache);
         return true;
     }
 
