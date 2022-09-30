@@ -17,6 +17,7 @@ import static com.example.gwt.sandbox.client.calendar.GCalendar.MOVE_CONTEXT;
  */
 public class GTacheCol implements Positionable {
 
+    private DrawingArea canvas;
     private GSalarie salarie;
     private Tache tache;
     private Rectangle rectangle;
@@ -26,33 +27,36 @@ public class GTacheCol implements Positionable {
     private double heureFinJour;
     private double plageHoraire;
     private double largCol;
-    private int numCol;
+    private int xCol;
+    private int numCol=0;
 
     private static final Logger LOGGER = java.util.logging.Logger.getLogger(GTacheCol.class.getName());
 
-    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int positionX, int positionXPlus1, double largCol, int indicePremiereCol, int nbJoursAffiches) {
+    public GTacheCol(DrawingArea canvas, GSalarie salarie, Tache tache, double heureDebJour, double heureFinJour, int numCol, int xCol, int positionXPlus1, double largCol, int indicePremiereCol, int nbJoursAffiches) {
+        this.canvas = canvas;
         this.salarie = salarie;
         this.tache = tache;
+        this.numCol = numCol;
+        this.largCol = largCol;
+        this.xCol=xCol;
         this.heureDebJour = heureDebJour;
         this.heureFinJour = heureFinJour;
         plageHoraire = heureFinJour - heureDebJour;
         LOGGER.info("GTacheCol.new  numCol = "+numCol+" "+tache);
-        construit(canvas, numCol, positionX, positionXPlus1, largCol, indicePremiereCol, nbJoursAffiches);
+        construit(positionXPlus1, indicePremiereCol, nbJoursAffiches);
     }
 
 
-    private void construit(DrawingArea canvas, int numCol, int positionX, int posXPlus1, double largCol, int indicePremiereCol, int nbJoursAffiches){
-        if(tache == null)LOGGER.info("GTacheCol.construit "+this);
+    private void construit(int posXPlus1, int indicePremiereCol, int nbJoursAffiches){
+        if(tache == null)LOGGER.info("!!!!!!!!!!!! GTacheCol.construit "+this);
         else {
-            this.largCol = largCol;
-            this.numCol = numCol;
-            Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
-            int maxNiv = is != null ? is.getmaxNiv() : 1;
-            int x = getPositionXDeb(numCol, positionX, largCol, heureDebJour, heureFinJour);
-            int y = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
-            int w = getLargeur(numCol, largCol, heureDebJour, heureFinJour);
-            int h = (int) (salarie.getHauteurSal() / maxNiv - 6);
             if (isDessinable(numCol)) {
+                Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
+                int maxNiv = is != null ? is.getmaxNiv() : 1;
+                int x = getPositionXDeb();
+                int y = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
+                int w = getLargeur();
+                int h = (int) (salarie.getHauteurSal() / maxNiv - 6);
                 rectangle = new Rectangle(x, y, w, h);
                 rectangle.setFillOpacity(0.5);
                 rectangle.setStrokeWidth(0);
@@ -75,9 +79,9 @@ public class GTacheCol implements Positionable {
     }
 
 
-    public void remove(DrawingArea canvas) {
-        canvas.remove(rectangle);
-        canvas.remove(text);
+    public void remove() {
+        if(rectangle != null)canvas.remove(rectangle);
+        if(text != null)canvas.remove(text);
     }
 
     @Override
@@ -107,36 +111,23 @@ public class GTacheCol implements Positionable {
     }
 
     private boolean isDessinable(int numCol){
-        if(tache == null)LOGGER.info("GTacheCol.isDessinable avec tache null pour "+this+" numCol= "+numCol);
-        else {
-            if (tache.getJoursSelDeb() == tache.getJoursSelFin()) {//c'est une intersection classique
-                if (tache.getHDebDecim() < heureFinJour && tache.getHFinDecim() > heureDebJour) return true;
-                return false;
-            }
-            if (tache.getJoursSelDeb() == numCol) {// on ne tiend compte que de l'heure de début (l'heure de fin est sur le lendemain
-                if (tache.getHDebDecim() < heureFinJour) return true;
-                return false;
-            }
-            if (tache.getJoursSelFin() == numCol) {
-                if (tache.getHFinDecim() > heureDebJour) return true;
-            }
-        }
+        if (numCol >= tache.getJoursSelDeb() && numCol <= tache.getJoursSelFin()) return true;
         return false;
     }
 
 
-    private int getPositionXDeb(int numCol, int positionXCol, double largCol, double heureDebJour, double heureFinJour){
+    private int getPositionXDeb(){
         if(tache  == null)LOGGER.info("GTacheCol.getPositionXDeb "+this+" numCol= "+numCol);
         if(tache.getJoursSelDeb() ==  numCol){
             int decalX =  (int)((tache.getHDebDecim() - heureDebJour) * largCol / (heureFinJour - heureDebJour));
-            int x = decalX < 3 ? positionXCol + 3 : positionXCol +(int) decalX;// dépendra de la taille des traits
+            int x = decalX < 3 ? xCol + 3 : xCol +(int) decalX;// dépendra de la taille des traits
             return x;
         }else{//on est donc sur numColFin
-            return positionXCol +3;
+            return xCol +3;
         }
     }
 
-    private int getLargeur(int numCol, double largCol, double heureDebJour, double heureFinJour){
+    private int getLargeur(){
         double nbHeuresJour = heureFinJour - heureDebJour;
         if(tache == null)LOGGER.info("GTacheCol.getLargeur tache null "+this+" numCol= "+numCol);
         else {
@@ -149,5 +140,8 @@ public class GTacheCol implements Positionable {
             }
         }
         return 0;
+    }
+    public String toString(){
+        return "GTachCol numCol = "+numCol;
     }
 }

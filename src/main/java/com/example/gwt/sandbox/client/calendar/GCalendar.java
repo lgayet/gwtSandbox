@@ -9,7 +9,6 @@ import org.vaadin.gwtgraphics.client.VectorObject;
 import org.vaadin.gwtgraphics.client.shape.Text;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -100,8 +99,8 @@ public class GCalendar {
         canvas.addMouseUpHandler(event -> {
             LOGGER.info("MouseUpHandler busy= "+MOVE_CONTEXT.isBusy());
             if(MOVE_CONTEXT.isBusy()) {
-                afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
                 MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
+                afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
             }
 //            affiche(choixAffichage);
         });
@@ -262,27 +261,20 @@ public class GCalendar {
 
     private void afficheSalCol(GSalarie salarie, int premCol, int dernCol){
         Colonne c;
-        LOGGER.info("GCal.afficheSalCol");
+        LOGGER.info("GCal.afficheSalCol-0");
         for(int i = premCol; i <= dernCol; i++) {
-            LOGGER.info("GCal.afficheSalCol boucle cols i= "+i);
             c = tCols[i];
-            LOGGER.info("GCal.afficheSalCol2 boucle cols i= "+i);
             GSalCol g = salarie.getGSalCols()[i];
-            LOGGER.info("GCal.afficheSalCol3 boucle cols i= "+i+" "+g);
-            LOGGER.info("GCal.afficheSalCol3 "+ Arrays.asList(g.getTacheCols()));
-//            if(g.getTacheASupprimer() != null)g.getTacheASupprimer().remove(canvas);//tache du move
+            if(g.getTacheASupprimer() != null)g.getTacheASupprimer().remove();//tache du move
             for (GTacheCol t : g.getTacheCols()) {
                 if(t != null) {
-                    t.remove(canvas);
+                    t.remove();
                     tacheCols.remove(t);
                 }
             }
-            LOGGER.info("GCal.afficheSalCol2 boucle cols i= "+i);
             SalCol salCol = g.getSalCol();
             int it = 0;
-            LOGGER.info("GCal.afficheSalCol "+ Arrays.asList(salCol.getTaches()));
             for (Tache tache : salCol.getTaches()) {
-                LOGGER.info("GCal.afficheSalCol boucle tache i= "+it);
                 int posXPlus1 = i < indicePremiereCol + nbJoursAffiches ? tCols[i+1].getPositionX() : LARGEUR_PANEL;
                 g.getTacheCols()[it] = ajoutTache(salarie, tache, i, c.getPositionX(), posXPlus1);
                 it++;
@@ -308,7 +300,7 @@ public class GCalendar {
         canvas.remove(labelCentre);
         objectsGraphiqueStructure.forEach(o -> canvas.remove(o));
         objectsGraphiqueStructure.clear();
-        tacheCols.forEach(t -> t.remove(canvas));
+        tacheCols.forEach(t -> t.remove());
         tacheCols.clear();
     }
 

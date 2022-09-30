@@ -18,6 +18,8 @@ public class MoveContext  {
     private int nbJoursAffiches;
     private int precedJourSelDeb;
     private int precedJourSelFin;
+    private int minCol;
+    private int maxCol;
     private int iter = 0;
     private static final Logger LOGGER = java.util.logging.Logger.getLogger(MoveContext.class.getName());
 //    valeurs de la tache pour le re-calcul
@@ -39,6 +41,8 @@ public class MoveContext  {
             yRef = y;
             precedJourSelDeb = tache.getJoursSelDeb();
             precedJourSelFin = tache.getJoursSelFin();
+            minCol= precedJourSelDeb;
+            maxCol = precedJourSelFin;
         }
     }
 
@@ -47,6 +51,8 @@ public class MoveContext  {
             LOGGER.info("MC.move "+tache);
             precedJourSelDeb = tache.getJoursSelDeb();
             precedJourSelFin = tache.getJoursSelFin();
+            minCol = Math.min(precedJourSelDeb, minCol);
+            maxCol = Math.max(precedJourSelFin, maxCol);
             int decalMn = (int)((x -xRef) * 1440 / largCol);
             int mnSelDeb = tacheInitiale.getMnSelDeb() + decalMn;
             tache.setJoursSelDeb(mnSelDeb / 1440);
@@ -76,11 +82,11 @@ public class MoveContext  {
 
     int getPremColAff(){
 //        if(tache == null)LOGGER.info("getPremColAff avec tache null");
-        return tache.getJoursSelDeb();
+        return minCol;
     }
 
     int getDernColAff(){
-        return tache.getJoursSelFin();
+        return maxCol;
     }
 
     GSalarie getSalarie(){

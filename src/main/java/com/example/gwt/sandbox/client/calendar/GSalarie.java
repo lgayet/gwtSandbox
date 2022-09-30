@@ -27,7 +27,7 @@ public class GSalarie  {
         SalCol[] sc = salarie.getSalCols();
         this.salCols = new GSalCol[sc.length];
         for(int i =0; i< sc.length; i ++){
-            GSalCol g =  new GSalCol(sc[i]);
+            GSalCol g =  new GSalCol(i, sc[i]);
             this.salCols[i] = g;
         }
     }
