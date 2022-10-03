@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Tache implements Serializable {
 
     private TypTache typTache;
+    private int numSal;
     private int aanumTache;
     private int joursSelDeb;
     private int hDeb;
@@ -16,6 +17,8 @@ public class Tache implements Serializable {
     private int niveau;// l'indice du niveau de dépôt de la tâche
     private boolean move;
 //    les taches et intersection
+    private transient Salarie salarie;
+    private transient Intersection intersection;
     private Integer numIntersection;
     private int oldNiv;
     private Integer oldNumIntersect;
@@ -23,7 +26,8 @@ public class Tache implements Serializable {
     public Tache() {
     }
 
-    public Tache(int numTache, int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin) {
+    public Tache(int numSal, int numTache, int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin) {
+        this.numSal = numSal;
         this.aanumTache = numTache;
         this.joursSelDeb = joursSelDeb;
         this.hDeb = hDeb;
@@ -34,7 +38,12 @@ public class Tache implements Serializable {
     }
 
     public Tache copyTache(){
-        return new Tache(aanumTache, joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
+        return new Tache(numSal, aanumTache, joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
+    }
+
+    public void rattache(Salarie[] tSals){
+        salarie = tSals[numSal];
+        if(numIntersection != null)intersection = salarie.getTIntersection()[numIntersection];
     }
 
     public boolean isMove() {
@@ -88,8 +97,13 @@ public class Tache implements Serializable {
         return numIntersection;
     }
 
-    public void setNumIntersection(Integer numIntersection) {
-        this.numIntersection = numIntersection;
+    public Intersection getIntersection() {
+        return intersection;
+    }
+
+    public void setIntersection(Intersection intersection){
+        this.intersection = intersection;
+        numIntersection = intersection.getNumIntersec();
     }
 
     public boolean isIntersection(){
@@ -99,6 +113,8 @@ public class Tache implements Serializable {
     public void removeIntersection(){
         niveau = 0;
         numIntersection = null;
+        oldNiv = 0;
+        oldNumIntersect = null;
     }
 
     public void restaureIntersect(){
@@ -137,9 +153,12 @@ public class Tache implements Serializable {
         this.mnFin = mnFin;
     }
 
+    public String getText(){
+        return numIntersection !=null ? aanumTache+"-"+numIntersection : aanumTache+"";
+    }
 
      public String toString(){
-        return "Tache "+aanumTache+" "+hDeb+":"+mnDeb+"<==>"+" "+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau+" jourSelDeb="+joursSelDeb+" jourSelFin= "+joursSelFin;
+        return "Tache "+aanumTache+" "+joursSelDeb+":"+hDeb+":"+mnDeb+"<==>"+" "+joursSelFin+":"+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau;
      }
 
 }

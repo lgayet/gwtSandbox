@@ -51,9 +51,7 @@ public class MoveContext  {
             LOGGER.info("MC.move "+tache);
             precedJourSelDeb = tache.getJoursSelDeb();
             precedJourSelFin = tache.getJoursSelFin();
-            minCol = Math.min(precedJourSelDeb, minCol);
-            maxCol = Math.max(precedJourSelFin, maxCol);
-            int decalMn = (int)((x -xRef) * 1440 / largCol);
+            int decalMn = (int)((x -xRef) * 1440 / largCol);// TODO on calcule toujours le décalage par rapport à la position initiale
             int mnSelDeb = tacheInitiale.getMnSelDeb() + decalMn;
             tache.setJoursSelDeb(mnSelDeb / 1440);
             tache.setHDeb(mnSelDeb % 1440 / 60 );
@@ -64,6 +62,10 @@ public class MoveContext  {
             tache.setMnFin(mnSelFin % 1440 % 60);
             salarie.mouvTacheIntersect(tache);
             LOGGER.info("MC.move jourSelDeb= "+tache.getJoursSelDeb()+" jourSelFin= "+tache.getJoursSelFin()+" precedJourSelDeb= "+precedJourSelDeb+" precedJourSelFin= "+precedJourSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
+            minCol = tache.isIntersection() ? Math.max(indicePremiereColonne, Math.min(precedJourSelDeb, tache.getIntersection().getNumJourMin())) : precedJourSelDeb;
+            maxCol = tache.isIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedJourSelFin, tache.getIntersection().getNumJourMax())) : precedJourSelFin;
+            minCol = indicePremiereColonne;
+            maxCol = indicePremiereColonne + nbJoursAffiches -1;
             salarie.mouvTacheSalCol(tache, precedJourSelDeb, precedJourSelFin);
             iter ++;
             return true;

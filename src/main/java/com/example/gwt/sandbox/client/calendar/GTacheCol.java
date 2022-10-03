@@ -68,7 +68,7 @@ public class GTacheCol implements Positionable {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());
                 });
                 canvas.add(rectangle);
-                text = new Text(x + w / 2, y + h / 2, "");//le label contiendra les informations tâche à afficher
+                text = new Text(x + w / 2, y + h / 2, tache.getText());//le label contiendra les informations tâche à afficher
                 text.addMouseDownHandler(event -> {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());
                 });
@@ -91,7 +91,7 @@ public class GTacheCol implements Positionable {
                 canvas.add(rfin);
             }
         }
-        LOGGER.info("GTacheCol.construit-Fin numCol= "+numCol+" numTache= "+tache.getNumTache());
+//        LOGGER.info("GTacheCol.construit-Fin numCol= "+numCol+" numTache= "+tache.getNumTache());
     }
 
     public int getNumTache(){
@@ -143,27 +143,27 @@ public class GTacheCol implements Positionable {
     }
 
     private boolean isDebutVisible(){
-        if(tache.getMnDeb() < mnDebJour)return true;
+        if(tache.getMnDeb() < mnDebJour || numCol > tache.getJoursSelDeb())return true;
         return false;
     }
 
     private boolean isFinVisible(){
-        if(tache.getMnFin() > mnFinJour)return true;
+        if(tache.getMnFin() > mnFinJour || numCol < tache.getJoursSelFin())return true;
         return false;
     }
 
     private int getPositionXDeb(){
-        int decalX =  Math.max(tache.getMnDeb() - mnDebJour, 0) * largCol / mnJour;
-        int x = decalX < 3 ? xCol + 3 : xCol +decalX;// dépendra de la taille des traits
+        int decalX =  (tache.getJoursSelDeb() < numCol ? 0 : Math.max(tache.getMnDeb() - mnDebJour, 0)) * largCol / mnJour;
+        int x = decalX < 3 ? xCol + 3 : xCol + decalX;// dépendra de la taille des traits
         return x;
     }
 
     private int getLargeur(){
-        int larg = (Math.min(tache.getMnFin(), mnFinJour) - Math.max(tache.getMnDeb() , mnDebJour))* largCol / mnJour;
-        LOGGER.info("getLargeur( tache.getMnFin()="+tache.getMnFin()+" mnFinJour= "+mnFinJour+" tache.getMnDeb()= "+tache.getMnDeb()+" mnDebJour= "+mnDebJour+" largCol= "+largCol+" mnJour= "+mnJour+" larg= "+larg);
+        int larg = ( (tache.getJoursSelFin()> numCol ? mnFinJour : Math.min(tache.getMnFin(), mnFinJour)) - (tache.getJoursSelDeb() < numCol ? mnDebJour : Math.max(tache.getMnDeb() , mnDebJour)))* largCol / mnJour;
+//        LOGGER.info("getLargeur( tache.getMnFin()="+tache.getMnFin()+" mnFinJour= "+mnFinJour+" tache.getMnDeb()= "+tache.getMnDeb()+" mnDebJour= "+mnDebJour+" largCol= "+largCol+" mnJour= "+mnJour+" larg= "+larg);
         return larg;
     }
     public String toString(){
-        return "GTachCol numCol = "+numCol;
+        return "GTachCol numCol = "+numCol+" "+tache;
     }
 }

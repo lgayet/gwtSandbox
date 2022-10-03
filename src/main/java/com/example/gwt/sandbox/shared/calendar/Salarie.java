@@ -2,16 +2,18 @@ package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class Salarie implements Serializable {
 
     private int numSal;
     private String nomSal;
     private int nbJours;
+    private Intersection[]tInter;//TODO tableau transitoire servant à restaurer les liens à l'arrivée sur GCalendar
     private ArrayList<Intersection> aInter = new ArrayList<>();//TODO suppression du transient
     private ArrayList<Intersection> aInterTempo = new ArrayList<>();// créées temporairement (non appliquée si impact non significatif)
-
     private SalCol[] salCols;
+    private static final Logger LOGGER = java.util.logging.Logger.getLogger(Salarie.class.getName());
 
 
 
@@ -25,6 +27,12 @@ public class Salarie implements Serializable {
         salCols = new SalCol[nbJours];
         for(int i = 0; i< nbJours; i++){
             salCols[i] = new SalCol(i);
+        }
+    }
+
+    public void rattache(){
+        for(Intersection i: getTIntersection()){
+            i.rattache();
         }
     }
 
@@ -57,8 +65,10 @@ public class Salarie implements Serializable {
         return null;
     }
 
-    public void removeIntersection(Intersection intersection){
-        aInter.remove(intersection);
+
+    public Intersection[] getTIntersection(){
+        if(tInter == null)tInter = aInter.toArray(new Intersection[aInter.size()]);
+        return tInter;
     }
 
     public ArrayList<Intersection> getAInter() {
@@ -69,10 +79,16 @@ public class Salarie implements Serializable {
         return aInterTempo;
     }
 
-    public Intersection ajoutIntersection(Tache tache, boolean move){
-        Intersection i = new Intersection(numSal, move ? aInterTempo.size()+100 : aInter.size(), tache);
-        if(move)aInterTempo.add(i);
-        else aInter.add(i);
+    public Intersection ajoutIntersection(Tache tache){
+        Intersection i = new Intersection(numSal, aInter.size(), TypIntersection.STANDARD, tache);
+        aInter.add(i);
+        LOGGER.info("Salarie apres ajoutIntersection aInter.size = "+aInter.size());
+        return i;
+    }
+
+    public Intersection ajoutIntersectionTemporaire(Tache tache){
+        Intersection i = new Intersection(numSal, aInterTempo.size()+100 , TypIntersection.TEMPORAIRE, tache);
+        aInterTempo.add(i);
         return i;
     }
 

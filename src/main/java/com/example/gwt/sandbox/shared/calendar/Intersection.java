@@ -1,23 +1,27 @@
 package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Intersection implements Serializable {
     private int numSalarie;
-    private int anumIntersec;
+    private int anumIntersec;//TODO j'ai ajouté le a pour voir cette information en premier en debug
+    private TypIntersection typIntersection;
     private Niv[] nivs = new Niv[1];
-    private List<Tache> aTache = new ArrayList<>();//pour recalculer l'intersection dans le même ordre (eviter le clignotement)
 
     public Intersection() {
     }
 
-    public Intersection(int numSalarie, int numIntersec, Tache tache) {
+    public Intersection(int numSalarie, int numIntersec, TypIntersection typIntersection, Tache tache) {
         this.numSalarie = numSalarie;
         this.anumIntersec = numIntersec;
-        nivs[0] = new Niv(numIntersec, 0, tache);
-        aTache.add(tache);
+        this.typIntersection = typIntersection;
+        nivs[0] = new Niv(this, numIntersec, 0, tache);
+    }
+
+    public void rattache(){
+        for(Niv n: nivs){
+            n.setIntersection(this);
+        }
     }
 
     public int getNumIntersec() {
@@ -26,6 +30,14 @@ public class Intersection implements Serializable {
 
     public void setNumIntersec(int numIntersec) {
         this.anumIntersec = numIntersec;
+    }
+
+    public TypIntersection getTypIntersection() {
+        return typIntersection;
+    }
+
+    public void setTypIntersection(TypIntersection typIntersection) {
+        this.typIntersection = typIntersection;
     }
 
     public int getmaxNiv() {
@@ -37,38 +49,6 @@ public class Intersection implements Serializable {
             if(n.controleEtAjout(this, tache))return;
         }
         ajoutNiv(tache);
-        aTache.add(tache);
-    }
-
-    public void ajoutArray(Tache tache){
-        aTache.add(tache);
-    }
-
-    public boolean isEquivalent(Intersection inter, Tache tache){
-        return inter.getSommeTachesIntersection(tache) == getSommeTachesIntersection(tache)
-                && inter.getSommeNiv(tache) == getSommeNiv(tache);
-    }
-
-    public int getSommeNiv(Tache tache){
-        int somme=0;
-        int i = 1;
-        for(Niv n: nivs){
-            somme = somme +n.getTaches().length * i;
-            i++;
-        }
-        return somme;
-    }
-
-    public int getSommeTachesIntersection(Tache tache){
-        int somme=0;
-        for(Niv n: nivs){
-            for(Tache ta: n.getTaches()){
-                if(tache.getMnSelDeb() < ta.getMnSelFin() && tache.getMnSelFin() > ta.getMnSelDeb()){
-                    somme += ta.getNumTache();
-                }
-            }
-        }
-        return somme;
     }
 
     public void appliqueTaches(){
@@ -76,13 +56,10 @@ public class Intersection implements Serializable {
         for(Niv n: nivs){
             for(Tache t: n.getTaches()){
                 t.setNiveau(i);
-                t.setNumIntersection(anumIntersec);
+                t.setIntersection(this);
             }
             i++;
         }
-    }
-    public Tache[] getTaches2(){
-        return aTache.toArray(new Tache[aTache.size()]);
     }
 
     public Tache[] getTaches(){
@@ -92,11 +69,43 @@ public class Intersection implements Serializable {
         int i=0;
         for(Niv n: nivs){
             for(Tache ta: n.getTaches()){
-                t[i]=ta;
+                if(i == 0)t[1]=ta;
+                else if(i == 1)t[0]=ta;
+                else t[i]=ta;
                 i++;
             }
         }
         return t;
+    }
+    public Intersection fusionne(Tache[] tachesAFusionner){
+        for(Tache t: tachesAFusionner){
+            ajoutTache(t);
+        }
+        return this;
+    }
+
+    public int getNumJourMin(){
+        int jourMin = 9999;
+        for(Tache t: getTaches())jourMin = Math.min(jourMin, t.getJoursSelDeb());
+        return jourMin;
+    }
+
+    public int getNumJourMax(){
+        int jourMax = 0;
+        for(Tache t: getTaches())jourMax = Math.max(jourMax, t.getJoursSelFin());
+        return jourMax;
+    }
+
+    public String getStringTaches(){
+        String s =" [";
+        String sep ="";
+        for(Niv n: nivs){
+            for(Tache t: n.getTaches()){
+                s = s+sep+t.getNumTache();
+                sep=";";
+            }
+        }
+        return s+"]";
     }
 
     private void ajoutNiv(Tache tache){
@@ -104,12 +113,12 @@ public class Intersection implements Serializable {
         for(int i = 0; i < nivs.length; i ++){
             t[i] = nivs[i];
         }
-        Niv n = new Niv(anumIntersec, nivs.length, tache);
+        Niv n = new Niv(this, anumIntersec, nivs.length, tache);
         t[nivs.length] = n;
         nivs = t;
     }
 
     public String toString(){
-        return "Intersection "+numSalarie+":"+anumIntersec;
+        return "Intersection "+typIntersection+" "+anumIntersec+getStringTaches();
     }
 }

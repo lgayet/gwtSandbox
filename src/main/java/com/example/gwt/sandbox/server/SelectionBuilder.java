@@ -34,13 +34,13 @@ public class SelectionBuilder implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,1,14,0));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,8,0,2022,8,2,13,45));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,10,0,2022,8,2,16,0));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,2,11,30));
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,16,30,2022,8,2,20,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,6,0,2022,8,4,10,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,7,30,2022,8,3,8,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,30,2022,8,2,12,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,14,0,2022,8,2,15,30));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,16,30,2022,8,2,18,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
+        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,55,2022,8,3,12,0));
         aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
         aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
         for(Salarie sal: tSals){
@@ -73,7 +73,7 @@ public class SelectionBuilder implements Serializable {
         int mnSelDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int mnSelFin = (int)(d4.toEpochDay() - debut.toEpochDay());
 
-        Tache t = selection.ajoutTache( mnSelDeb, heure, minute,mnSelFin, hFin, mnFin
+        Tache t = selection.ajoutTache(salarie.getNumSal(), mnSelDeb, heure, minute,mnSelFin, hFin, mnFin
                );
         salarie.ajoutTaches(t);
         return t;
@@ -99,7 +99,7 @@ public class SelectionBuilder implements Serializable {
         d4 = LocalDate.of(d2.getYear(), d2.getMonthValue(), d2.getDayOfMonth());
         int mnSelDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int mnSelFin = (int)(d4.toEpochDay() - debut.toEpochDay());
-        Tache t = selection.ajoutTache(mnSelDeb, d.getHour(), d.getMinute(), mnSelFin, d2.getHour(), d2.getMinute());
+        Tache t = selection.ajoutTache(salarie.getNumSal(), mnSelDeb, d.getHour(), d.getMinute(), mnSelFin, d2.getHour(), d2.getMinute());
         salarie.ajoutTaches(t);
         return t;
     }

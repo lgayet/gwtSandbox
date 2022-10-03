@@ -1,9 +1,6 @@
 package com.example.gwt.sandbox.client.calendar;
 
-import com.example.gwt.sandbox.shared.calendar.Intersection;
-import com.example.gwt.sandbox.shared.calendar.SalCol;
-import com.example.gwt.sandbox.shared.calendar.Salarie;
-import com.example.gwt.sandbox.shared.calendar.Tache;
+import com.example.gwt.sandbox.shared.calendar.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,18 +65,18 @@ public class GSalarie  {
 //            pour chaque iteration, je vérifie la presence précédante et pour la tache
             if(appatientPrecedEtNonTache(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
 //                 je dois donc supprimer de SalCol et GSalCol
-                LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
                 g = salCols[i];
+                LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.supprimeTacheCol(tache);// je ne la supprime pas en tant que GTacheCol, je ne veux implement plus créer de Rectangle
             }
             if(appatientTacheEtNonPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
-                LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
                 g = salCols[i];
+                LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.ajoutTacheCol(salarie, tache);
             }
             if(appatientTacheEtPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
-                LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache);
                 g = salCols[i];
+                LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.mouvTacheCol(salarie, tache);
             }
         }
@@ -109,9 +106,10 @@ public class GSalarie  {
                     modif des taches
          */
         numMove++;
-//        LOGGER.info("mouvTache "+tache.getNumTache()+" numMov= "+numMove+" pour "+this);
+        LOGGER.info("mouvTacheIntersect "+tache.getNumTache()+" numMov= "+numMove+" pour "+tache);
         if(tache.isIntersection()){
             Intersection interBefore = salarie.getIntersection(tache.getNumIntersection());
+            LOGGER.info("GSalarie.mouvTacheIntersect interBefore= "+interBefore);
             Tache[] tachesIntersect = interBefore.getTaches();
             for(Tache t: tachesIntersect)t.sauvIntersect();
             Intersection intersect = null;
@@ -121,32 +119,32 @@ public class GSalarie  {
                         if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
                             Integer numIntersection = t1.isIntersection() ? t1.getNumIntersection() : t2.isIntersection() ? t2.getNumIntersection() : null;
                             if(numIntersection == null){
-                                intersect = salarie.ajoutIntersection(t2, true);
-//                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
+                                intersect = salarie.ajoutIntersectionTemporaire(t2);
+                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
                             }
                             else {
                                 intersect = salarie.getIntersectionTempo(numIntersection);
                             }
                             intersect.ajoutTache(t1);
-//                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
+                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
                         }
                     }
                 }
             }
-            if(salarie.getAInterTempo().size() == 1 && salarie.getAInterTempo().get(0).isEquivalent(interBefore, tache)){
-//                dans ce cas, je n'ai rien à faire
-                for(Tache t: tachesIntersect)t.restaureIntersect();
-                salarie.getAInterTempo().clear();
-            }
-            else{
+            if(salarie.getAInterTempo().size() >= 1){
                 for(Tache t: tachesIntersect)t.removeIntersection();
                 for(Intersection i: salarie.getAInterTempo()){
 //                    LOGGER.finest("applique "+i);
                     i.setNumIntersec(salarie.getAInter().size());
+                    i.setTypIntersection(TypIntersection.STANDARD);
                     i.appliqueTaches();
                     salarie.getAInterTempo().remove(i);
                     salarie.getAInter().add(i);
                 };
+            }
+            else{
+                if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
+                else for(Tache t: tachesIntersect)t.restaureIntersect();
             }
         }
         String s ="finMovTache";

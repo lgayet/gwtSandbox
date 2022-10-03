@@ -4,11 +4,14 @@ import com.example.gwt.sandbox.shared.calendar.SalCol;
 import com.example.gwt.sandbox.shared.calendar.Salarie;
 import com.example.gwt.sandbox.shared.calendar.Tache;
 
+import java.util.logging.Logger;
+
 public class GSalCol  {
     private int numCol;
     private SalCol salCol;
     private GTacheCol[] tacheCols = new GTacheCol[0];
     private GTacheCol tacheASupprimer;
+    private static final Logger LOGGER = java.util.logging.Logger.getLogger(GSalCol.class.getName());
 
     public GSalCol() {
     }
@@ -41,7 +44,6 @@ public class GSalCol  {
         salCol.supprimeTache(tache);
         Tache[]t = salCol.getTaches();
         tacheCols = new GTacheCol[t.length];
-
     }
 
     public GTacheCol getTacheASupprimer() {
@@ -52,6 +54,8 @@ public class GSalCol  {
         for(GTacheCol tc: tacheCols)if(tc.getNumTache() == numTache)return tc;
         return null;
     }
+
+
 
     public GTacheCol[] getTacheCols() {
         return tacheCols;

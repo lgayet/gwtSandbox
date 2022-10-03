@@ -87,17 +87,17 @@ public class GCalendar {
         labelCentre = ajoutLabel((((LARGEUR_PANEL-LARGEUR_ENTETE_SALARIES)/2)+LARGEUR_ENTETE_SALARIES),30,"du texte", 20, 1.0);
 
         canvas.addMouseMoveHandler(event -> {
-            LOGGER.info("MouseMoveHandler busy= "+MOVE_CONTEXT.isBusy());
+//            LOGGER.info("MouseMoveHandler busy= "+MOVE_CONTEXT.isBusy());
             if(MOVE_CONTEXT.isBusy()) {
                 MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
 //            affiche(choixAffichage);
-                LOGGER.info("MouseMoveHandler ==> afficheSalCol "+MOVE_CONTEXT.getSalarie()+" premCol= "+MOVE_CONTEXT.getPremColAff()+" derniereCol= "+MOVE_CONTEXT.getDernColAff());
+                LOGGER.info("MouseMoveHandler ==> afficheSalCol "+MOVE_CONTEXT.getSalarie()+" "+MOVE_CONTEXT.getPremColAff()+" <==> "+MOVE_CONTEXT.getDernColAff());
                 afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
             }
         });
 
         canvas.addMouseUpHandler(event -> {
-            LOGGER.info("MouseUpHandler busy= "+MOVE_CONTEXT.isBusy());
+//            LOGGER.info("MouseUpHandler busy= "+MOVE_CONTEXT.isBusy());
             if(MOVE_CONTEXT.isBusy()) {
                 MOVE_CONTEXT.stop(event.getClientX(), event.getClientY());
                 afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
@@ -182,7 +182,6 @@ public class GCalendar {
 
     private void affiche(ChoixAffichage choixAffichage){
 
-        System.out.println("affichage "+choixAffichage);
         this.choixAffichage = choixAffichage;
 
         effacerObjetsGraphiques();
@@ -261,7 +260,6 @@ public class GCalendar {
 
     private void afficheSalCol(GSalarie salarie, int premCol, int dernCol){
         Colonne c;
-        LOGGER.info("GCal.afficheSalCol-0");
         for(int i = premCol; i <= dernCol; i++) {
             c = tCols[i];
             GSalCol g = salarie.getGSalCols()[i];
@@ -280,17 +278,24 @@ public class GCalendar {
                 it++;
             }
         }
-        LOGGER.info("GCal.afficheSalCol-fin");
     }
     private void construit(Selection selection){
         tCols = selection.getTCols();
         taches = selection.getTTache();
         Salarie[] salaries = selection.getTSals();
+        for(Salarie s: salaries){
+            s.rattache();
+        }
         tSals = new GSalarie[salaries.length];
         for (int i = 0; i< salaries.length; i++){
             tSals[i] = new GSalarie(this, salaries[i]);
         }
+        for(Tache t: taches){
+            t.rattache(salaries);
+        }
     }
+
+
 
     public Tache[] getTaches() {
         return taches;

@@ -8,20 +8,27 @@ public class Niv implements Serializable {
     private int numIntersec;
     private int indice;
     private Tache[]taches = new Tache[1];
+//
+    private transient Intersection intersection;
 
-    public Tache[] getTaches() {
-        return taches;
-    }
+
+
 
     public Niv() {
     }
 
-    public Niv(int numIntersec, int indice, Tache tache) {
+    public Niv(Intersection intersection, int numIntersec, int indice, Tache tache) {
+        this.intersection = intersection;
         this.numIntersec = numIntersec;
         this.indice = indice;
-        tache.setNumIntersection(numIntersec);
+        tache.setIntersection(intersection);
         tache.setNiveau(indice);
         taches[0] = tache;
+    }
+
+
+    public Tache[] getTaches() {
+        return taches;
     }
 
     public boolean controleEtAjout(Intersection inter, Tache tache){
@@ -37,12 +44,14 @@ public class Niv implements Serializable {
         for(int i = 0; i < taches.length; i ++){
             t[i] = taches[i];
         }
-        tache.setNumIntersection(numIntersec);
+        tache.setIntersection(intersection);
         tache.setNiveau(indice);
         t[taches.length] = tache;
         taches = t;
-        inter.ajoutArray(tache);
         return true;
+    }
+    public void setIntersection(Intersection intersection){
+        this.intersection = intersection;
     }
 
 }

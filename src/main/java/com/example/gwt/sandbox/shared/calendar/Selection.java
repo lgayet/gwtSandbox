@@ -17,9 +17,9 @@ public class Selection  implements Serializable {
 
     }
 
-    public Tache ajoutTache(int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin){
+    public Tache ajoutTache(int numSal, int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin){
         if(aTaches == null)aTaches = new ArrayList<>();
-        Tache t = new Tache(getAndIncrNumTache(), joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
+        Tache t = new Tache(numSal, getAndIncrNumTache(), joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
         aTaches.add(t);
         return t;
     }
@@ -57,8 +57,6 @@ public class Selection  implements Serializable {
     }
 
     public int getAndIncrNumTache(){
-        int num = numTache;
-        numTache ++;
-        return num;
+        return numTache ++;
     }
 }
