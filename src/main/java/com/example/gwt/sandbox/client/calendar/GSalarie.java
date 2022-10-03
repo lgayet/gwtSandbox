@@ -72,7 +72,7 @@ public class GSalarie  {
             if(appatientTacheEtNonPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
                 g = salCols[i];
                 LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
-                g.ajoutTacheCol(salarie, tache);
+                g.ajoutTacheCol(salarie, tache,"mouvTacheSalCol" );
             }
             if(appatientTacheEtPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
                 g = salCols[i];
@@ -96,60 +96,8 @@ public class GSalarie  {
 
 
     public void mouvTacheIntersect(Tache tache){
-        /*
-            Cette methode gère l'impact d'un déplacement de tache avec intersection dans son intersection
-            MouvTache devrait créer une intersectionProvisoire sans impact sur les tâches(NumIntersection et niv) et retourner cette intersection
-            c'est seulement si cette intersection est différente de l'intersection initiale qu'on procèdera à la prise en compte:
-                    copy et ajout de l'intersection dans salarie
-                    typage de l'intersection en move
-                    ajout de l'intersection initiale dans arrayMove
-                    modif des taches
-         */
-        numMove++;
-        LOGGER.info("mouvTacheIntersect "+tache.getNumTache()+" numMov= "+numMove+" pour "+tache);
-        if(tache.isIntersection()){
-            Intersection interBefore = salarie.getIntersection(tache.getNumIntersection());
-            LOGGER.info("GSalarie.mouvTacheIntersect interBefore= "+interBefore);
-            Tache[] tachesIntersect = interBefore.getTaches();
-            for(Tache t: tachesIntersect)t.sauvIntersect();
-            Intersection intersect = null;
-            for(Tache t1: tachesIntersect){
-                for(Tache t2: tachesIntersect){
-                    if(t1.getNumTache() != t2.getNumTache()){
-                        if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
-                            Integer numIntersection = t1.isIntersection() ? t1.getNumIntersection() : t2.isIntersection() ? t2.getNumIntersection() : null;
-                            if(numIntersection == null){
-                                intersect = salarie.ajoutIntersectionTemporaire(t2);
-                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
-                            }
-                            else {
-                                intersect = salarie.getIntersectionTempo(numIntersection);
-                            }
-                            intersect.ajoutTache(t1);
-                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
-                        }
-                    }
-                }
-            }
-            if(salarie.getAInterTempo().size() >= 1){
-                for(Tache t: tachesIntersect)t.removeIntersection();
-                for(Intersection i: salarie.getAInterTempo()){
-//                    LOGGER.finest("applique "+i);
-                    i.setNumIntersec(salarie.getAInter().size());
-                    i.setTypIntersection(TypIntersection.STANDARD);
-                    i.appliqueTaches();
-                    salarie.getAInterTempo().remove(i);
-                    salarie.getAInter().add(i);
-                };
-            }
-            else{
-                if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
-                else for(Tache t: tachesIntersect)t.restaureIntersect();
-            }
-        }
-        String s ="finMovTache";
+        salarie.mouvTacheIntersect(tache);
     }
-
 
     public int getPositionY() {
         return positionY;

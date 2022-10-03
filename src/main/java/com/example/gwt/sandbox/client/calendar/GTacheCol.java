@@ -68,7 +68,8 @@ public class GTacheCol implements Positionable {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());
                 });
                 canvas.add(rectangle);
-                text = new Text(x + w / 2, y + h / 2, tache.getText());//le label contiendra les informations tâche à afficher
+                text = new Text(x + w / 2 -10, y + h / 2, tache.getText());//le label contiendra les informations tâche à afficher
+                text.setFontSize(12);
                 text.addMouseDownHandler(event -> {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());
                 });

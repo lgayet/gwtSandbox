@@ -36,37 +36,35 @@ public class SalCol implements Serializable {
     }
 
     public void mouvTache(Salarie salarie, Tache tache){
-        Tache[]tachesIntersect =  new Tache[0];
-        if(tache.isIntersection()) tachesIntersect = tache.getIntersection().getTaches();
-        ajoutIntersection(salarie);
-//        for(Tache t: tachesIntersect)ajoutIntersection(salarie);
+        reorganise(salarie,"mouvTache");
     }
 
-    public void ajoutTache(Salarie salarie, Tache tache){// pour le moment, les taches sont nouvelles, donc sans intersection
+    public void ajoutTache(Salarie salarie, Tache tache, String methodeAppelante){// pour le moment, les taches sont nouvelles, donc sans intersection
         Tache[] t = new Tache[taches.length + 1];
         for(int i = 0; i < taches.length; i ++){
             t[i] = taches[i];
         }
         t[taches.length] = tache;
         taches = t;
-        ajoutIntersection(salarie);
+        reorganise(salarie,"ajoutTache <== "+methodeAppelante);
     }
 
-    private void ajoutIntersection(Salarie salarie){
+
+
+    private void reorganise(Salarie salarie, String methodeAppelante){
         Intersection intersect = null;
-        LOGGER.info("SC:ajoutIntersection-0 "+getStringTaches()+"\n     salarie.aInter.size= "+salarie.getAInter().size());
-        for(Tache t: taches){
-            for(Tache tache: taches) {
-                if (tache.getNumTache() != t.getNumTache() && t.getMnSelDeb() < tache.getMnSelFin() && t.getMnSelFin() > tache.getMnSelDeb()) {
-                    intersect = t.getIntersection() != null ? t.getIntersection() : (tache.getIntersection() != null ? tache.getIntersection() : null);
-                    if (t.getNumIntersection() == null) {
-                        intersect = salarie.ajoutIntersection(t);
-                        LOGGER.info("SC:ajoutIntersection new  "+intersect+" avec "+t);
-                    } else {
-                        intersect = salarie.getIntersection(t.getNumIntersection());
+        LOGGER.info("SC:reorganise numCol=  "+numCol+" appelé par "+methodeAppelante+"  "+getStringTaches()+"\n     salarie.aInter.size= "+salarie.getAInter().size());
+        for(Tache t1: taches){
+            for(Tache t2: taches) {
+                if (t2.getNumTache() != t1.getNumTache() && t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()) {
+                    if(t1.isIntersection() && t2.isIntersection())t1.getIntersection().fusionne(t2.getIntersection().getTaches());
+                    intersect = t1.getIntersection() != null ? t1.getIntersection() : (t2.getIntersection() != null ? t2.getIntersection() : null);
+                    if (intersect == null) {
+                        intersect = salarie.ajoutIntersection(t1);
+                        LOGGER.info("      new  " + intersect + " avec " + t1);
                     }
-                    intersect.ajoutTache(tache);
-                    LOGGER.info("SC:ajoutTache  "+intersect+" pour "+t);
+                    intersect.ajoutTache(t2);
+                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t2);
                 }
             }
         }

@@ -34,18 +34,30 @@ public class SelectionBuilder implements Serializable {
         selection.setNbJours(nbJours);
         selection.setTCols(tCols);
         Salarie[] tSals = creationSalaries(selection, nbJours);
-        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
+//        cas1
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,13,0,2022,8,3,14,0));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,30,2022,8,2,12,0));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,14,0,2022,8,2,15,30));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,16,30,2022,8,2,18,0));
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,55,2022,8,3,12,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
-        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
+//        cas 2
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,3,16,0,2022,8,3,18,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
+//        cas 3 (permutation première tache)
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,3,16,0,2022,8,3,18,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
+//          taches complémentaire
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,55,2022,8,3,12,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
-                aTaches.add(generationTache(selection, sal));
+//                aTaches.add(generationTache(selection, sal));
             }
         }
         selection.setTSals(tSals);
@@ -75,7 +87,7 @@ public class SelectionBuilder implements Serializable {
 
         Tache t = selection.ajoutTache(salarie.getNumSal(), mnSelDeb, heure, minute,mnSelFin, hFin, mnFin
                );
-        salarie.ajoutTaches(t);
+        salarie.ajoutTaches(t,"génération");
         return t;
     }
 
@@ -100,7 +112,7 @@ public class SelectionBuilder implements Serializable {
         int mnSelDeb = (int)(d3.toEpochDay() - debut.toEpochDay());
         int mnSelFin = (int)(d4.toEpochDay() - debut.toEpochDay());
         Tache t = selection.ajoutTache(salarie.getNumSal(), mnSelDeb, d.getHour(), d.getMinute(), mnSelFin, d2.getHour(), d2.getMinute());
-        salarie.ajoutTaches(t);
+        salarie.ajoutTaches(t,"génération");
         return t;
     }
 

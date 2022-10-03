@@ -27,8 +27,8 @@ public class GSalCol  {
         return salCol;
     }
 
-    public void ajoutTacheCol(Salarie salarie, Tache tache){
-        salCol.ajoutTache(salarie, tache);
+    public void ajoutTacheCol(Salarie salarie, Tache tache, String methodeAppelante){
+        salCol.ajoutTache(salarie, tache,methodeAppelante);
         GTacheCol[]t = new GTacheCol[salCol.getTaches().length];
         for(int i = 0; i< tacheCols.length; i++)t[i]= tacheCols[i];
         tacheCols = t;

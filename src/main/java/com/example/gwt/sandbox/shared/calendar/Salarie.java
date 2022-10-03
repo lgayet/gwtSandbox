@@ -82,7 +82,6 @@ public class Salarie implements Serializable {
     public Intersection ajoutIntersection(Tache tache){
         Intersection i = new Intersection(numSal, aInter.size(), TypIntersection.STANDARD, tache);
         aInter.add(i);
-        LOGGER.info("Salarie apres ajoutIntersection aInter.size = "+aInter.size());
         return i;
     }
 
@@ -93,10 +92,65 @@ public class Salarie implements Serializable {
     }
 
 
-    public void ajoutTaches(Tache tache){
+    public void ajoutTaches(Tache tache, String methodeAppelante){
         for(int i = tache.getJoursSelDeb(); i <= tache.getJoursSelFin(); i++) {
-            salCols[i].ajoutTache(this, tache);
+            salCols[i].ajoutTache(this, tache,methodeAppelante);
         }
+    }
+
+    public void mouvTacheIntersect(Tache tache){
+        /*
+            Cette methode gère l'impact d'un déplacement de tache avec intersection dans son intersection
+            MouvTache devrait créer une intersectionProvisoire sans impact sur les tâches(NumIntersection et niv) et retourner cette intersection
+            c'est seulement si cette intersection est différente de l'intersection initiale qu'on procèdera à la prise en compte:
+                    copy et ajout de l'intersection dans salarie
+                    typage de l'intersection en move
+                    ajout de l'intersection initiale dans arrayMove
+                    modif des taches
+         */
+        LOGGER.info("mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
+        if(tache.isIntersection()){
+            Intersection interBefore = getIntersection(tache.getNumIntersection());
+            LOGGER.info("Salarie.mouvTacheIntersect interBefore= "+interBefore);
+            Tache[] tachesIntersect = interBefore.getTaches();
+            for(Tache t: tachesIntersect)t.sauvIntersect();
+            Intersection intersect = null;
+            for(Tache t1: tachesIntersect){
+                for(Tache t2: tachesIntersect){
+                    if(t1.getNumTache() != t2.getNumTache()){
+                        if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
+                            if(t1.isIntersection() && t2.isIntersection())t1.getIntersection().fusionne(t2.getIntersection().getTaches());
+                            Integer numIntersection = t1.isIntersection() ? t1.getNumIntersection() : t2.isIntersection() ? t2.getNumIntersection() : null;
+                            if(numIntersection == null){
+                                intersect = ajoutIntersectionTemporaire(t2);
+                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
+                            }
+                            else {
+                                intersect = getIntersectionTempo(numIntersection);
+                            }
+                            intersect.ajoutTache(t1);
+                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
+                        }
+                    }
+                }
+            }
+            if(getAInterTempo().size() >= 1){
+                for(Tache t: tachesIntersect)t.removeIntersection();
+                for(Intersection i: getAInterTempo()){
+//                    LOGGER.finest("applique "+i);
+                    i.setNumIntersec(getAInter().size());
+                    i.setTypIntersection(TypIntersection.STANDARD);
+                    i.appliqueTaches();
+                    getAInterTempo().remove(i);
+                    getAInter().add(i);
+                };
+            }
+            else{
+                if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
+                else for(Tache t: tachesIntersect)t.restaureIntersect();
+            }
+        }
+        String s ="finMovTache";
     }
 
 
