@@ -22,6 +22,7 @@ public class Tache implements Serializable {
     private Integer numIntersection;
     private int oldNiv;
     private Integer oldNumIntersect;
+    private Intersection oldIntersection;
 
     public Tache() {
     }
@@ -113,20 +114,25 @@ public class Tache implements Serializable {
     public void removeIntersection(){
         niveau = 0;
         numIntersection = null;
+        intersection= null;
         oldNiv = 0;
         oldNumIntersect = null;
+        oldIntersection = null;
     }
 
     public void restaureIntersect(){
         niveau = oldNiv;
         numIntersection = oldNumIntersect;
+        intersection = oldIntersection;
     }
 
     public void sauvIntersect(){
         oldNiv = niveau;
         oldNumIntersect = numIntersection;
+        oldIntersection = intersection;
         niveau = 0;
         numIntersection = null;
+        intersection = null;
     }
 
     public int getMnDeb() {

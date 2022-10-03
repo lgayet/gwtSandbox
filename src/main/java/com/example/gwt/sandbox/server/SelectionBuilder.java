@@ -57,7 +57,7 @@ public class SelectionBuilder implements Serializable {
 //        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
-//                aTaches.add(generationTache(selection, sal));
+                aTaches.add(generationTache(selection, sal));
             }
         }
         selection.setTSals(tSals);

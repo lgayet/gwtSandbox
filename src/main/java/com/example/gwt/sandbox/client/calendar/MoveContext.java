@@ -60,7 +60,7 @@ public class MoveContext  {
             tache.setJoursSelFin(mnSelFin / 1440);
             tache.setHFin(mnSelFin % 1440 / 60 );
             tache.setMnFin(mnSelFin % 1440 % 60);
-            salarie.mouvTacheIntersect(tache);
+            salarie.mouvTacheIntersect(tache);// pour gérer l'impact au sein de l'intersection (déplacements internes)
             LOGGER.info("MC.move jourSelDeb= "+tache.getJoursSelDeb()+" jourSelFin= "+tache.getJoursSelFin()+" precedJourSelDeb= "+precedJourSelDeb+" precedJourSelFin= "+precedJourSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
             minCol = tache.isIntersection() ? Math.max(indicePremiereColonne, Math.min(precedJourSelDeb, tache.getIntersection().getNumJourMin())) : precedJourSelDeb;
             maxCol = tache.isIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedJourSelFin, tache.getIntersection().getNumJourMax())) : precedJourSelFin;
