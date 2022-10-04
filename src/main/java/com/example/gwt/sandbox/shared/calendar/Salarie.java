@@ -9,6 +9,8 @@ public class Salarie implements Serializable {
     private int numSal;
     private String nomSal;
     private int nbJours;
+    private int numInter = 0;
+    private int numInterTempo = 1000;
     private Intersection[]tInter;//TODO tableau transitoire servant à restaurer les liens à l'arrivée sur GCalendar
     private ArrayList<Intersection> aInter = new ArrayList<>();//TODO suppression du transient
     private ArrayList<Intersection> aInterTempo = new ArrayList<>();// créées temporairement (non appliquée si impact non significatif)
@@ -80,13 +82,13 @@ public class Salarie implements Serializable {
     }
 
     public Intersection ajoutIntersection(Tache tache){
-        Intersection i = new Intersection(numSal, aInter.size(), TypIntersection.STANDARD, tache);
+        Intersection i = new Intersection(numSal, getNumInter(), TypIntersection.STANDARD, tache);
         aInter.add(i);
         return i;
     }
 
     public Intersection ajoutIntersectionTemporaire(Tache tache){
-        Intersection i = new Intersection(numSal, aInterTempo.size()+100 , TypIntersection.TEMPORAIRE, tache);
+        Intersection i = new Intersection(numSal, getNumInterTempo() , TypIntersection.TEMPORAIRE, tache);
         aInterTempo.add(i);
         return i;
     }
@@ -138,23 +140,31 @@ public class Salarie implements Serializable {
                 for(Tache t: tachesIntersect)t.removeIntersection();
                 for(Intersection i: getAInterTempo()){
 //                    LOGGER.finest("applique "+i);
-                    i.setNumIntersec(getAInter().size());
+                    i.setNumIntersec(getNumInter());
                     i.setTypIntersection(TypIntersection.STANDARD);
                     i.appliqueTaches();
                     getAInterTempo().remove(i);
                     getAInter().add(i);
-                };
+                }
             }
-            else{
+            else{// la tâche n'est plus en intersection
+                LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );
                 if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
-                else for(Tache t: tachesIntersect)t.restaureIntersect();
+                else for(Tache t: tachesIntersect){
+                    if(t.getNumTache() == tache.getNumTache())t.removeIntersection();
+                    else t.restaureIntersect();
+                }
             }
         }
         String s ="finMovTache";
     }
 
-
-
+    public int getNumInter(){
+        return numInter++;
+    }
+    private int getNumInterTempo(){
+        return numInterTempo ++;
+    }
 
 
 

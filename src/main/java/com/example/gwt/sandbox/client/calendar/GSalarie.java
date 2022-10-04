@@ -1,9 +1,10 @@
 package com.example.gwt.sandbox.client.calendar;
 
-import com.example.gwt.sandbox.shared.calendar.*;
+import com.example.gwt.sandbox.shared.calendar.Intersection;
+import com.example.gwt.sandbox.shared.calendar.SalCol;
+import com.example.gwt.sandbox.shared.calendar.Salarie;
+import com.example.gwt.sandbox.shared.calendar.Tache;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class GSalarie  {
@@ -29,9 +30,6 @@ public class GSalarie  {
         }
     }
 
-    public Salarie getSalarie() {
-        return salarie;
-    }
 
     public String getNomSal() {
         return salarie.getNomSal();
@@ -39,19 +37,6 @@ public class GSalarie  {
 
     public GSalCol[] getGSalCols(){
         return salCols;
-    }
-
-    public SalCol[] getSalCols() {
-        return salarie.getSalCols();
-    }
-
-    public GTacheCol[] getTachesCol(int numTache){
-        Tache ta = calendar.getTaches()[numTache];
-        List<GTacheCol> tc = new ArrayList<>();
-        for(int i = ta.getJoursSelDeb(); i <= ta.getJoursSelFin(); i++){
-            tc.add(salCols[i].getTacheCol(numTache));
-        }
-        return tc.toArray(new GTacheCol[tc.size()]);
     }
 
     public Intersection getIntersection(Integer numInter){
@@ -77,7 +62,7 @@ public class GSalarie  {
             if(appatientTacheEtPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
                 g = salCols[i];
                 LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
-                g.mouvTacheCol(salarie, tache);
+                g.mouvTacheCol(salarie);
             }
         }
     }

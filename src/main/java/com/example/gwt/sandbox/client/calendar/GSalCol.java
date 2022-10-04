@@ -34,8 +34,8 @@ public class GSalCol  {
         tacheCols = t;
     }
 
-    public void mouvTacheCol(Salarie salarie, Tache tache){
-        salCol.mouvTache(salarie, tache);
+    public void mouvTacheCol(Salarie salarie){
+        salCol.mouvTache(salarie);
     }
 
     public void supprimeTacheCol(Tache tache){

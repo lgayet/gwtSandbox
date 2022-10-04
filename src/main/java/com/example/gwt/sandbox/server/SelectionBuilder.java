@@ -52,12 +52,12 @@ public class SelectionBuilder implements Serializable {
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
 //          taches complémentaire
-//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,55,2022,8,3,12,0));
-//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,10,0,2022,8,3,11,0));
-//        aTaches.add(generationTacheFixe(selection,tSals[0], 2022,8,3,14,0,2022,8,3,16,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,3,10,55,2022,8,3,12,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,13,0,2022,8,1,14,0));
+        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,4,14,0,2022,8,4,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
-                aTaches.add(generationTache(selection, sal));
+//                aTaches.add(generationTache(selection, sal));
             }
         }
         selection.setTSals(tSals);

@@ -35,7 +35,7 @@ public class SalCol implements Serializable {
 
     }
 
-    public void mouvTache(Salarie salarie, Tache tache){
+    public void mouvTache(Salarie salarie){
         reorganise(salarie,"mouvTache");
     }
 
@@ -60,11 +60,11 @@ public class SalCol implements Serializable {
                     if(t1.isIntersection() && t2.isIntersection())t1.getIntersection().fusionne(t2.getIntersection().getTaches());
                     intersect = t1.getIntersection() != null ? t1.getIntersection() : (t2.getIntersection() != null ? t2.getIntersection() : null);
                     if (intersect == null) {
-                        intersect = salarie.ajoutIntersection(t1);
-                        LOGGER.info("      new  " + intersect + " avec " + t1);
+                        intersect = salarie.ajoutIntersection(t2);
+                        LOGGER.info("      new  " + intersect + " avec " + t2);
                     }
-                    intersect.ajoutTache(t2);
-                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t2);
+                    intersect.ajoutTache(t1);
+                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t1);
                 }
             }
         }

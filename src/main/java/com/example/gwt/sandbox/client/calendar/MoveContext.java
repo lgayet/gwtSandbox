@@ -48,24 +48,26 @@ public class MoveContext  {
 
     boolean move(int x, int y) {
         if (isBusy()) {
+            /*
+                TODO: les calculs de décalage se font en minutes
+                      joursSelDeb et fin correspondent aux indices du tableau tCols
+             */
             LOGGER.info("MC.move "+tache);
             precedJourSelDeb = tache.getJoursSelDeb();
             precedJourSelFin = tache.getJoursSelFin();
-            int decalMn = (int)((x -xRef) * 1440 / largCol);// TODO on calcule toujours le décalage par rapport à la position initiale
+            int decalMn = (int)((x -xRef) * 1440 / largCol);
             int mnSelDeb = tacheInitiale.getMnSelDeb() + decalMn;
-            tache.setJoursSelDeb(mnSelDeb / 1440);
+            tache.setJoursSelDeb(mnSelDeb / 1440);// == numColDeb
             tache.setHDeb(mnSelDeb % 1440 / 60 );
             tache.setMnDeb(mnSelDeb % 1440 % 60 );
             int mnSelFin = tacheInitiale.getMnSelFin() + decalMn;
-            tache.setJoursSelFin(mnSelFin / 1440);
+            tache.setJoursSelFin(mnSelFin / 1440);// == numColFin
             tache.setHFin(mnSelFin % 1440 / 60 );
             tache.setMnFin(mnSelFin % 1440 % 60);
             salarie.mouvTacheIntersect(tache);// pour gérer l'impact au sein de l'intersection (déplacements internes)
             LOGGER.info("MC.move jourSelDeb= "+tache.getJoursSelDeb()+" jourSelFin= "+tache.getJoursSelFin()+" precedJourSelDeb= "+precedJourSelDeb+" precedJourSelFin= "+precedJourSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
             minCol = tache.isIntersection() ? Math.max(indicePremiereColonne, Math.min(precedJourSelDeb, tache.getIntersection().getNumJourMin())) : precedJourSelDeb;
             maxCol = tache.isIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedJourSelFin, tache.getIntersection().getNumJourMax())) : precedJourSelFin;
-            minCol = indicePremiereColonne;
-            maxCol = indicePremiereColonne + nbJoursAffiches -1;
             salarie.mouvTacheSalCol(tache, precedJourSelDeb, precedJourSelFin);
             iter ++;
             return true;
