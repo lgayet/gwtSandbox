@@ -2,6 +2,7 @@ package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 public class Salarie implements Serializable {
@@ -29,12 +30,6 @@ public class Salarie implements Serializable {
         salCols = new SalCol[nbJours];
         for(int i = 0; i< nbJours; i++){
             salCols[i] = new SalCol(i);
-        }
-    }
-
-    public void rattache(){
-        for(Intersection i: getTIntersection()){
-            i.rattache();
         }
     }
 
@@ -77,10 +72,6 @@ public class Salarie implements Serializable {
         return aInter;
     }
 
-    public ArrayList<Intersection> getAInterTempo() {
-        return aInterTempo;
-    }
-
     public Intersection ajoutIntersection(Tache tache){
         Intersection i = new Intersection(numSal, getNumInter(), TypIntersection.STANDARD, tache);
         aInter.add(i);
@@ -95,8 +86,36 @@ public class Salarie implements Serializable {
 
 
     public void ajoutTaches(Tache tache, String methodeAppelante){
-        for(int i = tache.getJoursSelDeb(); i <= tache.getJoursSelFin(); i++) {
+        for(int i = tache.getColSelDeb(); i <= tache.getColSelFin(); i++) {
             salCols[i].ajoutTache(this, tache,methodeAppelante);
+            reorganise(salCols[i].getTaches());
+        }
+    }
+    public void mouvTaches(int colMin, int colMax){
+        List<Tache> a = new ArrayList<>();
+        for(int i = colMin; i<= colMax; i++){
+            for(Tache t: salCols[i].getTaches()){
+                if( ! a.contains(t))a.add(t);
+            }
+        }
+        reorganise(a.toArray(new Tache[a.size()]));
+    }
+    public void reorganise(Tache[] taches){
+        Intersection intersect = null;
+        for(Tache t1: taches){
+            for(Tache t2: taches) {
+                if (t2.getNumTache() != t1.getNumTache() && t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()) {
+                    if(t1.hasIntersection() && t2.hasIntersection())t1.getIntersection().fusionne(t2.getIntersection().getTaches());
+                    intersect = t1.getIntersection() != null ? t1.getIntersection() : (t2.getIntersection() != null ? t2.getIntersection() : null);
+                    if (intersect == null) {
+                        intersect = ajoutIntersection(t2);
+                                ajoutIntersection(t2);
+                        LOGGER.info("      new  " + intersect + " avec " + t2);
+                    }
+                    intersect.ajoutTache(t1);
+                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t1);
+                }
+            }
         }
     }
 
@@ -111,8 +130,8 @@ public class Salarie implements Serializable {
                     modif des taches
          */
         LOGGER.info("mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
-        if(tache.isIntersection()){
-            Intersection interBefore = getIntersection(tache.getNumIntersection());
+        if(tache.hasIntersection()){
+            Intersection interBefore = tache.getIntersection();
             LOGGER.info("Salarie.mouvTacheIntersect interBefore= "+interBefore);
             Tache[] tachesIntersect = interBefore.getTaches();
             for(Tache t: tachesIntersect)t.sauvIntersect();
@@ -121,31 +140,52 @@ public class Salarie implements Serializable {
                 for(Tache t2: tachesIntersect){
                     if(t1.getNumTache() != t2.getNumTache()){
                         if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
-                            if(t1.isIntersection() && t2.isIntersection())t1.getIntersection().fusionne(t2.getIntersection().getTaches());
-                            Integer numIntersection = t1.isIntersection() ? t1.getNumIntersection() : t2.isIntersection() ? t2.getNumIntersection() : null;
-                            if(numIntersection == null){
-                                intersect = ajoutIntersectionTemporaire(t2);
-                                LOGGER.info(" new Intersection= "+intersect+" "+t2);
+                            if(t1.hasIntersection() && t2.hasIntersection() && (int)t1.getNumIntersection() != (int)t2.getNumIntersection()){
+                                LOGGER.info("fusion I "+t1.getNumIntersection()+" <== I "+t2.getNumIntersection()+" sur "+t1.getIntersection()+" de "+t2.getIntersection());
+                                t1.getIntersection().fusionne(t2.getIntersection().getTaches());
+                                LOGGER.info(" apres fusion");
+                                t2.getIntersection().setSupprimee();
                             }
                             else {
-                                intersect = getIntersectionTempo(numIntersection);
+                                Integer numIntersection = t1.hasIntersection() ? t1.getNumIntersection() : t2.hasIntersection() ? t2.getNumIntersection() : null;
+                                LOGGER.info("boucle t1="+t1+" t2= "+t2);
+                                if (numIntersection == null) {
+                                    intersect = ajoutIntersectionTemporaire(t2);
+                                    LOGGER.info(" new Intersection= " + intersect + " " + t2);
+                                } else {
+                                    intersect = getIntersectionTempo(numIntersection);
+                                }
+                                intersect.ajoutTache(t1);
+                                LOGGER.info("ajoutTache  Intersection= " + intersect + " " + t1);
                             }
-                            intersect.ajoutTache(t1);
-                            LOGGER.info("ajoutTache  Intersection= "+intersect+" "+t1);
                         }
                     }
                 }
             }
-            if(getAInterTempo().size() >= 1){
-                for(Tache t: tachesIntersect)t.removeIntersection();
-                for(Intersection i: getAInterTempo()){
-//                    LOGGER.finest("applique "+i);
-                    i.setNumIntersec(getNumInter());
-                    i.setTypIntersection(TypIntersection.STANDARD);
-                    i.appliqueTaches();
-                    getAInterTempo().remove(i);
-                    getAInter().add(i);
+//            TODO je fais une boucle complémentaire pour fusionner les intersections
+            for(Intersection i1: aInterTempo){
+                for(Intersection i2: aInterTempo){
+                    if( ! i1.isSupprimee()  && ! i2.isSupprimee() && i1.getTacheMin().getMnSelDeb() < i2.getTacheMax().getMnSelFin() && i1.getTacheMax().getMnSelFin() > i2.getTacheMin().getMnSelDeb()){
+//                        i1.fusionne(i2.getTaches());
+//                        i2.setSupprimee();
+                    }
                 }
+            }
+            if(aInterTempo.size() >= 1){
+                for(Tache t: tachesIntersect){
+                    t.removeIntersection();
+                }
+                for(Intersection i: aInterTempo){
+                    if( ! i.isSupprimee()) {
+                        LOGGER.finest("applique " + i);
+                        i.setNumIntersec(getNumInter());
+                        i.setTypIntersection(TypIntersection.STANDARD);
+                        i.appliqueTaches();
+                        aInterTempo.remove(i);
+                        getAInter().add(i);
+                    }
+                }
+                aInterTempo.clear();
             }
             else{// la tâche n'est plus en intersection
                 LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );

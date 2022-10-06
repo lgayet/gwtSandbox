@@ -1,16 +1,20 @@
 package com.example.gwt.sandbox.shared.calendar;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 
 public class Tache implements Serializable {
 
+    public final static int MINUTES_PER_HOUR = 60;
+    public final static int MINUTES_PER_DAY = MINUTES_PER_HOUR * 24;
+
     private TypTache typTache;
     private int numSal;
     private int aanumTache;
-    private int joursSelDeb;
+    private int colSelDeb;
     private int hDeb;
     private int mnDeb;
-    private int joursSelFin;
+    private int colSelFin;
     private int hFin;
     private int mnFin;
 //
@@ -18,28 +22,32 @@ public class Tache implements Serializable {
     private boolean move;
 //    les taches et intersection
     private transient Salarie salarie;
+    @Nullable
     private transient Intersection intersection;
+    @Nullable
     private Integer numIntersection;
     private int oldNiv;
     private Integer oldNumIntersect;
     private Intersection oldIntersection;
+    // La tache initale sert à garder l'état pour les calcul de decalage lors du déplacement engendré par MoveContext
+    private Tache tacheInitiale;
 
     public Tache() {
     }
 
-    public Tache(int numSal, int numTache, int joursSelDeb, int hDeb, int mnDeb, int joursSelFin, int hFin, int mnFin) {
+    public Tache(int numSal, int numTache, int colSelDeb, int hDeb, int mnDeb, int colSelFin, int hFin, int mnFin) {
         this.numSal = numSal;
         this.aanumTache = numTache;
-        this.joursSelDeb = joursSelDeb;
+        this.colSelDeb = colSelDeb;
         this.hDeb = hDeb;
         this.mnDeb = mnDeb;
-        this.joursSelFin = joursSelFin;
+        this.colSelFin = colSelFin;
         this.hFin = hFin;
         this.mnFin = mnFin;
     }
 
-    public Tache copyTache(){
-        return new Tache(numSal, aanumTache, joursSelDeb, hDeb, mnDeb, joursSelFin, hFin, mnFin);
+    public void createInitale(){
+        tacheInitiale = new Tache(numSal, aanumTache, colSelDeb, hDeb, mnDeb, colSelFin, hFin, mnFin);
     }
 
     public void rattache(Salarie[] tSals){
@@ -55,35 +63,45 @@ public class Tache implements Serializable {
         this.move = move;
     }
 
-
-
     public int getNumTache() {
         return aanumTache;
     }
 
+    public void addDecalageMinutes (int minutes){
+
+        int totMnDeb = tacheInitiale.getMnSelDeb() + minutes;
+        colSelDeb = totMnDeb / MINUTES_PER_DAY;
+        hDeb = totMnDeb % MINUTES_PER_DAY / MINUTES_PER_HOUR;
+        mnDeb = totMnDeb % MINUTES_PER_DAY % MINUTES_PER_HOUR;
+
+        int totMnFin = tacheInitiale.getMnSelFin() + minutes;
+        colSelFin = totMnFin / MINUTES_PER_DAY;
+        hFin = totMnFin % MINUTES_PER_DAY / MINUTES_PER_HOUR;
+        mnFin = totMnFin % MINUTES_PER_DAY % MINUTES_PER_HOUR;
+    }
 
     public int getMnSelDeb(){
-        return joursSelDeb * 24 * 60 + hDeb * 60 + mnDeb;
+        return colSelDeb * MINUTES_PER_DAY + hDeb * MINUTES_PER_HOUR + mnDeb;
     }
 
-    public int getJoursSelDeb() {
-        return joursSelDeb;
-    }
-
-    public void setJoursSelDeb(int joursSelDeb) {
-        this.joursSelDeb = joursSelDeb;
+    public int getColSelDeb() {
+        return colSelDeb;
     }
 
     public int getMnSelFin(){
-        return joursSelFin * 24 * 60 + hFin * 60 + mnFin;
+        return colSelFin * MINUTES_PER_DAY + hFin * MINUTES_PER_HOUR + mnFin;
     }
 
-    public int getJoursSelFin() {
-        return joursSelFin;
+    public int getColSelFin() {
+        return colSelFin;
     }
 
-    public void setJoursSelFin(int joursSelFin) {
-        this.joursSelFin = joursSelFin;
+    public int getMnDeb() {
+        return hDeb * MINUTES_PER_HOUR + mnDeb;
+    }
+
+    public int getMnFin() {
+        return hFin * MINUTES_PER_HOUR + mnFin;
     }
 
     public int getNiveau() {
@@ -104,10 +122,10 @@ public class Tache implements Serializable {
 
     public void setIntersection(Intersection intersection){
         this.intersection = intersection;
-        numIntersection = intersection.getNumIntersec();
+            numIntersection = intersection.getNumIntersec();
     }
 
-    public boolean isIntersection(){
+    public boolean hasIntersection(){
         return numIntersection != null;
     }
 
@@ -135,36 +153,12 @@ public class Tache implements Serializable {
         intersection = null;
     }
 
-    public int getMnDeb() {
-        return hDeb * 60 + mnDeb;
-    }
-
-    public int getMnFin() {
-        return hFin * 60 + mnFin;
-    }
-
-    public void setHDeb(int hDeb) {
-        this.hDeb = hDeb;
-    }
-
-    public void setMnDeb(int mnDeb) {
-        this.mnDeb = mnDeb;
-    }
-
-    public void setHFin(int hFin) {
-        this.hFin = hFin;
-    }
-
-    public void setMnFin(int mnFin) {
-        this.mnFin = mnFin;
-    }
-
     public String getText(){
         return numIntersection !=null ? aanumTache+"-"+numIntersection : aanumTache+"";
     }
 
      public String toString(){
-        return "Tache "+aanumTache+" "+joursSelDeb+":"+hDeb+":"+mnDeb+"<==>"+" "+joursSelFin+":"+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau;
+        return "Tache "+aanumTache+" "+colSelDeb+":"+hDeb+":"+mnDeb+"<==>"+" "+colSelFin+":"+hFin+":"+mnFin+" numIntersec="+numIntersection+" niv= "+niveau;
      }
 
 }

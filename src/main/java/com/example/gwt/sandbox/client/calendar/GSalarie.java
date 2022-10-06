@@ -43,38 +43,43 @@ public class GSalarie  {
         return salarie.getIntersection(numInter);
     }
 
-    public void mouvTacheSalCol(Tache tache, int precedJourSelDeb, int precedJourSelFin){
+    public void mouvTaches(int colMin, int colMax){
+        salarie.mouvTaches(colMin, colMax);
+    }
+
+    public void mouvTacheSalCol(Tache tache, int precedColSelDeb, int precedColSelFin){
         GSalCol g;
-        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getJoursSelDeb()+" tache.joursSelFin= "+tache.getJoursSelFin()+" precedJoursSelDeb= "+precedJourSelDeb+" precedJoursSelFin= "+precedJourSelFin);
-        for(int i = Math.min(tache.getJoursSelDeb(), precedJourSelDeb); i<= Math.max(tache.getJoursSelFin(), precedJourSelFin); i++){
+        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getColSelDeb()+" tache.joursSelFin= "+tache.getColSelFin()+" precedJoursSelDeb= "+precedColSelDeb+" precedJoursSelFin= "+precedColSelFin);
+        for(int i = Math.min(tache.getColSelDeb(), precedColSelDeb); i<= Math.max(tache.getColSelFin(), precedColSelFin); i++){
 //            pour chaque iteration, je vérifie la presence précédante et pour la tache
-            if(appatientPrecedEtNonTache(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+            if(containsPrecedEtNonTache(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
 //                 je dois donc supprimer de SalCol et GSalCol
                 g = salCols[i];
                 LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.supprimeTacheCol(tache);// je ne la supprime pas en tant que GTacheCol, je ne veux implement plus créer de Rectangle
             }
-            if(appatientTacheEtNonPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+            if(containsTacheEtNonPreced(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
                 g = salCols[i];
                 LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.ajoutTacheCol(salarie, tache,"mouvTacheSalCol" );
             }
-            if(appatientTacheEtPreced(i, tache.getJoursSelDeb(), tache.getJoursSelFin(), precedJourSelDeb, precedJourSelFin)){
+            if(containsTacheEtPreced(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
                 g = salCols[i];
                 LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
-                g.mouvTacheCol(salarie);
+//                g.mouvTacheCol(salarie);
             }
         }
+
     }
-    private boolean appatientTacheEtPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+    private boolean containsTacheEtPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
         if(i >= tacheJD && i <= tachejF && i >= precedJD && i <= precedJF)return true;
         return false;
     }
-    private boolean appatientTacheEtNonPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+    private boolean containsTacheEtNonPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
         if(i >= tacheJD && i <= tachejF && (i < precedJD || i > precedJF))return true;
         return false;
     }
-    private boolean appatientPrecedEtNonTache(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
+    private boolean containsPrecedEtNonTache(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
         if((i < tacheJD || i > tachejF) && i >= precedJD && i <= precedJF)return true;
         return false;
     }

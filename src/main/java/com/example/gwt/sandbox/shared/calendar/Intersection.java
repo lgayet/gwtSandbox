@@ -7,6 +7,7 @@ public class Intersection implements Serializable {
     private int anumIntersec;//TODO j'ai ajouté le a pour voir cette information en premier en debug
     private TypIntersection typIntersection;
     private Niv[] nivs = new Niv[1];
+    private boolean supprimee;
 
     public Intersection() {
     }
@@ -15,13 +16,8 @@ public class Intersection implements Serializable {
         this.numSalarie = numSalarie;
         this.anumIntersec = numIntersec;
         this.typIntersection = typIntersection;
-        nivs[0] = new Niv(this, numIntersec, 0, tache);
-    }
-
-    public void rattache(){
-        for(Niv n: nivs){
-            n.setIntersection(this);
-        }
+        nivs[0] = new Niv(0, tache);
+        tache.setIntersection(this);
     }
 
     public int getNumIntersec() {
@@ -45,8 +41,9 @@ public class Intersection implements Serializable {
     }
 
     public void ajoutTache(Tache tache){
+        tache.setIntersection(this);
         for(Niv n: nivs){
-            if(n.controleEtAjout(this, tache))return;
+            if(n.controleEtAjout(tache))return;
         }
         ajoutNiv(tache);
     }
@@ -63,20 +60,21 @@ public class Intersection implements Serializable {
     }
 
     public Tache[] getTaches(){
+        if(supprimee)return new Tache[0];
         int nbTache =0;
         for(Niv n: nivs)nbTache+=n.getTaches().length;
         Tache[]t = new Tache[nbTache];
         int i=0;
         for(Niv n: nivs){
             for(Tache ta: n.getTaches()){
-                if(i == 0)t[1]=ta;
-                else if(i == 1)t[0]=ta;
-                else t[i]=ta;
+                t[i]=ta;
                 i++;
             }
         }
         return t;
     }
+
+
     public Intersection fusionne(Tache[] tachesAFusionner){
         for(Tache t: tachesAFusionner){
             ajoutTache(t);
@@ -84,15 +82,26 @@ public class Intersection implements Serializable {
         return this;
     }
 
+    public Tache getTacheMin(){
+        Tache tacheMin = nivs[0].getTaches()[0] ;//pour avoir une valeur de départ
+        for(Tache t: getTaches())tacheMin = t.getMnSelDeb() < tacheMin.getMnSelDeb() ? t : tacheMin;
+        return tacheMin;
+    }
+    public Tache getTacheMax(){
+        Tache tacheMax = nivs[0].getTaches()[0] ;//pour avoir une valeur de départ
+        for(Tache t: getTaches())tacheMax = t.getMnSelFin() > tacheMax.getMnSelFin() ? t : tacheMax;
+        return tacheMax;
+    }
+
     public int getNumJourMin(){
         int jourMin = 9999;
-        for(Tache t: getTaches())jourMin = Math.min(jourMin, t.getJoursSelDeb());
+        for(Tache t: getTaches())jourMin = Math.min(jourMin, t.getColSelDeb());
         return jourMin;
     }
 
     public int getNumJourMax(){
         int jourMax = 0;
-        for(Tache t: getTaches())jourMax = Math.max(jourMax, t.getJoursSelFin());
+        for(Tache t: getTaches())jourMax = Math.max(jourMax, t.getColSelFin());
         return jourMax;
     }
 
@@ -113,9 +122,17 @@ public class Intersection implements Serializable {
         for(int i = 0; i < nivs.length; i ++){
             t[i] = nivs[i];
         }
-        Niv n = new Niv(this, anumIntersec, nivs.length, tache);
+        Niv n = new Niv(nivs.length, tache);
         t[nivs.length] = n;
         nivs = t;
+    }
+
+    public boolean isSupprimee() {
+        return supprimee;
+    }
+
+    public void setSupprimee() {
+        this.supprimee = true;
     }
 
     public String toString(){

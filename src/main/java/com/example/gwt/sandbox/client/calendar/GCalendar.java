@@ -283,9 +283,6 @@ public class GCalendar {
         tCols = selection.getTCols();
         taches = selection.getTTache();
         Salarie[] salaries = selection.getTSals();
-        for(Salarie s: salaries){
-            s.rattache();
-        }
         tSals = new GSalarie[salaries.length];
         for (int i = 0; i< salaries.length; i++){
             tSals[i] = new GSalarie(this, salaries[i]);
@@ -294,8 +291,6 @@ public class GCalendar {
             t.rattache(salaries);
         }
     }
-
-
 
     public Tache[] getTaches() {
         return taches;

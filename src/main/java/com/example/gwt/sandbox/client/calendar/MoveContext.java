@@ -4,20 +4,19 @@ import com.example.gwt.sandbox.shared.calendar.Tache;
 
 import java.util.logging.Logger;
 
+import static com.example.gwt.sandbox.shared.calendar.Tache.MINUTES_PER_DAY;
+
 public class MoveContext  {
 
     private GSalarie salarie;
     private Tache tache = null;
     private int numCol;
-    private Tache tacheInitiale;
     private double largCol;
     private int xRef;
     private int yRef;
 //    pour le calcul des colonnes à afficher
     private int indicePremiereColonne;
     private int nbJoursAffiches;
-    private int precedJourSelDeb;
-    private int precedJourSelFin;
     private int minCol;
     private int maxCol;
     private int iter = 0;
@@ -33,16 +32,14 @@ public class MoveContext  {
             this.tache = tache;
             tache.setMove(true);
             this.numCol = numCol;
-            tacheInitiale = tache.copyTache();
+            tache.createInitale();
             this.largCol = largCol;
             this.indicePremiereColonne = indicePremiereColonne;
             this.nbJoursAffiches = nbJoursAffiches;
             xRef = x;
             yRef = y;
-            precedJourSelDeb = tache.getJoursSelDeb();
-            precedJourSelFin = tache.getJoursSelFin();
-            minCol= precedJourSelDeb;
-            maxCol = precedJourSelFin;
+            minCol = tache.getColSelDeb();
+            maxCol = tache.getColSelFin();
         }
     }
 
@@ -53,22 +50,18 @@ public class MoveContext  {
                       joursSelDeb et fin correspondent aux indices du tableau tCols
              */
             LOGGER.info("MC.move "+tache);
-            precedJourSelDeb = tache.getJoursSelDeb();
-            precedJourSelFin = tache.getJoursSelFin();
-            int decalMn = (int)((x -xRef) * 1440 / largCol);
-            int mnSelDeb = tacheInitiale.getMnSelDeb() + decalMn;
-            tache.setJoursSelDeb(mnSelDeb / 1440);// == numColDeb
-            tache.setHDeb(mnSelDeb % 1440 / 60 );
-            tache.setMnDeb(mnSelDeb % 1440 % 60 );
-            int mnSelFin = tacheInitiale.getMnSelFin() + decalMn;
-            tache.setJoursSelFin(mnSelFin / 1440);// == numColFin
-            tache.setHFin(mnSelFin % 1440 / 60 );
-            tache.setMnFin(mnSelFin % 1440 % 60);
+            int precedColSelDeb = tache.getColSelDeb();
+            int precedColSelFin = tache.getColSelFin();
+            int decalMn = (int)((x -xRef) * MINUTES_PER_DAY / largCol);
+            tache.addDecalageMinutes(decalMn);
             salarie.mouvTacheIntersect(tache);// pour gérer l'impact au sein de l'intersection (déplacements internes)
-            LOGGER.info("MC.move jourSelDeb= "+tache.getJoursSelDeb()+" jourSelFin= "+tache.getJoursSelFin()+" precedJourSelDeb= "+precedJourSelDeb+" precedJourSelFin= "+precedJourSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
-            minCol = tache.isIntersection() ? Math.max(indicePremiereColonne, Math.min(precedJourSelDeb, tache.getIntersection().getNumJourMin())) : precedJourSelDeb;
-            maxCol = tache.isIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedJourSelFin, tache.getIntersection().getNumJourMax())) : precedJourSelFin;
-            salarie.mouvTacheSalCol(tache, precedJourSelDeb, precedJourSelFin);
+            LOGGER.info("MC.move jourSelDeb= "+tache.getColSelDeb()+" jourSelFin= "+tache.getColSelFin()+" precedJourSelDeb= "+precedColSelDeb+" precedJourSelFin= "+precedColSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
+            minCol = tache.hasIntersection() ? Math.max(indicePremiereColonne, Math.min(precedColSelDeb, tache.getIntersection().getNumJourMin())) : precedColSelDeb;
+            maxCol = tache.hasIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedColSelFin, tache.getIntersection().getNumJourMax())) : precedColSelFin;
+            salarie.mouvTacheSalCol(tache, precedColSelDeb, precedColSelFin);
+            minCol =indicePremiereColonne;
+            maxCol = indicePremiereColonne+nbJoursAffiches-1;
+            salarie.mouvTaches(minCol,maxCol);
             iter ++;
             return true;
         }

@@ -54,7 +54,7 @@ public class GTacheCol implements Positionable {
 
     private void construit(int indicePremiereCol, int nbJoursAffiches){
         if (isDessinable(numCol)) {
-            Intersection is = tache.isIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
+            Intersection is = tache.hasIntersection() ? salarie.getIntersection(tache.getNumIntersection()) : null;
             int maxNiv = is != null ? is.getmaxNiv() : 1;
             int y = (int) (salarie.getPositionY() + salarie.getHauteurSal() * tache.getNiveau() / maxNiv + 3);
             int h = (int) (salarie.getHauteurSal() / maxNiv - 6);
@@ -134,7 +134,7 @@ public class GTacheCol implements Positionable {
     }
 
     private boolean isDessinable(int numCol){
-        if (numCol >= tache.getJoursSelDeb() && numCol <= tache.getJoursSelFin()) return true;
+        if (numCol >= tache.getColSelDeb() && numCol <= tache.getColSelFin()) return true;
         return false;
     }
 
@@ -144,23 +144,23 @@ public class GTacheCol implements Positionable {
     }
 
     private boolean isDebutVisible(){
-        if(tache.getMnDeb() < mnDebJour || numCol > tache.getJoursSelDeb())return true;
+        if(tache.getMnDeb() < mnDebJour || numCol > tache.getColSelDeb())return true;
         return false;
     }
 
     private boolean isFinVisible(){
-        if(tache.getMnFin() > mnFinJour || numCol < tache.getJoursSelFin())return true;
+        if(tache.getMnFin() > mnFinJour || numCol < tache.getColSelFin())return true;
         return false;
     }
 
     private int getPositionXDeb(){
-        int decalX =  (tache.getJoursSelDeb() < numCol ? 0 : Math.max(tache.getMnDeb() - mnDebJour, 0)) * largCol / mnJour;
+        int decalX =  (tache.getColSelDeb() < numCol ? 0 : Math.max(tache.getMnDeb() - mnDebJour, 0)) * largCol / mnJour;
         int x = decalX < 3 ? xCol + 3 : xCol + decalX;// dépendra de la taille des traits
         return x;
     }
 
     private int getLargeur(){
-        int larg = ( (tache.getJoursSelFin()> numCol ? mnFinJour : Math.min(tache.getMnFin(), mnFinJour)) - (tache.getJoursSelDeb() < numCol ? mnDebJour : Math.max(tache.getMnDeb() , mnDebJour)))* largCol / mnJour;
+        int larg = ( (tache.getColSelFin()> numCol ? mnFinJour : Math.min(tache.getMnFin(), mnFinJour)) - (tache.getColSelDeb() < numCol ? mnDebJour : Math.max(tache.getMnDeb() , mnDebJour)))* largCol / mnJour;
 //        LOGGER.info("getLargeur( tache.getMnFin()="+tache.getMnFin()+" mnFinJour= "+mnFinJour+" tache.getMnDeb()= "+tache.getMnDeb()+" mnDebJour= "+mnDebJour+" largCol= "+largCol+" mnJour= "+mnJour+" larg= "+larg);
         return larg;
     }

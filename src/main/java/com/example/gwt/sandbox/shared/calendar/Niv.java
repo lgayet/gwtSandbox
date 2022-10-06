@@ -5,23 +5,14 @@ import java.io.Serializable;
 
 public class Niv implements Serializable {
 
-    private int numIntersec;
     private int indice;
     private Tache[]taches = new Tache[1];
-//
-    private transient Intersection intersection;
-
-
-
 
     public Niv() {
     }
 
-    public Niv(Intersection intersection, int numIntersec, int indice, Tache tache) {
-        this.intersection = intersection;
-        this.numIntersec = numIntersec;
+    public Niv(int indice, Tache tache) {
         this.indice = indice;
-        tache.setIntersection(intersection);
         tache.setNiveau(indice);
         taches[0] = tache;
     }
@@ -31,7 +22,7 @@ public class Niv implements Serializable {
         return taches;
     }
 
-    public boolean controleEtAjout(Intersection inter, Tache tache){
+    public boolean controleEtAjout(Tache tache){
         for(Tache t: taches){
             if(tache == t)return true;// j'ai déjà déposé cette tâche, je ne fais rien
         }
@@ -44,14 +35,10 @@ public class Niv implements Serializable {
         for(int i = 0; i < taches.length; i ++){
             t[i] = taches[i];
         }
-        tache.setIntersection(intersection);
         tache.setNiveau(indice);
         t[taches.length] = tache;
         taches = t;
         return true;
-    }
-    public void setIntersection(Intersection intersection){
-        this.intersection = intersection;
     }
 
 }

@@ -44,7 +44,7 @@ public class SelectionBuilder implements Serializable {
 //        cas 2
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,1,7,0,2022,8,3,14,0));
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
-//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,3,16,0,2022,8,3,18,0));
+//        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,4,9,58,2022,8,4,14,0));
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,9,0,2022,8,4,10,0));
 //        cas 3 (permutation première tache)
 //        aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,2,6,10,2022,8,2,8,30));
@@ -57,7 +57,7 @@ public class SelectionBuilder implements Serializable {
         aTaches.add(generationTacheFixe(selection,tSals[1], 2022,8,4,14,0,2022,8,4,16,0));
         for(Salarie sal: tSals){
             for(int i = 0; i < 50; i++) {
-//                aTaches.add(generationTache(selection, sal));
+                aTaches.add(generationTache(selection, sal));
             }
         }
         selection.setTSals(tSals);
