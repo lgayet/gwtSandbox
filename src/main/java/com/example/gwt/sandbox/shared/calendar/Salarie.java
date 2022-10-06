@@ -160,13 +160,11 @@ public class Salarie implements Serializable {
                 }
             }
             LOGGER.info("  application: aInterTempo.size= "+aInterTempo.size());
-            if(aInterTempo.size() >= 1){
-                for(Tache t: taches){
-                    t.removeIntersection();
-                }
-                for(Intersection i: aInterTempo){
-                    LOGGER.info("  boucle application aInterTempo "+i);
-                    if( ! i.isSupprimee()) {
+            for(Tache t: taches)t.removeIntersection();
+            if(aInterTempo.size() >= 1) {
+                for (Intersection i : aInterTempo) {
+                    LOGGER.info("  boucle application aInterTempo " + i);
+                    if (!i.isSupprimee()) {
                         LOGGER.finest("applique " + i);
                         i.setNumIntersec(getNumInter());
                         i.setTypIntersection(TypIntersection.STANDARD);
@@ -175,14 +173,6 @@ public class Salarie implements Serializable {
                     }
                 }
                 aInterTempo.clear();
-            }
-            else{// la tâche n'est plus en intersection
-                LOGGER.info("sortie Intersection pour "+tachMouv );
-                if(taches.length== 2)for(Tache t: taches)t.removeIntersection();
-                else for(Tache t: taches){
-                    if(t.getNumTache() == tachMouv.getNumTache())t.removeIntersection();
-                    else t.restaureIntersect();
-                }
             }
         String s ="fin MovTacheIntersect";
     }
