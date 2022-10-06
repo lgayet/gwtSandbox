@@ -110,10 +110,10 @@ public class Salarie implements Serializable {
                     if (intersect == null) {
                         intersect = ajoutIntersection(t2);
                                 ajoutIntersection(t2);
-                        LOGGER.info("      new  " + intersect + " avec " + t2);
+//                        LOGGER.info("      new  " + intersect + " avec " + t2);
                     }
                     intersect.ajoutTache(t1);
-                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t1);
+//                    LOGGER.info("      ajoutTache  "+intersect+" pour "+t1);
                 }
             }
         }
@@ -129,10 +129,10 @@ public class Salarie implements Serializable {
                     ajout de l'intersection initiale dans arrayMove
                     modif des taches
          */
-        LOGGER.info("mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
+//        LOGGER.info("debut mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
         if(tache.hasIntersection()){
             Intersection interBefore = tache.getIntersection();
-            LOGGER.info("Salarie.mouvTacheIntersect interBefore= "+interBefore);
+//            LOGGER.info("Salarie.mouvTacheIntersect interBefore= "+interBefore);
             Tache[] tachesIntersect = interBefore.getTaches();
             for(Tache t: tachesIntersect)t.sauvIntersect();
             Intersection intersect = null;
@@ -141,22 +141,22 @@ public class Salarie implements Serializable {
                     if(t1.getNumTache() != t2.getNumTache()){
                         if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
                             if(t1.hasIntersection() && t2.hasIntersection() && (int)t1.getNumIntersection() != (int)t2.getNumIntersection()){
-                                LOGGER.info("fusion I "+t1.getNumIntersection()+" <== I "+t2.getNumIntersection()+" sur "+t1.getIntersection()+" de "+t2.getIntersection());
+//                                LOGGER.info("fusion I "+t1.getNumIntersection()+" <== I "+t2.getNumIntersection()+" sur "+t1.getIntersection()+" de "+t2.getIntersection());
                                 t1.getIntersection().fusionne(t2.getIntersection().getTaches());
-                                LOGGER.info(" apres fusion");
+//                                LOGGER.info(" apres fusion");
                                 t2.getIntersection().setSupprimee();
                             }
                             else {
-                                Integer numIntersection = t1.hasIntersection() ? t1.getNumIntersection() : t2.hasIntersection() ? t2.getNumIntersection() : null;
-                                LOGGER.info("boucle t1="+t1+" t2= "+t2);
+                                Integer numIntersection = t1.hasIntersection() ? t1.getNumIntersection() : (t2.hasIntersection() ? t2.getNumIntersection() : null);
+//                                LOGGER.info("boucle t1="+t1+" t2= "+t2);
                                 if (numIntersection == null) {
                                     intersect = ajoutIntersectionTemporaire(t2);
-                                    LOGGER.info(" new Intersection= " + intersect + " " + t2);
+//                                    LOGGER.info(" new Intersection= " + intersect + " " + t2);
                                 } else {
                                     intersect = getIntersectionTempo(numIntersection);
                                 }
                                 intersect.ajoutTache(t1);
-                                LOGGER.info("ajoutTache  Intersection= " + intersect + " " + t1);
+//                                LOGGER.info("ajoutTache  Intersection= " + intersect + " " + t1);
                             }
                         }
                     }
@@ -177,7 +177,7 @@ public class Salarie implements Serializable {
                 }
                 for(Intersection i: aInterTempo){
                     if( ! i.isSupprimee()) {
-                        LOGGER.finest("applique " + i);
+//                        LOGGER.finest("applique " + i);
                         i.setNumIntersec(getNumInter());
                         i.setTypIntersection(TypIntersection.STANDARD);
                         i.appliqueTaches();
@@ -188,7 +188,7 @@ public class Salarie implements Serializable {
                 aInterTempo.clear();
             }
             else{// la tâche n'est plus en intersection
-                LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );
+//                LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );
                 if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
                 else for(Tache t: tachesIntersect){
                     if(t.getNumTache() == tache.getNumTache())t.removeIntersection();
@@ -196,7 +196,7 @@ public class Salarie implements Serializable {
                 }
             }
         }
-        String s ="finMovTache";
+//        String s ="fin MovTacheIntersect";
     }
 
     public int getNumInter(){

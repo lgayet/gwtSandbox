@@ -49,13 +49,13 @@ public class MoveContext  {
                 TODO: les calculs de décalage se font en minutes
                       joursSelDeb et fin correspondent aux indices du tableau tCols
              */
-            LOGGER.info("MC.move "+tache);
+//            LOGGER.info("MC.move "+tache);
             int precedColSelDeb = tache.getColSelDeb();
             int precedColSelFin = tache.getColSelFin();
             int decalMn = (int)((x -xRef) * MINUTES_PER_DAY / largCol);
             tache.addDecalageMinutes(decalMn);
             salarie.mouvTacheIntersect(tache);// pour gérer l'impact au sein de l'intersection (déplacements internes)
-            LOGGER.info("MC.move jourSelDeb= "+tache.getColSelDeb()+" jourSelFin= "+tache.getColSelFin()+" precedJourSelDeb= "+precedColSelDeb+" precedJourSelFin= "+precedColSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
+//            LOGGER.info("MC.move jourSelDeb= "+tache.getColSelDeb()+" jourSelFin= "+tache.getColSelFin()+" precedJourSelDeb= "+precedColSelDeb+" precedJourSelFin= "+precedColSelFin+" pour numTache="+tache.getNumTache()+" iter= "+iter+"\n      "+tache);
             minCol = tache.hasIntersection() ? Math.max(indicePremiereColonne, Math.min(precedColSelDeb, tache.getIntersection().getNumJourMin())) : precedColSelDeb;
             maxCol = tache.hasIntersection() ? Math.min(indicePremiereColonne + nbJoursAffiches -1, Math.max(precedColSelFin, tache.getIntersection().getNumJourMax())) : precedColSelFin;
             salarie.mouvTacheSalCol(tache, precedColSelDeb, precedColSelFin);

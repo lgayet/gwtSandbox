@@ -39,6 +39,7 @@ public class GSalCol  {
     }
 
     public void supprimeTacheCol(Tache tache){
+//        LOGGER.info("GSalCol.supprimeTacheCol "+tache);
         tacheASupprimer = getTacheCol(tache.getNumTache());
         for(GTacheCol t: tacheCols)if(t!= null)t.remove();
         salCol.supprimeTache(tache);

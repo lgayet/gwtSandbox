@@ -47,7 +47,7 @@ public class GTacheCol implements Positionable {
         mnDebJour = (int)(heureDebJour * 60);
         mnFinJour = (int)(heureFinJour * 60);
         mnJour = mnFinJour-mnDebJour;
-        LOGGER.info("GTacheCol.new  numCol = "+numCol+" "+tache);
+//        if(tache.isMove())LOGGER.info("GTacheCol.new  numCol = "+numCol+" "+tache);
         construit(indicePremiereCol, nbJoursAffiches);
     }
 

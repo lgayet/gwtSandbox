@@ -91,7 +91,7 @@ public class GCalendar {
             if(MOVE_CONTEXT.isBusy()) {
                 MOVE_CONTEXT.move(event.getClientX(), event.getClientY());
 //            affiche(choixAffichage);
-                LOGGER.info("MouseMoveHandler ==> afficheSalCol "+MOVE_CONTEXT.getSalarie()+" "+MOVE_CONTEXT.getPremColAff()+" <==> "+MOVE_CONTEXT.getDernColAff());
+//                LOGGER.info("MouseMoveHandler ==> afficheSalCol "+MOVE_CONTEXT.getSalarie()+" "+MOVE_CONTEXT.getPremColAff()+" <==> "+MOVE_CONTEXT.getDernColAff());
                 afficheSalCol(MOVE_CONTEXT.getSalarie(), MOVE_CONTEXT.getPremColAff(), MOVE_CONTEXT.getDernColAff());
             }
         });
@@ -124,7 +124,6 @@ public class GCalendar {
     }
 
     public void actionChoixAffichage(ChoixAffichage choixAffichage){
-        System.out.println("coucou setChoixAffichage avec "+choixAffichage);
         if( choixAffichage != this.choixAffichage) {
             boutPlus.setValid(true);
             boutMoins.setValid(true);
@@ -259,11 +258,16 @@ public class GCalendar {
     }
 
     private void afficheSalCol(GSalarie salarie, int premCol, int dernCol){
+//        LOGGER.info("GC.afficheSalCol premCol= "+premCol+" dernCol= "+dernCol);
         Colonne c;
         for(int i = premCol; i <= dernCol; i++) {
             c = tCols[i];
             GSalCol g = salarie.getGSalCols()[i];
-            if(g.getTacheASupprimer() != null)g.getTacheASupprimer().remove();//tache du move
+            if(g.getTacheASupprimer() != null)
+            {
+//                LOGGER.info("GC.afficheSalCol supprime "+g.getTacheASupprimer());
+                g.getTacheASupprimer().remove();//tache du move
+            }
             for (GTacheCol t : g.getTacheCols()) {
                 if(t != null) {
                     t.remove();

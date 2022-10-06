@@ -49,31 +49,22 @@ public class GSalarie  {
 
     public void mouvTacheSalCol(Tache tache, int precedColSelDeb, int precedColSelFin){
         GSalCol g;
-        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getColSelDeb()+" tache.joursSelFin= "+tache.getColSelFin()+" precedJoursSelDeb= "+precedColSelDeb+" precedJoursSelFin= "+precedColSelFin);
+//        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getColSelDeb()+" tache.joursSelFin= "+tache.getColSelFin()+" precedJoursSelDeb= "+precedColSelDeb+" precedJoursSelFin= "+precedColSelFin);
         for(int i = Math.min(tache.getColSelDeb(), precedColSelDeb); i<= Math.max(tache.getColSelFin(), precedColSelFin); i++){
 //            pour chaque iteration, je vérifie la presence précédante et pour la tache
             if(containsPrecedEtNonTache(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
 //                 je dois donc supprimer de SalCol et GSalCol
                 g = salCols[i];
-                LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
+//                LOGGER.info("   commenté: GSalarie.supprimeTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.supprimeTacheCol(tache);// je ne la supprime pas en tant que GTacheCol, je ne veux implement plus créer de Rectangle
             }
             if(containsTacheEtNonPreced(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
                 g = salCols[i];
-                LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
+//                LOGGER.info("GSalarie.ajoutTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
                 g.ajoutTacheCol(salarie, tache,"mouvTacheSalCol" );
-            }
-            if(containsTacheEtPreced(i, tache.getColSelDeb(), tache.getColSelFin(), precedColSelDeb, precedColSelFin)){
-                g = salCols[i];
-                LOGGER.info("GSalarie.mouvTacheCol numCol= "+i+" tache= "+tache.getNumTache()+"\n     "+tache+"\n     "+g.getSalCol().getStringTaches());
-//                g.mouvTacheCol(salarie);
             }
         }
 
-    }
-    private boolean containsTacheEtPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
-        if(i >= tacheJD && i <= tachejF && i >= precedJD && i <= precedJF)return true;
-        return false;
     }
     private boolean containsTacheEtNonPreced(int i,int tacheJD, int tachejF, int precedJD, int precedJF){
         if(i >= tacheJD && i <= tachejF && (i < precedJD || i > precedJF))return true;
