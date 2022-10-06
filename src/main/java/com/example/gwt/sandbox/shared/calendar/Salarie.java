@@ -129,61 +129,72 @@ public class Salarie implements Serializable {
                     ajout de l'intersection initiale dans arrayMove
                     modif des taches
          */
-//        LOGGER.info("debut mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
+        LOGGER.info("debut mouvTacheIntersect "+getStringTaches(taches)+" tachMouv= "+tachMouv+"\n   aInterTempo.size= "+aInterTempo.size());
 
             for(Tache t: taches)t.sauvIntersect();
             Intersection intersect = null;
             for(Tache t1: taches){
                 for(Tache t2: taches){
                     if(t1.getNumTache() != t2.getNumTache()){
+//                        LOGGER.info("boucle t1="+t1+" t2= "+t2);
                         if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
                             if(t1.hasIntersection() && t2.hasIntersection() && (int)t1.getNumIntersection() != (int)t2.getNumIntersection()){
-//                                LOGGER.info("fusion I "+t1.getNumIntersection()+" <== I "+t2.getNumIntersection()+" sur "+t1.getIntersection()+" de "+t2.getIntersection());
+                                LOGGER.info("fusion I "+t1.getNumIntersection()+" <== I "+t2.getNumIntersection()+" sur "+t1.getIntersection()+" de "+t2.getIntersection());
                                 t1.getIntersection().fusionne(t2.getIntersection().getTaches());
-//                                LOGGER.info(" apres fusion");
+                                LOGGER.info(" apres fusion");
                                 t2.getIntersection().setSupprimee();
                             }
                             else {
                                 Integer numIntersection = t1.hasIntersection() ? t1.getNumIntersection() : (t2.hasIntersection() ? t2.getNumIntersection() : null);
-//                                LOGGER.info("boucle t1="+t1+" t2= "+t2);
                                 if (numIntersection == null) {
                                     intersect = ajoutIntersectionTemporaire(t2);
-//                                    LOGGER.info(" new Intersection= " + intersect + " " + t2);
+                                    LOGGER.info(" new Intersection= " + intersect + " " + t2);
                                 } else {
                                     intersect = getIntersectionTempo(numIntersection);
                                 }
                                 intersect.ajoutTache(t1);
-//                                LOGGER.info("ajoutTache  Intersection= " + intersect + " " + t1);
+                                LOGGER.info("ajoutTache  Intersection= " + intersect + " " + t1);
                             }
                         }
                     }
                 }
             }
+            LOGGER.info("  application: aInterTempo.size= "+aInterTempo.size());
             if(aInterTempo.size() >= 1){
                 for(Tache t: taches){
                     t.removeIntersection();
                 }
                 for(Intersection i: aInterTempo){
+                    LOGGER.info("  boucle application aInterTempo "+i);
                     if( ! i.isSupprimee()) {
-//                        LOGGER.finest("applique " + i);
+                        LOGGER.finest("applique " + i);
                         i.setNumIntersec(getNumInter());
                         i.setTypIntersection(TypIntersection.STANDARD);
                         i.appliqueTaches();
-                        aInterTempo.remove(i);
                         getAInter().add(i);
                     }
                 }
                 aInterTempo.clear();
             }
             else{// la tâche n'est plus en intersection
-//                LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );
+                LOGGER.info("sortie Intersection pour "+tachMouv );
                 if(taches.length== 2)for(Tache t: taches)t.removeIntersection();
                 else for(Tache t: taches){
                     if(t.getNumTache() == tachMouv.getNumTache())t.removeIntersection();
                     else t.restaureIntersect();
                 }
             }
-//        String s ="fin MovTacheIntersect";
+        String s ="fin MovTacheIntersect";
+    }
+
+    private String getStringTaches(Tache[]taches){
+        String s ="\n     [";
+        String sep ="";
+        for(Tache t: taches){
+            s= s+sep+t;
+            sep="\n      ";
+        }
+        return s+"]";
     }
 
     public int getNumInter(){

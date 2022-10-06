@@ -144,6 +144,6 @@ public class Intersection implements Serializable {
     }
 
     public String toString(){
-        return "Intersection "+typIntersection+" "+anumIntersec+getStringTaches();
+        return "Intersection "+typIntersection+" "+(supprimee ? " supprimée ": "")+anumIntersec+getStringTaches();
     }
 }
