@@ -91,14 +91,14 @@ public class Salarie implements Serializable {
             reorganise(salCols[i].getTaches());
         }
     }
-    public void mouvTaches(int colMin, int colMax){
+    public void mouvTaches(int colMin, int colMax, Tache tache){
         List<Tache> a = new ArrayList<>();
         for(int i = colMin; i<= colMax; i++){
             for(Tache t: salCols[i].getTaches()){
                 if( ! a.contains(t))a.add(t);
             }
         }
-        reorganise(a.toArray(new Tache[a.size()]));
+        mouvTacheIntersect(a.toArray(new Tache[a.size()]) , tache);
     }
     public void reorganise(Tache[] taches){
         Intersection intersect = null;
@@ -119,7 +119,7 @@ public class Salarie implements Serializable {
         }
     }
 
-    public void mouvTacheIntersect(Tache tache){
+    public void mouvTacheIntersect(Tache[] taches, Tache tachMouv){
         /*
             Cette methode gère l'impact d'un déplacement de tache avec intersection dans son intersection
             MouvTache devrait créer une intersectionProvisoire sans impact sur les tâches(NumIntersection et niv) et retourner cette intersection
@@ -130,14 +130,11 @@ public class Salarie implements Serializable {
                     modif des taches
          */
 //        LOGGER.info("debut mouvTacheIntersect "+tache.getNumTache()+" pour "+tache);
-        if(tache.hasIntersection()){
-            Intersection interBefore = tache.getIntersection();
-//            LOGGER.info("Salarie.mouvTacheIntersect interBefore= "+interBefore);
-            Tache[] tachesIntersect = interBefore.getTaches();
-            for(Tache t: tachesIntersect)t.sauvIntersect();
+
+            for(Tache t: taches)t.sauvIntersect();
             Intersection intersect = null;
-            for(Tache t1: tachesIntersect){
-                for(Tache t2: tachesIntersect){
+            for(Tache t1: taches){
+                for(Tache t2: taches){
                     if(t1.getNumTache() != t2.getNumTache()){
                         if(t1.getMnSelDeb() < t2.getMnSelFin() && t1.getMnSelFin() > t2.getMnSelDeb()){
                             if(t1.hasIntersection() && t2.hasIntersection() && (int)t1.getNumIntersection() != (int)t2.getNumIntersection()){
@@ -162,17 +159,8 @@ public class Salarie implements Serializable {
                     }
                 }
             }
-//            TODO je fais une boucle complémentaire pour fusionner les intersections
-            for(Intersection i1: aInterTempo){
-                for(Intersection i2: aInterTempo){
-                    if( ! i1.isSupprimee()  && ! i2.isSupprimee() && i1.getTacheMin().getMnSelDeb() < i2.getTacheMax().getMnSelFin() && i1.getTacheMax().getMnSelFin() > i2.getTacheMin().getMnSelDeb()){
-//                        i1.fusionne(i2.getTaches());
-//                        i2.setSupprimee();
-                    }
-                }
-            }
             if(aInterTempo.size() >= 1){
-                for(Tache t: tachesIntersect){
+                for(Tache t: taches){
                     t.removeIntersection();
                 }
                 for(Intersection i: aInterTempo){
@@ -189,13 +177,12 @@ public class Salarie implements Serializable {
             }
             else{// la tâche n'est plus en intersection
 //                LOGGER.info("sortie Intersection pour "+tache+"\n         interBefor= "+interBefore );
-                if(tachesIntersect.length== 2)for(Tache t: tachesIntersect)t.removeIntersection();
-                else for(Tache t: tachesIntersect){
-                    if(t.getNumTache() == tache.getNumTache())t.removeIntersection();
+                if(taches.length== 2)for(Tache t: taches)t.removeIntersection();
+                else for(Tache t: taches){
+                    if(t.getNumTache() == tachMouv.getNumTache())t.removeIntersection();
                     else t.restaureIntersect();
                 }
             }
-        }
 //        String s ="fin MovTacheIntersect";
     }
 

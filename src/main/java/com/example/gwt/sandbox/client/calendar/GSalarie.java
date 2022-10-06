@@ -43,8 +43,8 @@ public class GSalarie  {
         return salarie.getIntersection(numInter);
     }
 
-    public void mouvTaches(int colMin, int colMax){
-        salarie.mouvTaches(colMin, colMax);
+    public void mouvTaches(int colMin, int colMax, Tache tache){
+        salarie.mouvTaches(colMin, colMax, tache);
     }
 
     public void mouvTacheSalCol(Tache tache, int precedColSelDeb, int precedColSelFin){
@@ -75,10 +75,6 @@ public class GSalarie  {
         return false;
     }
 
-
-    public void mouvTacheIntersect(Tache tache){
-        salarie.mouvTacheIntersect(tache);
-    }
 
     public int getPositionY() {
         return positionY;

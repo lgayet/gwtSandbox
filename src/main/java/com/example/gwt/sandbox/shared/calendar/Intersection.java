@@ -1,6 +1,8 @@
 package com.example.gwt.sandbox.shared.calendar;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Intersection implements Serializable {
     private int numSalarie;
@@ -8,6 +10,7 @@ public class Intersection implements Serializable {
     private TypIntersection typIntersection;
     private Niv[] nivs = new Niv[1];
     private boolean supprimee;
+    private List<Tache>tachesOrdonnees = new ArrayList<>();
 
     public Intersection() {
     }
@@ -18,6 +21,7 @@ public class Intersection implements Serializable {
         this.typIntersection = typIntersection;
         nivs[0] = new Niv(0, tache);
         tache.setIntersection(this);
+        tachesOrdonnees.add(tache);
     }
 
     public int getNumIntersec() {
@@ -46,6 +50,7 @@ public class Intersection implements Serializable {
             if(n.controleEtAjout(tache))return;
         }
         ajoutNiv(tache);
+        tachesOrdonnees.add(tache);
     }
 
     public void appliqueTaches(){
@@ -57,6 +62,9 @@ public class Intersection implements Serializable {
             }
             i++;
         }
+    }
+    public Tache[] getTachesOrdonnees(){
+        return tachesOrdonnees.toArray(new Tache[tachesOrdonnees.size()]);
     }
 
     public Tache[] getTaches(){
