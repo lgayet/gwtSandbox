@@ -19,7 +19,7 @@ public class Intersection implements Serializable {
         this.numSalarie = numSalarie;
         this.anumIntersec = numIntersec;
         this.typIntersection = typIntersection;
-        nivs[0] = new Niv(0, tache);
+        nivs[0] = new Niv(this, 0, tache);
         tache.setIntersection(this);
         tachesOrdonnees.add(tache);
     }
@@ -130,7 +130,7 @@ public class Intersection implements Serializable {
         for(int i = 0; i < nivs.length; i ++){
             t[i] = nivs[i];
         }
-        Niv n = new Niv(nivs.length, tache);
+        Niv n = new Niv(this, nivs.length, tache);
         t[nivs.length] = n;
         nivs = t;
     }

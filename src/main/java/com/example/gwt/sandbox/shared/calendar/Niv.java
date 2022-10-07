@@ -5,13 +5,15 @@ import java.io.Serializable;
 
 public class Niv implements Serializable {
 
+    private Intersection intersection;
     private int indice;
     private Tache[]taches = new Tache[1];
 
     public Niv() {
     }
 
-    public Niv(int indice, Tache tache) {
+    public Niv(Intersection intersection, int indice, Tache tache) {
+        this.intersection = intersection;
         this.indice = indice;
         tache.setNiveau(indice);
         taches[0] = tache;
@@ -36,6 +38,7 @@ public class Niv implements Serializable {
             t[i] = taches[i];
         }
         tache.setNiveau(indice);
+        tache.setIntersection(intersection);
         t[taches.length] = tache;
         taches = t;
         return true;
