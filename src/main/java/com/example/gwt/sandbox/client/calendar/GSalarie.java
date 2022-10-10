@@ -43,11 +43,11 @@ public class GSalarie  {
         return salarie.getIntersection(numInter);
     }
 
-    public void mouvTaches(int colMin, int colMax, Tache tache){
-        salarie.mouvTaches(colMin, colMax, tache);
+    public void majIntersections(int colMin, int colMax, Tache tache){
+        salarie.majIntersections(colMin, colMax, tache);
     }
 
-    public void mouvTacheSalCol(Tache tache, int precedColSelDeb, int precedColSelFin){
+    public void majSalCol(Tache tache, int precedColSelDeb, int precedColSelFin){
         GSalCol g;
 //        LOGGER.info("GSalarie.mouvTacheSalCol tache.joursSelDeb= "+tache.getColSelDeb()+" tache.joursSelFin= "+tache.getColSelFin()+" precedJoursSelDeb= "+precedColSelDeb+" precedJoursSelFin= "+precedColSelFin);
         for(int i = Math.min(tache.getColSelDeb(), precedColSelDeb); i<= Math.max(tache.getColSelFin(), precedColSelFin); i++){

@@ -91,15 +91,6 @@ public class Salarie implements Serializable {
             reorganise(salCols[i].getTaches());
         }
     }
-    public void mouvTaches(int colMin, int colMax, Tache tache){
-        List<Tache> a = new ArrayList<>();
-        for(int i = colMin; i<= colMax; i++){
-            for(Tache t: salCols[i].getTaches()){
-                if( ! a.contains(t))a.add(t);
-            }
-        }
-        mouvTacheIntersect(a.toArray(new Tache[a.size()]) , tache);
-    }
     public void reorganise(Tache[] taches){
         Intersection intersect = null;
         for(Tache t1: taches){
@@ -119,9 +110,20 @@ public class Salarie implements Serializable {
         }
     }
 
-    public void mouvTacheIntersect(Tache[] taches, Tache tachMouv){
+    public void majIntersections(int colMin, int colMax, Tache tache){
+        List<Tache> a = new ArrayList<>();
+        for(int i = colMin; i<= colMax; i++){
+            for(Tache t: salCols[i].getTaches()){
+                if( ! a.contains(t))a.add(t);
+            }
+        }
+        majIntersectionsSuite(a.toArray(new Tache[a.size()]) , tache);
+    }
+
+    public void majIntersectionsSuite(Tache[] taches, Tache tachMouv){
         /*
-            Cette methode gère l'impact d'un déplacement de tache avec intersection dans son intersection
+            Cette methode gère l'impact d'un déplacement de tac
+            he avec intersection dans son intersection
             MouvTache devrait créer une intersectionProvisoire sans impact sur les tâches(NumIntersection et niv) et retourner cette intersection
             c'est seulement si cette intersection est différente de l'intersection initiale qu'on procèdera à la prise en compte:
                     copy et ajout de l'intersection dans salarie
@@ -164,7 +166,7 @@ public class Salarie implements Serializable {
             if(aInterTempo.size() >= 1) {
                 for (Intersection i : aInterTempo) {
                     LOGGER.info("  boucle application aInterTempo " + i);
-                    if (!i.isSupprimee()) {
+                    if ( ! i.isSupprimee()) {
                         LOGGER.finest("applique " + i);
                         i.setNumIntersec(getNumInter());
                         i.setTypIntersection(TypIntersection.STANDARD);

@@ -189,6 +189,7 @@ public class GCalendar {
             nbJoursAffiches = 1;
             Colonne c = tCols[indicePremiereCol];
             c.setPositionX(LARGEUR_ENTETE_SALARIES);
+            tCols[indicePremiereCol + 1].setPositionX(LARGEUR_PANEL);
             labelCentre = ajoutLabel((LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES) / 2 + LARGEUR_ENTETE_SALARIES - 100,30,tJoursLong[c.getNumJourSem()]+" "+c.getNumJourMois()+" "+tMoisLong[c.getNumMois()]+" "+c.getAnnee(), 20, 1.0);
             largCol = LARGEUR_PANEL - LARGEUR_ENTETE_SALARIES;
             double largeurHoraire = largCol / PLAGE_HORARAIRE;
