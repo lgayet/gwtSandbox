@@ -1,5 +1,6 @@
 package com.example.gwt.sandbox.client.calendar;
 
+import com.example.gwt.sandbox.client.calendar.custom.TextArialPlein;
 import org.vaadin.gwtgraphics.client.DrawingArea;
 import org.vaadin.gwtgraphics.client.shape.Rectangle;
 import org.vaadin.gwtgraphics.client.shape.Text;
@@ -24,8 +25,8 @@ public class GButtonPlusMoins {
             onClick();
         });
         canvas.add(rectangle);
-        text = new Text(x+10, y+20, label);
-        text.setPropertyDouble("fontsize",14.0D);
+        text = new TextArialPlein(x+10, y+20, label);
+        text.setFontSize(14);
         text.addClickHandler(event -> {
             onClick();
         });

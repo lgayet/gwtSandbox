@@ -1,5 +1,6 @@
 package com.example.gwt.sandbox.client.calendar;
 
+import com.example.gwt.sandbox.client.calendar.custom.TextArialPlein;
 import com.example.gwt.sandbox.shared.calendar.Intersection;
 import com.example.gwt.sandbox.shared.calendar.Tache;
 import org.vaadin.gwtgraphics.client.DrawingArea;
@@ -68,7 +69,7 @@ public class GTacheCol implements Positionable {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());
                 });
                 canvas.add(rectangle);
-                text = new Text(x + w / 2 -10, y + h / 2, tache.getText());//le label contiendra les informations tâche à afficher
+                text = new TextArialPlein(x + w / 2 -10, y + h / 2, tache.getText());//le label contiendra les informations tâche à afficher
                 text.setFontSize(12);
                 text.addMouseDownHandler(event -> {
                     MOVE_CONTEXT.start(salarie, tache, numCol, largCol, indicePremiereCol, nbJoursAffiches, event.getClientX(), event.getClientY());

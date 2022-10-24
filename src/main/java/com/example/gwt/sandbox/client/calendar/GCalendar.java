@@ -1,6 +1,8 @@
 package com.example.gwt.sandbox.client.calendar;
 
 import com.example.gwt.sandbox.client.calendar.GButtonChoixAffichage.ChoixAffichage;
+import com.example.gwt.sandbox.client.calendar.custom.DrawingAreaCrispEdges;
+import com.example.gwt.sandbox.client.calendar.custom.TextArialPlein;
 import com.example.gwt.sandbox.shared.calendar.*;
 import com.google.gwt.user.client.ui.Widget;
 import org.vaadin.gwtgraphics.client.DrawingArea;
@@ -27,7 +29,7 @@ public class GCalendar {
     private final int HAUTEUR_PANEL = 600;
     private final int HAUTEUR_ENTETES_COLONNES = 50;
     private final int LARGEUR_ENTETE_SALARIES = LARGEUR_PANEL / 8;
-    private final DrawingArea canvas = new DrawingArea(LARGEUR_PANEL, HAUTEUR_PANEL);
+    private final DrawingArea canvas = new DrawingAreaCrispEdges(LARGEUR_PANEL, HAUTEUR_PANEL);
     private final double OPACITY = 0.3D;
     private ChoixAffichage choixAffichage;
     //  Informations pour affichage des dates
@@ -332,7 +334,7 @@ public class GCalendar {
     }
 
     private Text ajoutLabel(int x, int y, String text, int size, double opacity){
-        Text t = new Text(x,y,text);
+        Text t = new TextArialPlein(x,y,text);
         t.setFontSize(size);
         t.setStrokeOpacity(opacity);
         canvas.add(t);
